@@ -8,7 +8,9 @@
     "build": "esbuild src/index.js --bundle --platform=node --outfile=dist/index.cjs --minify",
     "start": "node --env-file=.env dist/index.cjs",
     "dev": "node --watch --env-file=.env src/index.js",
-    "lint": "eslint . --fix"
+    "lint": "node config/pre-build.js --ignore-build --fix",
+    "prettier:check": "prettier -c .",
+    "prettier:write": "prettier -w ."
   },
   "keywords": [
     "rolling",
@@ -17,8 +19,12 @@
   "author": "Ezequiel Amin",
   "license": "ISC",
   "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-angular": "^18.4.3",
     "esbuild": "^0.19.9",
-    "eslint-config-airbnb-base": "^15.0.0"
+    "eslint-config-airbnb-base": "^15.0.0",
+    "gradient-string": "^2.0.2",
+    "husky": "^8.0.3"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

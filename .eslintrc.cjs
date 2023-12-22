@@ -12,5 +12,5 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'no-console': 'off',
   },
-  ignorePatterns: ['**/node_modules/**', '**/dist/**'],
+  ignorePatterns: ['node_modules', 'dist', 'config'],
 };

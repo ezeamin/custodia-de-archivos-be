@@ -46,7 +46,7 @@ Es necesario tener Node.js 20.6+ instalado en la PC, y una cuenta de MongoDB par
 
 La tabla a continuación detalla los endpoints de cada servicio disponible:
 
-#### Usuarios: 
+#### Usuarios:
 
 Ruta principal: `/api/v1/users`
 | Método | Endpoint | Protegido | Debe ser Admin | Descripción | Body |
