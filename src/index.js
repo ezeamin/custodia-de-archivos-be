@@ -2,9 +2,6 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 
-// DB connection establishment
-import './database/database.js';
-
 import routerProducts from './routes/productsRoutes.js';
 import routerAuth from './routes/authRoutes.js';
 import routerUsers from './routes/userRoutes.js';
