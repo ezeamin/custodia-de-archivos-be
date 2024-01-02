@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import HttpStatus from 'http-status-codes';
+import { envs } from '../helpers/envs';
 
-const secretKey = process.env.JWT_SECRET_KEY;
+const secretKey = envs.JWT_SECRET_KEY;
 
 const isAuthenticated = (req, res, next) => {
   const { headers } = req;
