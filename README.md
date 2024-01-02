@@ -4,15 +4,17 @@ Descripción corta del proyecto.
 
 ## Requisitos
 
-Es necesario tener Node.js 20.6+ instalado en la PC, y una cuenta de MongoDB para conectar con una DB propia, hosteada o local.
+> [!NOTE]
+> Es necesario tener Node.js 20.6+ instalado en la PC, y ya creada una instancia en la nube de una base de datos en PostgreSQL. La conexión se hace por medio de Prisma y un URI ubicado en el archivo `.env`.
 
 - [Node.js](https://nodejs.org/en/) -> Importante: Debe ser 20.6+ para que funcione el archivo `.env`
-- [MongoDB](https://www.mongodb.com/)
+- [pnpm](https://pnpm.io/es/) -> Para el manejo de dependencias
+  - Para instalarlo, correr el comando `npm i -g pnpm`
 
 ## Instalación
 
 1. Clonar este repositorio.
-2. Ejecutar `npm install` para instalar las dependencias.
+2. Ejecutar `pnpm i` para instalar las dependencias.
 
 ## Configuración
 
@@ -25,13 +27,13 @@ Es necesario tener Node.js 20.6+ instalado en la PC, y una cuenta de MongoDB par
   Para iniciar el servidor, ejecutar:
 
   ```bash
-  npm run build
+  pnpm build
   ```
 
   y con la build ya realizada, ejecutar:
 
   ```bash
-  npm start
+  pnpm start
   ```
 
 - Opcion 2: Modo desarrollo
@@ -39,7 +41,7 @@ Es necesario tener Node.js 20.6+ instalado en la PC, y una cuenta de MongoDB par
   Sino, puede correrse en modo desarrollo utilizando:
 
   ```bash
-  npm run dev
+  pnpm dev
   ```
 
 ## Documentación de API
@@ -78,3 +80,4 @@ Ruta principal: `/api/v1/products`
 ## Equipo
 
 - [Ezequiel Amin](https://github.com/ezeamin)
+- [Valentina Ormaechea](https://github.com/valeormaechea)
