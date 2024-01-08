@@ -35,6 +35,8 @@ routerUsers.get(
 // POST -----------
 routerUsers.post(
   '/',
+  isAuthenticated,
+  isAdmin,
   (req, res, next) => validateBody(req, res, next, post_userSchema),
   postUser,
 );
@@ -52,6 +54,7 @@ routerUsers.put(
 routerUsers.delete(
   '/:id',
   isAuthenticated,
+  isAdmin,
   (req, res, next) => validateParams(req, res, next, delete_params_userSchema),
   deleteUser,
 );

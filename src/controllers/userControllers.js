@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import HttpStatus from 'http-status-codes';
 
 import UsersModel from '../models/UserSchema.js';
+import { roles } from '../constants/roles.js';
 
 // ----------------------------
 // GET
@@ -46,7 +47,7 @@ export const getUser = async (req, res) => {
   if (id !== user._id && !user.isAdmin) {
     res.status(HttpStatus.FORBIDDEN).json({
       data: null,
-      message: 'No tienes permisos para realizar esta acción',
+      message: 'No tiene permisos para realizar esta acción',
     });
     return;
   }
@@ -95,12 +96,10 @@ export const postUser = async (req, res) => {
   const cryptedPassword = bcrypt.hashSync(body.password.trim(), 10);
 
   const newUser = new UsersModel({
-    firstname: body.firstname.trim(),
-    lastname: body.lastname.trim(),
     username: body.username.trim(),
     password: cryptedPassword,
     isActive: true,
-    isAdmin: false,
+    role: body.role,
   });
 
   try {
@@ -116,7 +115,7 @@ export const postUser = async (req, res) => {
     if (err.message.includes('duplicate')) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
-        message: `El usuario con username "${body.username}" ya existe`,
+        message: `El usuario con nombre de usuario "${body.username}" ya existe`,
       });
       return;
     }
@@ -145,17 +144,16 @@ export const putUser = async (req, res) => {
   if (id !== user._id && !user.isAdmin) {
     res.status(HttpStatus.FORBIDDEN).json({
       data: null,
-      message: 'No tienes permisos para realizar esta acción',
+      message: 'No tiene permisos para realizar esta acción',
     });
     return;
   }
 
-  // A not admin user can't set itself as one (or try to modify that value)
-  if (!user.isAdmin && 'isAdmin' in body) {
+  // A not admin user can't change its role
+  if (!user.role !== roles.ADMIN && 'role' in body) {
     res.status(HttpStatus.FORBIDDEN).json({
       data: null,
-      message:
-        'No tienes permisos para configurar los usuarios administradores',
+      message: 'No tiene permisos para configurar su rol en la plataforma',
     });
     return;
   }
@@ -191,7 +189,7 @@ export const putUser = async (req, res) => {
     if (err.message.includes('duplicate')) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
-        message: `El usuario con username "${body.username}" ya existe`,
+        message: `El usuario con nombre de usuario "${body.username}" ya existe`,
       });
       return;
     }
@@ -216,11 +214,11 @@ export const deleteUser = async (req, res) => {
     user,
   } = req;
 
-  // You can only delete your own profile or, if you are admin, all
-  if (id !== user._id && !user.isAdmin) {
+  // Only admin can delete users
+  if (user.role !== roles.ADMIN) {
     res.status(HttpStatus.FORBIDDEN).json({
       data: null,
-      message: 'No tienes permisos para realizar esta acción',
+      message: 'No tiene permisos para realizar esta acción',
     });
     return;
   }

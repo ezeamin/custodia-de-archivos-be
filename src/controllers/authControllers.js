@@ -3,6 +3,10 @@ import bcrypt from 'bcryptjs';
 import HttpStatus from 'http-status-codes';
 
 import UsersModel from '../models/UserSchema.js';
+import { envs } from '../helpers/envs.js';
+
+import nodemailer from 'nodemailer';
+import { recoverMailOptions } from '../helpers/recoverMail.js';
 
 const { JWT_SECRET_KEY } = process.env;
 
@@ -44,7 +48,8 @@ export const postLogin = async (req, res) => {
         firstname: userInDB._doc.firstname,
         lastname: userInDB._doc.lastname,
         username: userInDB._doc.username,
-        isAdmin: userInDB._doc.isAdmin,
+        email: userInDB._doc.email,
+        role: userInDB._doc.role,
       },
     };
 
@@ -57,6 +62,91 @@ export const postLogin = async (req, res) => {
     res.json({
       data: token,
       message: 'Login exitoso',
+    });
+  } catch (err) {
+    console.error('🟥', err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      errors: {
+        data: null,
+        message: `ERROR: ${err}`,
+      },
+    });
+  }
+};
+
+export const postRecoverPassword = async (req, res) => {
+  const {
+    body: { username },
+  } = req;
+
+  try {
+    // 1- (Try to) Search user in DB
+    const userInDB = await UsersModel.findOne({
+      //! Change to EmployeesModel
+      username: username.trim(),
+      isActive: true,
+    });
+
+    // 2- Validate credentials
+    // Cases:
+    // a. incorrect username (no user found)
+    if (!userInDB) {
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        data: null,
+        message: 'Usuario no encontrado',
+      });
+      return;
+    }
+
+    const userEmail = userInDB.email;
+    const hiddenEmail = userEmail.replace(/.{3}(?=@)/g, '***');
+
+    // 3- Send email to FE
+    res.json({
+      data: { email: hiddenEmail },
+      message: 'Usuario encontrado',
+    });
+
+    // 4- Generate JWT
+    const userInfo = {
+      user: {
+        id: userInDB._doc._id,
+        firstname: userInDB._doc.firstname,
+        lastname: userInDB._doc.lastname,
+        username: userInDB._doc.username,
+        email: userInDB._doc.email,
+        role: userInDB._doc.role,
+      },
+    };
+
+    // (payload, secretKey, options)
+    const token = jwt.sign(userInfo, JWT_SECRET_KEY, {
+      expiresIn: '30m',
+    });
+
+    // 5- Send email to user
+    const mailOptions = recoverMailOptions({ user: userInDB._doc, token });
+
+    const transporter = nodemailer.createTransport({
+      service: envs.MAIL.HOST,
+      auth: {
+        user: envs.MAIL.USER,
+        pass: envs.MAIL.PASS,
+      },
+    });
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error(
+          `🟥 RECOVER MAIL FAILED FOR ${userEmail} - ${userInDB._doc.username}:`,
+          err,
+        );
+        return;
+      }
+      console.log(
+        `🟩 RECOVER MAIL SENT TO ${userEmail} - ${userInDB._doc.username}:`,
+        info,
+      );
     });
   } catch (err) {
     console.error('🟥', err);
