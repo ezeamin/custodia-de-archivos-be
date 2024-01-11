@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { passwordRules, usernameRules } from '../validationRules/rules';
+import { passwordRules, usernameRules } from '../validationRules/rules.js';
 
 // ----------------------------
 // BODY

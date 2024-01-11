@@ -11,6 +11,6 @@ export const envs = {
   MAIL: {
     USER: get('MAIL_USER').required().asString(),
     PASS: get('MAIL_PASS').required().asString(),
-    HOST: get('MAIL_HOST').required().asUrlString(),
+    HOST: get('MAIL_HOST').required().asString(),
   },
 };

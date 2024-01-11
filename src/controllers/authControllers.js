@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import HttpStatus from 'http-status-codes';
+import nodemailer from 'nodemailer';
 
-import UsersModel from '../models/UserSchema.js';
+// import UsersModel from '../models/UserSchema.js';
 import { envs } from '../helpers/envs.js';
 
-import nodemailer from 'nodemailer';
 import { recoverMailOptions } from '../helpers/recoverMail.js';
 
 const { JWT_SECRET_KEY } = process.env;
@@ -21,10 +21,23 @@ export const postLogin = async (req, res) => {
 
   try {
     // 1- (Try to) Search user in DB
-    const userInDB = await UsersModel.findOne({
-      username: username.trim(),
-      isActive: true,
-    });
+    // const userInDB = await UsersModel.findOne({
+    //   username: username.trim(),
+    //   isActive: true,
+    // });
+    const userInDB = {
+      password: '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa', // admin
+      _doc: {
+        _id: '60d0b1b9b5f7e7a8c0d7c6c3',
+        firstname: 'Admin',
+        lastname: 'Admin',
+        username: 'admin',
+        role: {
+          id: '60d0b1b9b5f7e7a8c0d7c6c2',
+          name: 'admin',
+        },
+      },
+    };
 
     // 2- Validate credentials
     // Cases:
@@ -45,22 +58,28 @@ export const postLogin = async (req, res) => {
     const userInfo = {
       user: {
         id: userInDB._doc._id,
-        firstname: userInDB._doc.firstname,
-        lastname: userInDB._doc.lastname,
-        username: userInDB._doc.username,
-        email: userInDB._doc.email,
-        role: userInDB._doc.role,
+        name: userInDB._doc.firstname,
+        role: userInDB._doc.role.name.toUpperCase(),
       },
     };
 
     // (payload, secretKey, options)
-    const token = jwt.sign(userInfo, JWT_SECRET_KEY, {
+    const accessToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
       expiresIn: '1h',
+    });
+    const refreshToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
+      expiresIn: '2h',
     });
 
     // 4- Send JWT to FE
+    res.cookie('refresh_token', refreshToken, {
+      expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
     res.json({
-      data: token,
+      data: { token: accessToken },
       message: 'Login exitoso',
     });
   } catch (err) {
@@ -81,11 +100,12 @@ export const postRecoverPassword = async (req, res) => {
 
   try {
     // 1- (Try to) Search user in DB
-    const userInDB = await UsersModel.findOne({
-      //! Change to EmployeesModel
-      username: username.trim(),
-      isActive: true,
-    });
+    // const userInDB = await UsersModel.findOne({
+    //   //! Change to EmployeesModel
+    //   username: username.trim(),
+    //   isActive: true,
+    // });
+    const userInDB = null;
 
     // 2- Validate credentials
     // Cases:
@@ -147,6 +167,75 @@ export const postRecoverPassword = async (req, res) => {
         `🟩 RECOVER MAIL SENT TO ${userEmail} - ${userInDB._doc.username}:`,
         info,
       );
+    });
+  } catch (err) {
+    console.error('🟥', err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      errors: {
+        data: null,
+        message: `ERROR: ${err}`,
+      },
+    });
+  }
+};
+
+export const getRefreshToken = async (req, res) => {
+  const {
+    cookies: { refresh_token: refreshToken },
+  } = req;
+
+  try {
+    if (!refreshToken) throw new Error('No refresh token found');
+
+    // 1- Validate JWT
+    // (payload, secretKey, options)
+    const { user } = jwt.verify(refreshToken, JWT_SECRET_KEY);
+
+    // 2- Generate new JWT
+    const userInfo = {
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+      },
+    };
+
+    // (payload, secretKey, options)
+    const accessToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    const newRefreshToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
+      expiresIn: '2h',
+    });
+
+    // 3- Send JWT to FE
+    res.cookie('refresh_token', newRefreshToken, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+    res.json({
+      data: { token: accessToken },
+      message: 'Refresh token exitoso',
+    });
+  } catch (err) {
+    console.error('🟥', err);
+    // delete refreshToken cookie
+    res.clearCookie('refresh_token');
+    res.status(HttpStatus.UNAUTHORIZED).json({
+      data: null,
+      message: null,
+    });
+  }
+};
+
+export const postLogout = async (req, res) => {
+  try {
+    // delete refreshToken cookie
+    res.clearCookie('refresh_token');
+    res.json({
+      data: null,
+      message: 'Logout exitoso',
     });
   } catch (err) {
     console.error('🟥', err);

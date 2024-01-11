@@ -1,4 +1,4 @@
-import { envs } from './envs';
+import { envs } from './envs.js';
 
 export const recoverMailOptions = ({ user, token }) => ({
   from: envs.MAIL.USER,
