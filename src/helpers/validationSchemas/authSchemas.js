@@ -6,8 +6,8 @@ import { passwordRules, usernameRules } from '../validationRules/rules.js';
 // ----------------------------
 
 export const post_loginSchema = Joi.object({
-  username: usernameRules(),
-  password: passwordRules(),
+  username: Joi.string().required(),
+  password: Joi.string().required(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
