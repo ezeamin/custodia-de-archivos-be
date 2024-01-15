@@ -183,7 +183,10 @@ export class PostController {
   static logout(_, res) {
     try {
       // delete refreshToken cookie
-      res.clearCookie('refresh_token');
+      res.clearCookie('refresh_token', {
+        sameSite: 'none',
+        secure: true,
+      });
       res.json({
         data: null,
         message: 'Logout exitoso',
