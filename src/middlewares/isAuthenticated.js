@@ -4,7 +4,7 @@ import { envs } from '../helpers/envs';
 
 const secretKey = envs.JWT_SECRET_KEY;
 
-const isAuthenticated = (req, res, next) => {
+export const isAuthenticated = (req, res, next) => {
   const { headers } = req;
   const authHeader = headers.authorization; // string
 
@@ -35,5 +35,3 @@ const isAuthenticated = (req, res, next) => {
     });
   }
 };
-
-export default isAuthenticated;

@@ -20,10 +20,18 @@ export const usernameRules = () =>
     });
 
 export const passwordRules = () =>
-  Joi.string().required().trim().min(3).max(30).messages({
-    'string.empty': 'El campo "contraseña" no puede estar vacio',
-    'string.min': 'El campo "contraseña" debe tener al menos 3 caracteres',
-    'string.max': 'El campo "contraseña" debe tener máximo 30 caracteres',
-    'any.required': 'El campo "contraseña" es obligatorio',
-    '*': 'Revisa el campo "contraseña"',
-  });
+  Joi.string()
+    .required()
+    .trim()
+    .min(6)
+    .max(25)
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/)
+    .messages({
+      'string.empty': 'El campo "contraseña" no puede estar vacio',
+      'string.min': 'El campo "contraseña" debe tener al menos 6 caracteres',
+      'string.max': 'El campo "contraseña" debe tener máximo 25 caracteres',
+      'string.pattern.base':
+        'El campo "contraseña" debe tener al menos una mayúscula, una minúscula y un número',
+      'any.required': 'El campo "contraseña" es obligatorio',
+      '*': 'Revisa el campo "contraseña"',
+    });

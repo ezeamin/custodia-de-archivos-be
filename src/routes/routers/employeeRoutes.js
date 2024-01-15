@@ -1,0 +1,234 @@
+import express from 'express';
+
+import { isAuthenticated } from '../../middlewares/isAuthenticated';
+import { isAdmin } from '../../middlewares/isAdmin';
+
+import { Employees } from '../../controllers/employees';
+
+export const employeeRouter = express.Router();
+
+// Faltan: licensesTypes, trainingTypes,
+
+// GET ---------------------------
+employeeRouter.get(
+  '/',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employees,
+);
+employeeRouter.get(
+  '/:employeeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeById,
+);
+employeeRouter.get(
+  '/:employeeId/docs',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeDocs,
+);
+employeeRouter.get(
+  '/:employeeId/history',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeHistory,
+);
+employeeRouter.get(
+  '/:employeeId/absences',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeAbsences,
+);
+employeeRouter.get(
+  '/:employeeId/licenses',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeLicenses,
+);
+employeeRouter.get(
+  '/:employeeId/vacations',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeVacations,
+);
+employeeRouter.get(
+  '/:employeeId/trainings',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeTrainings,
+);
+employeeRouter.get(
+  '/:employeeId/formal-warnings',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeFormalWarnings,
+);
+employeeRouter.get(
+  '/:employeeId/late-arrivals',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeLateArrivals,
+);
+employeeRouter.get(
+  '/:employeeId/extra-hours',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeExtraHours,
+);
+employeeRouter.get(
+  '/licenses/types',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.licensesTypes,
+);
+employeeRouter.get(
+  '/licenses/types/:licenseTypeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.licensesTypesById,
+);
+employeeRouter.get(
+  '/trainings/types',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.trainingsTypes,
+);
+employeeRouter.get(
+  '/trainings/types/:trainingTypeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.trainingsTypesById,
+);
+
+// POST ---------------------------
+employeeRouter.post(
+  '/',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployee,
+);
+employeeRouter.post(
+  '/:employeeId/docs',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeDoc,
+);
+employeeRouter.post(
+  '/:employeeId/absences',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeAbsence,
+);
+employeeRouter.post(
+  '/:employeeId/licenses',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeLicense,
+);
+employeeRouter.post(
+  '/:employeeId/vacations',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeVacation,
+);
+employeeRouter.post(
+  '/:employeeId/trainings',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeTraining,
+);
+employeeRouter.post(
+  '/:employeeId/formal-warnings',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeFormalWarning,
+);
+employeeRouter.post(
+  '/:employeeId/late-arrivals',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeLateArrival,
+);
+employeeRouter.post(
+  '/:employeeId/extra-hours',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeExtraHour,
+);
+employeeRouter.post(
+  '/licenses/types',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createLicenseType,
+);
+employeeRouter.post(
+  '/trainings/types',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createTrainingType,
+);
+
+// PUT ----------------------------
+employeeRouter.put(
+  '/:employeeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateEmployee,
+);
+employeeRouter.put(
+  '/:employeeId/docs/:docId',
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateEmployeeDoc,
+);
+employeeRouter.put(
+  '/licenses/types/:licenseTypeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateLicenseType,
+);
+employeeRouter.put(
+  '/trainings/types/:trainingTypeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateTrainingType,
+);
+
+// DELETE -------------------------
+employeeRouter.delete(
+  '/:employeeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployee,
+);
+employeeRouter.delete(
+  '/:employeeId/docs/:docId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeDoc,
+);
+employeeRouter.delete(
+  '/:employeeId/licenses/:licenseId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeLicense,
+);
+employeeRouter.delete(
+  '/:employeeId/vacations/:vacationId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeVacation,
+);
+employeeRouter.delete(
+  '/employees/licenses/:licenseTypeId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteLicenseType,
+);
+employeeRouter.delete(
+  '/employees/trainings/:trainingId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteTrainingType,
+);

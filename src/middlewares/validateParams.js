@@ -1,6 +1,6 @@
 import HttpStatus from 'http-status-codes';
 
-const validateParams = (req, res, next, schema) => {
+export const validateParams = (req, res, next, schema) => {
   const { error } = schema.validate(req.params);
 
   if (error) {
@@ -14,5 +14,3 @@ const validateParams = (req, res, next, schema) => {
   // No errors, continue with the request
   next();
 };
-
-export default validateParams;

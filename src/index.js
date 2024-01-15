@@ -3,10 +3,8 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-// import routerProducts from './routes/productsRoutes.js';
-import routerAuth from './routes/authRoutes.js';
-// import routerUsers from './routes/userRoutes.js';
 import { envs } from './helpers/envs.js';
+import mainRouter from './routes/mainRouter.js';
 
 console.clear(); // Clear any previous console logs
 console.log('⌛ Inicializando servidor...');
@@ -35,12 +33,11 @@ const corsOptions = {
 app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.use(express.json()); // <== Parse body as JSON (otherwise "undefined")
+app.use(express.urlencoded({ extended: true })); // <== Parse body as URL encoded data
 app.use(cookieParser()); // <== Parse cookies
 
 // 4- Routes
-// app.use('/api/v1/products', routerProducts);
-app.use('/api/v1/auth', routerAuth);
-// app.use('/api/v1/users', routerUsers);
+app.use('/api/v1', mainRouter);
 
 // 5- Server loop
 app.listen(PORT, () => {

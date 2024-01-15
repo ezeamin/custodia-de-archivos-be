@@ -1,6 +1,6 @@
 import HttpStatus from 'http-status-codes';
 
-const validateBody = (req, res, next, schema) => {
+export const validateBody = (req, res, next, schema) => {
   const { error } = schema.validate(req.body);
 
   if (error) {
@@ -14,5 +14,3 @@ const validateBody = (req, res, next, schema) => {
   // No errors, continue with the request
   next();
 };
-
-export default validateBody;

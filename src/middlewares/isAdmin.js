@@ -1,6 +1,6 @@
 import HttpStatus from 'http-status-codes';
 
-const isAdmin = (req, res, next) => {
+export const isAdmin = (req, res, next) => {
   const { user } = req;
 
   if (!user.isAdmin) {
@@ -13,5 +13,3 @@ const isAdmin = (req, res, next) => {
 
   next();
 };
-
-export default isAdmin;
