@@ -1,8 +1,9 @@
 import express from 'express';
 
-import { Users } from '../../controllers/users/index.js';
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { isAdmin } from '../../middlewares/isAdmin.js';
+
+import { Users } from '../../controllers/users/index.js';
 
 export const userRouter = express.Router();
 

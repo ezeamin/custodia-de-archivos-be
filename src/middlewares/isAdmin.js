@@ -1,5 +1,5 @@
 import HttpStatus from 'http-status-codes';
-import { roles } from '../constants/roles';
+import { roles } from '../constants/roles.js';
 
 export const isAdmin = (req, res, next) => {
   const { user } = req;

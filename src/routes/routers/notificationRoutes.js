@@ -1,9 +1,9 @@
 import express from 'express';
 
-import { isAuthenticated } from '../../middlewares/isAuthenticated';
-import { isAdmin } from '../../middlewares/isAdmin';
+import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
+import { isAdmin } from '../../middlewares/isAdmin.js';
 
-import { Notifications } from '../../controllers/notifications';
+import { Notifications } from '../../controllers/notifications/index.js';
 
 export const notificationRouter = express.Router();
 

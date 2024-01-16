@@ -1,7 +1,7 @@
 import express from 'express';
 
-import { Params } from '../../controllers/params';
-import { isAuthenticated } from '../../middlewares/isAuthenticated';
+import { Params } from '../../controllers/params/index.js';
+import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 
 export const paramsRouter = express.Router();
 

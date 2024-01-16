@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import HttpStatus from 'http-status-codes';
-import { envs } from '../helpers/envs';
+import { envs } from '../helpers/envs.js';
 
 const secretKey = envs.JWT_SECRET_KEY;
 

@@ -1,9 +1,9 @@
 import express from 'express';
 
-import { isAuthenticated } from '../../middlewares/isAuthenticated';
-import { isAdmin } from '../../middlewares/isAdmin';
+import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
+import { isAdmin } from '../../middlewares/isAdmin.js';
 
-import { Employees } from '../../controllers/employees';
+import { Employees } from '../../controllers/employees/index.js';
 
 export const employeeRouter = express.Router();
 
