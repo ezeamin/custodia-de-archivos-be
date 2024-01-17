@@ -177,6 +177,12 @@ employeeRouter.put(
   Employees.PutController.updateEmployee,
 );
 employeeRouter.put(
+  '/:employeeId/image',
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateEmployeeImage,
+);
+employeeRouter.put(
   '/:employeeId/docs/:docId',
   isAuthenticated,
   isAdmin,

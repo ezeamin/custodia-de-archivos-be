@@ -1,1 +1,3 @@
-export class PutController {}
+export class PutController {
+  static async createAdmin(req, res) {}
+}

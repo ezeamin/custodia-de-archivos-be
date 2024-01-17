@@ -3,6 +3,9 @@ export class PutController {
   static async updateEmployee(req, res) {}
 
   // @param - employeeId
+  static async updateEmployeeImage(req, res) {}
+
+  // @param - employeeId
   // @param - docId
   static async updateEmployeeDoc(req, res) {}
 
