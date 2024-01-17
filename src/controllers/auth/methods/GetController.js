@@ -38,6 +38,7 @@ export class GetController {
 
       // 3- Send JWT to FE
       res.cookie('refresh_token', newRefreshToken, {
+        expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
         httpOnly: true,
         sameSite: 'none',
         secure: true,

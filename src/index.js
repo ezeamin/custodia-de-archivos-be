@@ -7,7 +7,7 @@ import { envs } from './helpers/envs.js';
 import mainRouter from './routes/mainRouter.js';
 
 console.clear(); // Clear any previous console logs
-console.log('⌛ Inicializando servidor...');
+console.log('⌛ Initiating server...');
 
 // 1- Initialize server
 const app = express();
@@ -41,5 +41,5 @@ app.use('/api/v1', mainRouter);
 
 // 5- Server loop
 app.listen(PORT, () => {
-  console.log(`✅ Servidor iniciado -> Puerto ${PORT}\n`);
+  console.log(`✅ Server up and running -> Port ${PORT}\n`);
 });
