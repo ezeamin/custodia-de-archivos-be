@@ -22,3 +22,9 @@ userRouter.put(
 );
 
 // DELETE -------------------------
+userRouter.delete(
+  '/delete-admin/:userId',
+  isAuthenticated,
+  isAdmin,
+  Users.DeleteController.deleteUser,
+);
