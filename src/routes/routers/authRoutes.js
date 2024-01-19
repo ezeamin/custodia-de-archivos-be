@@ -12,18 +12,14 @@ import { Auth } from '../../controllers/auth/index.js';
 
 export const authRouter = express.Router();
 
-// GET ---------------------------
-authRouter.get('/refresh-token', Auth.GetController.refreshToken);
-
 // POST ---------------------------
 authRouter.post(
   '/login',
   (req, res, next) => validateBody(req, res, next, post_loginSchema),
   Auth.PostController.login,
 );
-
+authRouter.post('/refresh-token', Auth.PostController.refreshToken);
 authRouter.post('/logout', Auth.PostController.logout);
-
 authRouter.post(
   '/recover-password',
   (req, res, next) => validateBody(req, res, next, post_recoverPasswordSchema),

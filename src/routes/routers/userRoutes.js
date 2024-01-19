@@ -12,6 +12,12 @@ userRouter.get('/', isAuthenticated, isAdmin, Users.GetController.users);
 
 // POST ---------------------------
 userRouter.post('/', isAuthenticated, isAdmin, Users.PostController.createUser);
+userRouter.post(
+  '/create-read-only',
+  isAuthenticated,
+  isAdmin,
+  Users.PostController.createReadOnlyUser,
+);
 
 // PUT ----------------------------
 userRouter.put(
