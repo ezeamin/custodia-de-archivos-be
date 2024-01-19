@@ -9,6 +9,12 @@ export const userRouter = express.Router();
 
 // GET ---------------------------
 userRouter.get('/', isAuthenticated, isAdmin, Users.GetController.users);
+userRouter.get(
+  '/login-logs',
+  isAuthenticated,
+  isAdmin,
+  Users.GetController.loginLogs,
+);
 
 // POST ---------------------------
 userRouter.post('/', isAuthenticated, isAdmin, Users.PostController.createUser);
