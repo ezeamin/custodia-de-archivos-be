@@ -1,3 +1,5 @@
 export class DeleteController {
-  static async deleteUser(req, res) {}
+  static async deleteAdminUser(req, res) {}
+
+  static async deleteReadOnlyUser(req, res) {}
 }

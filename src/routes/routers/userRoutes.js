@@ -32,5 +32,11 @@ userRouter.delete(
   '/delete-admin/:userId',
   isAuthenticated,
   isAdmin,
-  Users.DeleteController.deleteUser,
+  Users.DeleteController.deleteAdminUser,
+);
+userRouter.delete(
+  '/delete-read-only/:userId',
+  isAuthenticated,
+  isAdmin,
+  Users.DeleteController.deleteReadOnlyUser,
 );
