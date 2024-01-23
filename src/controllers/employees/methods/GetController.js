@@ -1,7 +1,10 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { calculateDateDiffInAges } from '../../../helpers/helpers.js';
+import {
+  calculateDateDiffInAges,
+  toLocalTz,
+} from '../../../helpers/helpers.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -30,7 +33,7 @@ export class GetController {
         lastname: employee.person.surname,
         firstname: employee.person.name,
         age: calculateDateDiffInAges(employee.person.birth_date),
-        antiquity: calculateDateDiffInAges(employee.employement_date),
+        antiquity: calculateDateDiffInAges(employee.employment_date),
         position: employee.position,
         area: {
           id: employee.area.id_area,
@@ -52,13 +55,93 @@ export class GetController {
       console.error('🟥', e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
-        message: 'Error retrieving employees',
+        message:
+          'Error al intentar obtener los empleados. Intente de nuevo más tarde.',
       });
     }
   }
 
   // @param - employeeId
-  static async employeeById(req, res) {}
+  static async employeeById(req, res) {
+    const {
+      params: { employeeId },
+    } = req;
+
+    try {
+      const employee = await prisma.employee.findUnique({
+        where: {
+          id_employee: employeeId,
+        },
+        include: {
+          area: true,
+          person: {
+            include: {
+              home: true,
+              phone: true,
+              family: true,
+              gender: true,
+            },
+          },
+          employee_status: true,
+        },
+      });
+
+      const formattedData = {
+        id: employee.id_employee,
+        dni: employee.person.identification_number,
+        imgSrc: employee.picture_url,
+        lastname: employee.person.surname,
+        firstname: employee.person.name,
+        birthdate: toLocalTz(employee.person.birth_date),
+        address: employee.person.home
+          ? {
+              street: employee.person.home.street,
+              streetNumber: employee.person.home.street_number,
+              apt: employee.person.home.door,
+              state: employee.person.home.province,
+              locality: employee.person.home.locality,
+            }
+          : null,
+        phone: employee.person.phone ? employee.person.phone.phone_no : null,
+        email: employee.email,
+        gender: {
+          id: employee.person.id_gender,
+          description: employee.person.gender.gender,
+        },
+        startDate: toLocalTz(employee.employment_date),
+        endDate: toLocalTz(employee.termination_date),
+        user: employee.id_user
+          ? {
+              id: employee.id_user,
+            }
+          : null,
+        age: calculateDateDiffInAges(employee.person.birth_date),
+        antiquity: calculateDateDiffInAges(employee.employment_date),
+        position: employee.position,
+        area: {
+          id: employee.area.id_area,
+          description: employee.area.area,
+        },
+        fileNumber: employee.no_file,
+        status: {
+          id: employee.id_status,
+          description: employee.employee_status.title_status,
+        },
+      };
+
+      res.json({
+        data: formattedData,
+        message: 'Employee retrieved successfully',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Error al intentar obtener el empleado. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
   static async employeeDocs(req, res) {}

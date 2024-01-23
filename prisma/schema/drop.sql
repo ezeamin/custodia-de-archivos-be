@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS public.employee_doc;
-DROP TABLE IF EXISTS public.third_party;
 DROP TABLE IF EXISTS public.notification;
 DROP TABLE IF EXISTS public.login;
 DROP TABLE IF EXISTS public.training;
@@ -13,9 +12,11 @@ DROP TABLE IF EXISTS public.late_arrival;
 DROP TABLE IF EXISTS public.formal_warning;
 DROP TABLE IF EXISTS public.extra_hours;
 DROP TABLE IF EXISTS public.employee_history;
-DROP TABLE IF EXISTS public.employee;
 DROP TABLE IF EXISTS public."user";
 DROP TABLE IF EXISTS public.user_type;
+DROP TABLE IF EXISTS public.third_party;
+DROP TABLE IF EXISTS public.notification_doc;
+DROP TABLE IF EXISTS public.employee;
 DROP TABLE IF EXISTS public.person;
 DROP TABLE IF EXISTS public.home;
 DROP TABLE IF EXISTS public.province;

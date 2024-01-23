@@ -22,6 +22,7 @@ export const handleUpload = async (req) => {
 
   const res = await cloudinary.uploader.upload(file64.content, {
     resource_type: 'auto',
+    
   });
   return res;
 };

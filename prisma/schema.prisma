@@ -37,15 +37,19 @@ model employee {
   area                area               @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
   person              person             @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
   employee_status     employee_status    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
+  employee_doc        employee_doc[]
   employee_history    employee_history[]
+  user                user[]
 }
 
 model employee_doc {
-  id_employee_doc String    @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  doc_url         String    @db.VarChar(150)
-  doc_name        String    @db.VarChar(50)
-  doc_created_at  DateTime  @default(now()) @db.Timestamp(6)
-  doc_updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  id_employee_doc         String    @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee             String    @db.Uuid
+  employee_doc_url        String    @db.VarChar(250)
+  employee_doc_name       String    @db.VarChar(50)
+  employee_doc_created_at DateTime  @default(now()) @db.Timestamp(6)
+  employee_doc_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  employee                employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_employee")
 }
 
 model employee_history {
@@ -152,17 +156,18 @@ model login {
 }
 
 model notification {
-  id_notification                     String            @id(map: "pk_notification") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  id_notification_type                String            @db.Uuid
-  id_sender                           String            @db.Uuid
-  id_receptor                         String            @db.Uuid
-  message                             String            @db.VarChar(500)
+  id_notification                     String             @id(map: "pk_notification") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_notification_type                String             @db.Uuid
+  id_sender                           String             @db.Uuid
+  id_receptor                         String             @db.Uuid
+  message                             String             @db.VarChar(500)
   read_status                         Boolean
-  notification_created_at             DateTime          @default(now()) @db.Timestamp(6)
-  notification_updated_at             DateTime?         @default(now()) @db.Timestamp(6)
-  user_notification_id_receptorTouser user              @relation("notification_id_receptorTouser", fields: [id_receptor], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receptor")
-  user_notification_id_senderTouser   user              @relation("notification_id_senderTouser", fields: [id_sender], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_sender")
-  notification_type                   notification_type @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
+  notification_created_at             DateTime           @default(now()) @db.Timestamp(6)
+  notification_updated_at             DateTime?          @default(now()) @db.Timestamp(6)
+  user_notification_id_receptorTouser user               @relation("notification_id_receptorTouser", fields: [id_receptor], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receptor")
+  user_notification_id_senderTouser   user               @relation("notification_id_senderTouser", fields: [id_sender], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_sender")
+  notification_type                   notification_type  @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
+  notification_doc                    notification_doc[]
 }
 
 model notification_type {
@@ -171,7 +176,7 @@ model notification_type {
   start_hour            DateTime       @db.Time(6)
   end_hour              DateTime       @db.Time(6)
   allowed_roles         String         @db.VarChar(200)
-  notification_isactive Boolean
+  notification_isactive Boolean        @default(true)
   notification          notification[]
 }
 
@@ -180,6 +185,7 @@ model person {
   id_gender             String     @db.Uuid
   id_family             String?    @db.Uuid
   id_address            String?    @db.Uuid
+  id_phone              String?    @db.Uuid
   name                  String     @db.VarChar(50)
   surname               String     @db.VarChar(50)
   birth_date            DateTime   @db.Date
@@ -190,6 +196,7 @@ model person {
   home                  home?      @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
   family                family?    @relation(fields: [id_family], references: [id_family], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_family")
   gender                gender     @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
+  phone                 phone?     @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
 }
 
 model phone {
@@ -197,6 +204,7 @@ model phone {
   phone_no         Int
   phone_created_at DateTime  @default(now()) @db.Timestamp(6)
   phone_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  person           person[]
 }
 
 model province {
@@ -208,6 +216,7 @@ model province {
 model third_party {
   id_third_party   String @id(map: "pk") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   role_description String @db.VarChar(20)
+  user             user[]
 }
 
 model training {
@@ -230,6 +239,8 @@ model training_type {
 model user {
   id_user                                     String             @id(map: "pk_user") @unique(map: "unq_id_user") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   id_user_type                                String             @db.Uuid
+  id_employee                                 String?            @db.Uuid
+  id_third_party                              String?            @db.Uuid
   username                                    Int                @unique
   password                                    String             @db.VarChar(100)
   user_isactive                               Boolean            @default(true)
@@ -239,6 +250,8 @@ model user {
   login                                       login[]
   notification_notification_id_receptorTouser notification[]     @relation("notification_id_receptorTouser")
   notification_notification_id_senderTouser   notification[]     @relation("notification_id_senderTouser")
+  employee                                    employee?          @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_employee")
+  third_party                                 third_party?       @relation(fields: [id_third_party], references: [id_third_party], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_third_party")
   user_type                                   user_type          @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
 }
 
@@ -254,4 +267,14 @@ model vacations {
   end_date_vacations   DateTime  @db.Date
   vacations_created_at DateTime  @default(now()) @db.Timestamp(6)
   vacations_updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model notification_doc {
+  id_notification_doc         String       @id(map: "pk_notification_doc") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_notification             String       @db.Uuid
+  notification_doc_url        String       @db.VarChar(250)
+  notification_doc_name       String       @db.VarChar(50)
+  notification_doc_created_at DateTime     @default(now()) @db.Timestamp(6)
+  notification_doc_updated_at DateTime?    @default(now()) @db.Timestamp(6)
+  notification                notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_doc_notification")
 }

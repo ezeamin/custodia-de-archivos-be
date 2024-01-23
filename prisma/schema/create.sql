@@ -73,6 +73,7 @@ CREATE TABLE public.person (
     id_gender            UUID NOT NULL,
     id_family            UUID ,
     id_address           UUID ,
+    id_phone             UUID ,
     name                 varchar(50) NOT NULL,
     surname              varchar(50) NOT NULL,
     birth_date           date NOT NULL,
@@ -82,7 +83,8 @@ CREATE TABLE public.person (
     CONSTRAINT pk_person PRIMARY KEY (id_person),
     CONSTRAINT fk_person_gender FOREIGN KEY (id_gender) REFERENCES public.gender(id_gender),
     CONSTRAINT fk_person_family FOREIGN KEY (id_family) REFERENCES public.family(id_family),
-    CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public.home(id_address)
+    CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public.home(id_address),
+    CONSTRAINT fk_person_phone FOREIGN KEY (id_phone) REFERENCES public.phone(id_phone)
 );
 
 CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
@@ -93,19 +95,11 @@ CREATE TABLE public.user_type (
     CONSTRAINT pk_user_type PRIMARY KEY (id_user_type)
 );
 
-CREATE TABLE public."user" (
-    id_user              UUID DEFAULT uuid_generate_v4() NOT NULL,
-    id_user_type         UUID NOT NULL,
-    username             integer NOT NULL UNIQUE,
-    "password"           varchar(100) NOT NULL,
-    user_isactive        boolean DEFAULT true NOT NULL,
-    user_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    user_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_user PRIMARY KEY (id_user),
-    CONSTRAINT fk_user_type FOREIGN KEY (id_user_type) REFERENCES public.user_type(id_user_type)
+CREATE TABLE public.third_party (
+    id_third_party       UUID DEFAULT uuid_generate_v4() NOT NULL,
+    role_description     varchar(20) NOT NULL,
+    CONSTRAINT pk PRIMARY KEY (id_third_party)
 );
-
-CREATE UNIQUE INDEX unq_id_user ON public."user" (id_user);
 
 CREATE TABLE public.employee (
     id_employee          UUID DEFAULT uuid_generate_v4() NOT NULL,
@@ -128,6 +122,24 @@ CREATE TABLE public.employee (
 );
 
 CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
+
+CREATE TABLE public."user" (
+    id_user              UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_user_type         UUID NOT NULL,
+    id_employee          UUID ,
+    id_third_party       UUID ,
+    username             integer NOT NULL UNIQUE,
+    "password"           varchar(100) NOT NULL,
+    user_isactive        boolean DEFAULT true NOT NULL,
+    user_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    user_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_user PRIMARY KEY (id_user),
+    CONSTRAINT fk_user_type FOREIGN KEY (id_user_type) REFERENCES public.user_type(id_user_type),
+    CONSTRAINT fk_user_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_user_third_party FOREIGN KEY (id_third_party) REFERENCES public.third_party(id_third_party)
+);
+
+CREATE UNIQUE INDEX unq_id_user ON public."user" (id_user);
 
 CREATE TABLE public.employee_history (
     id_history           UUID DEFAULT uuid_generate_v4() NOT NULL,
@@ -182,7 +194,7 @@ CREATE TABLE public.notification_type (
     end_hour             time NOT NULL,
     -- TODO: Check if this is the correct way to store the roles
     allowed_roles        varchar(200) NOT NULL,
-    notification_isactive boolean NOT NULL,
+    notification_isactive boolean DEFAULT true NOT NULL ,
     CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
 );
 
@@ -259,19 +271,26 @@ CREATE TABLE public.notification (
     CONSTRAINT fk_notification_receptor FOREIGN KEY (id_receptor) REFERENCES public."user"(id_user)
 );
 
-CREATE TABLE public.third_party (
-    id_third_party       UUID DEFAULT uuid_generate_v4() NOT NULL,
-    role_description     varchar(20) NOT NULL,
-    CONSTRAINT pk PRIMARY KEY (id_third_party)
+CREATE TABLE public.employee_doc (
+    id_employee_doc               UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee                   UUID NOT NULL,
+    employee_doc_url              varchar(250) NOT NULL,
+    employee_doc_name             varchar(50) NOT NULL,
+    employee_doc_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    employee_doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_employee_doc PRIMARY KEY (id_employee_doc),
+    CONSTRAINT fk_employee_doc_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
-CREATE TABLE public.employee_doc (
-    id_employee_doc      UUID DEFAULT uuid_generate_v4() NOT NULL,
-    doc_url              varchar(150) NOT NULL,
-    doc_name             varchar(50) NOT NULL,
-    doc_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_employee_doc PRIMARY KEY (id_employee_doc)
+CREATE TABLE public.notification_doc (
+    id_notification_doc               UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_notification                   UUID NOT NULL,
+    notification_doc_url              varchar(250) NOT NULL,
+    notification_doc_name             varchar(50) NOT NULL,
+    notification_doc_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    notification_doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_notification_doc PRIMARY KEY (id_notification_doc),
+    CONSTRAINT fk_notification_doc_notification FOREIGN KEY (id_notification) REFERENCES public.notification(id_notification)
 );
 
 -- Insert data into tables
@@ -285,7 +304,7 @@ VALUES
 INSERT INTO public.area (area)
 VALUES
     ('Mantenimiento'),
-    ('Administración'),('Almacenamiento');
+    ('Administración'),('Almacenamiento'),('Ventas'),('Compras'),('Producción'),('Recursos Humanos'),('Contabilidad'),('Sistemas'),('Gerencia');
 
 INSERT INTO public.employee_status (title_status) VALUES
   ('active'),

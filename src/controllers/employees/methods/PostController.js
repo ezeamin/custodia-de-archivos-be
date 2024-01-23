@@ -7,10 +7,22 @@ export class PostController {
   static async createEmployee(req, res) {
     let imageUrl = '';
 
+    // Check if image was sent
     if (!req.file) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message: 'No se ha enviado una imagen',
+      });
+      return;
+    }
+
+    // Check image size
+    const FIVE_MB = 5000000;
+    if (req.file.size > FIVE_MB) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        data: null,
+        message:
+          'El tamaño de la imagen es demasiado grande. El máximo permitido es de 5MB',
       });
       return;
     }
@@ -65,6 +77,32 @@ export class PostController {
         message: 'Empleado creado exitosamente',
       });
     } catch (e) {
+      if (e.code === 'P2002') {
+        if (e.meta.target.includes('identification_number')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'El DNI ingresado ya existe',
+          });
+          return;
+        }
+
+        if (e.meta.target.includes('email')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'El email ingresado ya existe',
+          });
+          return;
+        }
+
+        if (e.meta.target.includes('no_file')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'El número de legajo ingresado ya existe',
+          });
+          return;
+        }
+      }
+
       console.error('🟥', e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
