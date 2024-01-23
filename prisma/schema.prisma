@@ -1,14 +1,257 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-// TODO: Generate schema based on analysis
+model absence {
+  id_absence     String   @id(map: "pk_absence") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  date_absence   DateTime @db.Date
+  reason_absence String   @db.VarChar(50)
+}
+
+model area {
+  id_area  String     @id(map: "pk_area") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  area     String     @unique @db.VarChar(20)
+  employee employee[]
+}
+
+model employee {
+  id_employee         String             @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_person           String             @db.Uuid
+  id_status           String             @db.Uuid
+  id_area             String             @db.Uuid
+  no_file             Int                @unique
+  email               String             @unique @db.VarChar(75)
+  employment_date     DateTime           @db.Date
+  termination_date    DateTime?          @db.Date
+  position            String             @db.VarChar(100)
+  working_hours       Int?               @default(0)
+  picture_url         String             @db.VarChar(300)
+  employee_created_at DateTime           @default(now()) @db.Timestamp(6)
+  employee_updated_at DateTime?          @default(now()) @db.Timestamp(6)
+  area                area               @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
+  person              person             @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
+  employee_status     employee_status    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
+  employee_history    employee_history[]
+}
+
+model employee_doc {
+  id_employee_doc String    @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  doc_url         String    @db.VarChar(150)
+  doc_name        String    @db.VarChar(50)
+  doc_created_at  DateTime  @default(now()) @db.Timestamp(6)
+  doc_updated_at  DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model employee_history {
+  id_history        String   @id(map: "pk_employee_history") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee       String   @db.Uuid
+  id_modifying_user String   @db.Uuid
+  modified_field    String   @db.VarChar(30)
+  previous_value    Json?
+  current_value     Json?
+  modification_date DateTime @default(now()) @db.Timestamp(6)
+  employee          employee @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_history_employee")
+  user              user     @relation(fields: [id_modifying_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_history_user")
+}
+
+model employee_status {
+  id_status    String     @id(map: "pk_employee_status") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title_status String     @unique @db.VarChar(10)
+  employee     employee[]
+}
+
+model extra_hours {
+  id_extra_hours   String   @id(map: "pk_extra_hours") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  date_extra_hours DateTime @db.Date
+  qty_extra_hours  Int
+}
+
+model family {
+  id_family            String   @id(map: "pk_family") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_relationship_type String   @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  person               person[]
+}
+
+model family_relationship_type {
+  id_family_relationship_type String @id(map: "pk_family_relationship_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  relationship_type           String @db.VarChar(20)
+}
+
+model formal_warning {
+  id_formal_warning         String    @id(map: "pk_formal_warning") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  desc_formal_warning       String    @db.VarChar(200)
+  date_formal_warning       DateTime  @db.Date
+  formal_warning_created_at DateTime  @default(now()) @db.Timestamp(6)
+  formal_warning_updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model gender {
+  id_gender String   @id(map: "pk_gender") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  gender    String   @unique @db.VarChar(15)
+  person    person[]
+}
+
+model home {
+  id_address      String    @id(map: "pk_home") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_locality     String    @db.Uuid
+  id_province     String    @db.Uuid
+  street          String    @db.VarChar(40)
+  street_number   Int
+  door            String?   @db.VarChar(4)
+  home_created_at DateTime  @default(now()) @db.Timestamp(6)
+  home_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  locality        locality  @relation(fields: [id_locality], references: [id_locality], onDelete: NoAction, onUpdate: NoAction, map: "fk_home_locality")
+  province        province  @relation(fields: [id_province], references: [id_province], onDelete: NoAction, onUpdate: NoAction, map: "fk_home_province")
+  person          person[]
+}
+
+model late_arrival {
+  id_late_arrival         String    @id(map: "pk_late_arrival") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  date_late_arrival       DateTime  @db.Date
+  time_late_arrival       DateTime  @db.Time(6)
+  late_arrival_created_at DateTime  @default(now()) @db.Timestamp(6)
+  late_arrival_updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model license {
+  id_license         String       @id(map: "pk_license") @unique(map: "unq_id_license") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_license_type    String       @db.Uuid
+  start_date_license DateTime     @db.Date
+  end_date_license   DateTime     @db.Date
+  license_created_at DateTime     @default(now()) @db.Timestamp(6)
+  license_updated_at DateTime?    @default(now()) @db.Timestamp(6)
+  license_type       license_type @relation(fields: [id_license_type], references: [id_license_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_license_type")
+}
+
+model license_type {
+  id_license_type     String    @id(map: "pk_license_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title_license       String    @unique @db.VarChar(30)
+  description_license String    @db.VarChar(100)
+  license_isactive    Boolean   @default(true)
+  license             license[]
+}
+
+model locality {
+  id_locality String @id(map: "pk_localidad") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  locality    String @unique @db.VarChar(30)
+  home        home[]
+}
+
+model login {
+  id_log     String @id(map: "pk_login") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_user    String @db.Uuid
+  ip_address String @db.VarChar(15)
+  user_agent String @db.VarChar(150)
+  user       user   @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_login_user")
+}
+
+model notification {
+  id_notification                     String            @id(map: "pk_notification") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_notification_type                String            @db.Uuid
+  id_sender                           String            @db.Uuid
+  id_receptor                         String            @db.Uuid
+  message                             String            @db.VarChar(500)
+  read_status                         Boolean
+  notification_created_at             DateTime          @default(now()) @db.Timestamp(6)
+  notification_updated_at             DateTime?         @default(now()) @db.Timestamp(6)
+  user_notification_id_receptorTouser user              @relation("notification_id_receptorTouser", fields: [id_receptor], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receptor")
+  user_notification_id_senderTouser   user              @relation("notification_id_senderTouser", fields: [id_sender], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_sender")
+  notification_type                   notification_type @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
+}
+
+model notification_type {
+  id_notification_type  String         @id(map: "pk_notification_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title_notification    Int            @unique
+  start_hour            DateTime       @db.Time(6)
+  end_hour              DateTime       @db.Time(6)
+  allowed_roles         String         @db.VarChar(200)
+  notification_isactive Boolean
+  notification          notification[]
+}
+
+model person {
+  id_person             String     @id(map: "pk_person") @unique(map: "unq_id_person") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_gender             String     @db.Uuid
+  id_family             String?    @db.Uuid
+  id_address            String?    @db.Uuid
+  name                  String     @db.VarChar(50)
+  surname               String     @db.VarChar(50)
+  birth_date            DateTime   @db.Date
+  identification_number Int        @unique
+  person_created_at     DateTime   @default(now()) @db.Timestamp(6)
+  person_updated_at     DateTime?  @default(now()) @db.Timestamp(6)
+  employee              employee[]
+  home                  home?      @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
+  family                family?    @relation(fields: [id_family], references: [id_family], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_family")
+  gender                gender     @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
+}
+
+model phone {
+  id_phone         String    @id(map: "pk_phone") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  phone_no         Int
+  phone_created_at DateTime  @default(now()) @db.Timestamp(6)
+  phone_updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model province {
+  id_province String @id(map: "pk_province") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  province    String @unique @db.VarChar(50)
+  home        home[]
+}
+
+model third_party {
+  id_third_party   String @id(map: "pk") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  role_description String @db.VarChar(20)
+}
+
+model training {
+  id_training         String        @id(map: "pk_training") @unique(map: "unq_id_training") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_training_type    String        @db.Uuid
+  reason_training     String?       @db.VarChar(200)
+  training_created_at DateTime      @default(now()) @db.Timestamp(6)
+  training_updated_at DateTime?     @default(now()) @db.Timestamp(6)
+  training_type       training_type @relation(fields: [id_training_type], references: [id_training_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_training_type")
+}
+
+model training_type {
+  id_training_type          String     @id(map: "pk_id_training_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title_training_type       String     @unique @db.VarChar(30)
+  description_training_type String     @db.VarChar(100)
+  training_isactive         Boolean
+  training                  training[]
+}
+
+model user {
+  id_user                                     String             @id(map: "pk_user") @unique(map: "unq_id_user") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_user_type                                String             @db.Uuid
+  username                                    Int                @unique
+  password                                    String             @db.VarChar(100)
+  user_isactive                               Boolean            @default(true)
+  user_created_at                             DateTime           @default(now()) @db.Timestamp(6)
+  user_updated_at                             DateTime?          @default(now()) @db.Timestamp(6)
+  employee_history                            employee_history[]
+  login                                       login[]
+  notification_notification_id_receptorTouser notification[]     @relation("notification_id_receptorTouser")
+  notification_notification_id_senderTouser   notification[]     @relation("notification_id_senderTouser")
+  user_type                                   user_type          @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
+}
+
+model user_type {
+  id_user_type String @id(map: "pk_user_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_type    String @unique @db.VarChar(15)
+  user         user[]
+}
+
+model vacations {
+  id_vacations         String    @id(map: "pk_vacations") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  start_date_vacations DateTime  @db.Date
+  end_date_vacations   DateTime  @db.Date
+  vacations_created_at DateTime  @default(now()) @db.Timestamp(6)
+  vacations_updated_at DateTime? @default(now()) @db.Timestamp(6)
+}

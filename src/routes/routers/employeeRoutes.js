@@ -5,6 +5,8 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 
 import { Employees } from '../../controllers/employees/index.js';
 
+import { upload } from '../../helpers/multer.js';
+
 export const employeeRouter = express.Router();
 
 // Faltan: licensesTypes, trainingTypes,
@@ -106,6 +108,7 @@ employeeRouter.post(
   '/',
   isAuthenticated,
   isAdmin,
+  upload.single('imgFile'),
   Employees.PostController.createEmployee,
 );
 employeeRouter.post(

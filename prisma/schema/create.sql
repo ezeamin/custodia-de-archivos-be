@@ -1,0 +1,294 @@
+CREATE SCHEMA IF NOT EXISTS public;
+
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE public.area (
+    id_area   UUID DEFAULT uuid_generate_v4() NOT NULL,
+    area      varchar(20) NOT NULL UNIQUE,
+    CONSTRAINT pk_area PRIMARY KEY (id_area)
+);
+
+CREATE TABLE public.employee_status (
+    id_status            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    title_status         varchar(10) NOT NULL UNIQUE,
+    CONSTRAINT pk_employee_status PRIMARY KEY (id_status)
+);
+
+CREATE TABLE public.family_relationship_type (
+    id_family_relationship_type    UUID DEFAULT uuid_generate_v4() NOT NULL,
+    relationship_type              varchar(20) NOT NULL,
+    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
+);
+
+CREATE TABLE public.family (
+    id_family            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_relationship_type UUID DEFAULT uuid_generate_v4() NOT NULL,
+    CONSTRAINT pk_family PRIMARY KEY (id_family)
+);
+
+CREATE TABLE public.gender (
+    id_gender            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    gender               varchar(15) NOT NULL UNIQUE,
+    CONSTRAINT pk_gender PRIMARY KEY (id_gender)
+);
+
+CREATE TABLE public.locality (
+    id_locality          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    locality             varchar(30) NOT NULL UNIQUE,
+    CONSTRAINT pk_localidad PRIMARY KEY (id_locality)
+);
+
+CREATE TABLE public.phone (
+    id_phone          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    phone_no          integer NOT NULL,
+    phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_phone PRIMARY KEY (id_phone)
+);
+
+CREATE TABLE public.province (
+    id_province       UUID DEFAULT uuid_generate_v4() NOT NULL,
+    province          varchar(50) NOT NULL UNIQUE,
+    CONSTRAINT pk_province PRIMARY KEY (id_province)
+);
+
+CREATE TABLE public.home (
+    id_address           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_locality          UUID NOT NULL,
+    id_province          UUID NOT NULL,
+    street               varchar(40) NOT NULL,
+    street_number        integer NOT NULL,
+    door                 varchar(4),
+    home_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    home_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_home PRIMARY KEY (id_address),
+    CONSTRAINT fk_home_locality FOREIGN KEY (id_locality) REFERENCES public.locality(id_locality),
+    CONSTRAINT fk_home_province FOREIGN KEY (id_province) REFERENCES public.province(id_province)
+);
+
+
+CREATE TABLE public.person (
+    id_person            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_gender            UUID NOT NULL,
+    id_family            UUID ,
+    id_address           UUID ,
+    name                 varchar(50) NOT NULL,
+    surname              varchar(50) NOT NULL,
+    birth_date           date NOT NULL,
+    identification_number integer NOT NULL UNIQUE,
+    person_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    person_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_person PRIMARY KEY (id_person),
+    CONSTRAINT fk_person_gender FOREIGN KEY (id_gender) REFERENCES public.gender(id_gender),
+    CONSTRAINT fk_person_family FOREIGN KEY (id_family) REFERENCES public.family(id_family),
+    CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public.home(id_address)
+);
+
+CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
+
+CREATE TABLE public.user_type (
+    id_user_type     UUID DEFAULT uuid_generate_v4() NOT NULL,
+    user_type        varchar(15) NOT NULL UNIQUE,
+    CONSTRAINT pk_user_type PRIMARY KEY (id_user_type)
+);
+
+CREATE TABLE public."user" (
+    id_user              UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_user_type         UUID NOT NULL,
+    username             integer NOT NULL UNIQUE,
+    "password"           varchar(100) NOT NULL,
+    user_isactive        boolean DEFAULT true NOT NULL,
+    user_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    user_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_user PRIMARY KEY (id_user),
+    CONSTRAINT fk_user_type FOREIGN KEY (id_user_type) REFERENCES public.user_type(id_user_type)
+);
+
+CREATE UNIQUE INDEX unq_id_user ON public."user" (id_user);
+
+CREATE TABLE public.employee (
+    id_employee          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_person            UUID NOT NULL,
+    id_status            UUID NOT NULL,
+    id_area              UUID NOT NULL,
+    no_file              integer NOT NULL UNIQUE,
+    email                varchar(75) NOT NULL UNIQUE,
+    employment_date      date NOT NULL,
+    termination_date     date,
+    position             varchar(100) NOT NULL,
+    working_hours        integer DEFAULT 0,
+    picture_url          varchar(300) NOT NULL,
+    employee_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    employee_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_employee PRIMARY KEY (id_employee),
+    CONSTRAINT fk_employee_status FOREIGN KEY (id_status) REFERENCES public.employee_status(id_status),
+    CONSTRAINT fk_employee_area FOREIGN KEY (id_area) REFERENCES public.area(id_area),
+    CONSTRAINT fk_employee_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
+);
+
+CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
+
+CREATE TABLE public.employee_history (
+    id_history           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee          UUID NOT NULL,
+    id_modifying_user    UUID NOT NULL,
+    modified_field       varchar(30) NOT NULL,
+    previous_value       jsonb,
+    current_value        jsonb,
+    modification_date    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT pk_employee_history PRIMARY KEY (id_history),
+    CONSTRAINT fk_employee_history_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_employee_history_user FOREIGN KEY (id_modifying_user) REFERENCES public."user"(id_user)
+);
+
+CREATE TABLE public.extra_hours (
+    id_extra_hours       UUID DEFAULT uuid_generate_v4() NOT NULL,
+    date_extra_hours     date NOT NULL,
+    qty_extra_hours      integer NOT NULL,
+    CONSTRAINT pk_extra_hours PRIMARY KEY (id_extra_hours)
+);
+
+CREATE TABLE public.formal_warning (
+    id_formal_warning    UUID DEFAULT uuid_generate_v4() NOT NULL,
+    desc_formal_warning  varchar(200) NOT NULL,
+    date_formal_warning  date NOT NULL,
+    formal_warning_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    formal_warning_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_formal_warning PRIMARY KEY (id_formal_warning)
+);
+
+CREATE TABLE public.late_arrival (
+    id_late_arrival      UUID DEFAULT uuid_generate_v4() NOT NULL,
+    date_late_arrival    date NOT NULL,
+    time_late_arrival    time NOT NULL,
+    late_arrival_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    late_arrival_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_late_arrival PRIMARY KEY (id_late_arrival)
+);
+
+CREATE TABLE public.license_type (
+    id_license_type      UUID DEFAULT uuid_generate_v4() NOT NULL,
+    title_license        varchar(30) NOT NULL UNIQUE,
+    description_license  varchar(100) NOT NULL,
+    license_isactive     boolean NOT NULL DEFAULT true,
+    CONSTRAINT pk_license_type PRIMARY KEY (id_license_type)
+);
+
+CREATE TABLE public.notification_type (
+    id_notification_type UUID DEFAULT uuid_generate_v4() NOT NULL,
+    title_notification   integer NOT NULL UNIQUE,
+    start_hour           time NOT NULL,
+    end_hour             time NOT NULL,
+    -- TODO: Check if this is the correct way to store the roles
+    allowed_roles        varchar(200) NOT NULL,
+    notification_isactive boolean NOT NULL,
+    CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
+);
+
+CREATE TABLE public.training_type (
+    id_training_type           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    title_training_type        varchar(30) NOT NULL UNIQUE,
+    description_training_type  varchar(100) NOT NULL,
+    training_isactive          boolean NOT NULL,
+    CONSTRAINT pk_id_training_type PRIMARY KEY (id_training_type)
+);
+
+CREATE TABLE public.vacations (
+    id_vacations         UUID DEFAULT uuid_generate_v4() NOT NULL,
+    start_date_vacations date NOT NULL,
+    end_date_vacations   date NOT NULL,
+    vacations_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    vacations_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_vacations PRIMARY KEY (id_vacations)
+);
+
+CREATE TABLE public.absence (
+    id_absence           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    date_absence         date NOT NULL,
+    reason_absence       varchar(50) NOT NULL,
+    CONSTRAINT pk_absence PRIMARY KEY (id_absence)
+);
+
+CREATE TABLE public.license (
+    id_license           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_license_type      UUID NOT NULL,
+    start_date_license   date NOT NULL,
+    end_date_license     date NOT NULL,
+    license_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    license_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_license PRIMARY KEY (id_license),
+    CONSTRAINT fk_license_type FOREIGN KEY (id_license_type) REFERENCES public.license_type(id_license_type)
+);
+
+CREATE UNIQUE INDEX unq_id_license ON public.license (id_license);
+
+CREATE TABLE public.training (
+    id_training          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_training_type     UUID NOT NULL,
+    reason_training      varchar(200),
+    training_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    training_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_training PRIMARY KEY (id_training),
+    CONSTRAINT fk_training_type FOREIGN KEY (id_training_type) REFERENCES public.training_type(id_training_type)
+);
+
+CREATE UNIQUE INDEX unq_id_training ON public.training (id_training);
+
+CREATE TABLE public.login (
+    id_log               UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_user              UUID NOT NULL,
+    ip_address           varchar(15) NOT NULL,
+    user_agent           varchar(150) NOT NULL,
+    CONSTRAINT pk_login PRIMARY KEY (id_log),
+    CONSTRAINT fk_login_user FOREIGN KEY (id_user) REFERENCES public."user"(id_user)
+);
+
+CREATE TABLE public.notification (
+    id_notification            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_notification_type       UUID NOT NULL,
+    id_sender                  UUID NOT NULL,
+    id_receptor                UUID NOT NULL,
+    message                    varchar(500) NOT NULL,
+    read_status                boolean NOT NULL,
+    notification_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    notification_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_notification PRIMARY KEY (id_notification),
+    CONSTRAINT fk_notification_type FOREIGN KEY (id_notification_type) REFERENCES public.notification_type(id_notification_type),
+    CONSTRAINT fk_notification_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user),
+    CONSTRAINT fk_notification_receptor FOREIGN KEY (id_receptor) REFERENCES public."user"(id_user)
+);
+
+CREATE TABLE public.third_party (
+    id_third_party       UUID DEFAULT uuid_generate_v4() NOT NULL,
+    role_description     varchar(20) NOT NULL,
+    CONSTRAINT pk PRIMARY KEY (id_third_party)
+);
+
+CREATE TABLE public.employee_doc (
+    id_employee_doc      UUID DEFAULT uuid_generate_v4() NOT NULL,
+    doc_url              varchar(150) NOT NULL,
+    doc_name             varchar(50) NOT NULL,
+    doc_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_employee_doc PRIMARY KEY (id_employee_doc)
+);
+
+-- Insert data into tables
+
+INSERT INTO public.gender (gender)
+VALUES
+    ('Masculino'),
+    ('Femenino'),
+    ('Otro');
+
+INSERT INTO public.area (area)
+VALUES
+    ('Mantenimiento'),
+    ('Administración'),('Almacenamiento');
+
+INSERT INTO public.employee_status (title_status) VALUES
+  ('active'),
+  ('suspended'),
+  ('inactive'),
+  ('deleted');
