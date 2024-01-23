@@ -16,13 +16,35 @@ cloudinary.config({
 
 const parser = new DatauriParser();
 
-export const handleUpload = async (req) => {
+const imageFormats = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+export const handleUpload = async (req, privateDoc = false) => {
   const extName = path.extname(req.file.originalname).toString();
   const file64 = parser.format(extName, req.file.buffer);
 
+  const sanitizedFileName = req.file.originalname
+    .toLowerCase()
+    .replace(/[\s/\\:*?"<>|ñáéíóú]/g, '_')
+    .replace(/ñ/g, 'n')
+    .replace(/á/g, 'a')
+    .replace(/é/g, 'e')
+    .replace(/í/g, 'i')
+    .replace(/ó/g, 'o')
+    .replace(/ú/g, 'u');
+
   const res = await cloudinary.uploader.upload(file64.content, {
-    resource_type: 'auto',
-    
+    resource_type: imageFormats.includes(extName) ? 'image' : 'raw',
+    public_id: sanitizedFileName,
+    type: privateDoc ? 'private' : 'upload',
   });
   return res;
+};
+
+export const getDownloadLink = (originalUrl) => {
+  const publicId = originalUrl.split('/').pop().split('.')[0];
+  const extension = originalUrl.split('.').pop();
+
+  return cloudinary.utils.private_download_url(publicId, extension, {
+    resource_type: 'raw',
+  });
 };

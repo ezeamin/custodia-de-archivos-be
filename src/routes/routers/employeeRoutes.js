@@ -115,6 +115,7 @@ employeeRouter.post(
   '/:employeeId/docs',
   isAuthenticated,
   isAdmin,
+  upload.single('file'),
   Employees.PostController.createEmployeeDoc,
 );
 employeeRouter.post(

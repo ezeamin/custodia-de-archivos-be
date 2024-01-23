@@ -5,6 +5,7 @@ import {
   calculateDateDiffInAges,
   toLocalTz,
 } from '../../../helpers/helpers.js';
+import { getDownloadLink } from '../../../helpers/cloudinary.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -144,7 +145,37 @@ export class GetController {
   }
 
   // @param - employeeId
-  static async employeeDocs(req, res) {}
+  static async employeeDocs(req, res) {
+    const {
+      params: { employeeId },
+    } = req;
+
+    try {
+      const docs = await prisma.employee_doc.findMany({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      const formattedData = docs.map((doc) => ({
+        id: doc.id_employee_doc,
+        name: doc.employee_doc_name,
+        url: getDownloadLink(doc.employee_doc_url),
+      }));
+
+      res.json({
+        data: formattedData,
+        message: 'Employee documents retrieved successfully',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Error al intentar obtener los documentos del empleado. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
   static async employeeHistory(req, res) {}
