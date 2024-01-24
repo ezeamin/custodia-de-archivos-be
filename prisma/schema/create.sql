@@ -33,40 +33,50 @@ CREATE TABLE public.gender (
     CONSTRAINT pk_gender PRIMARY KEY (id_gender)
 );
 
-CREATE TABLE public.locality (
-    id_locality          UUID DEFAULT uuid_generate_v7() NOT NULL,
-    locality             varchar(30) NOT NULL UNIQUE,
-    CONSTRAINT pk_localidad PRIMARY KEY (id_locality)
-);
-
-CREATE TABLE public.phone (
-    id_phone          UUID DEFAULT uuid_generate_v7() NOT NULL,
-    phone_no          integer NOT NULL,
-    phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_phone PRIMARY KEY (id_phone)
-);
-
 CREATE TABLE public.province (
     id_province       UUID DEFAULT uuid_generate_v7() NOT NULL,
+    province_api_id   varchar(20) NOT NULL UNIQUE,
     province          varchar(50) NOT NULL UNIQUE,
     CONSTRAINT pk_province PRIMARY KEY (id_province)
 );
 
-CREATE TABLE public.home (
-    id_address           UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_locality          UUID NOT NULL,
+CREATE TABLE public.locality (
+    id_locality          UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_province          UUID NOT NULL,
-    street               varchar(40) NOT NULL,
-    street_number        integer NOT NULL,
-    door                 varchar(4),
-    home_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    home_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_home PRIMARY KEY (id_address),
-    CONSTRAINT fk_home_locality FOREIGN KEY (id_locality) REFERENCES public.locality(id_locality),
-    CONSTRAINT fk_home_province FOREIGN KEY (id_province) REFERENCES public.province(id_province)
+    locality_api_id      varchar(20) NOT NULL UNIQUE,
+    locality             varchar(30) NOT NULL UNIQUE,
+    CONSTRAINT pk_localidad PRIMARY KEY (id_locality),
+    CONSTRAINT fk_locality_province FOREIGN KEY (id_province) REFERENCES public.province(id_province)
 );
 
+
+CREATE TABLE public.street (
+    id_street          UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_locality        UUID NOT NULL,
+    street_api_id      varchar(20) NOT NULL UNIQUE,
+    street             varchar(75) NOT NULL UNIQUE,
+    CONSTRAINT pk_street PRIMARY KEY (id_street),
+    CONSTRAINT fk_street_locality FOREIGN KEY (id_locality) REFERENCES public.locality(id_locality)
+);
+
+CREATE TABLE public."address" (
+    id_address           UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_street            UUID NOT NULL,
+    street_number        integer NOT NULL,
+    door                 varchar(4),
+    address_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    address_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_address PRIMARY KEY (id_address),
+    CONSTRAINT fk_address_street FOREIGN KEY (id_street) REFERENCES public.street(id_street)
+);
+
+CREATE TABLE public.phone (
+    id_phone          UUID DEFAULT uuid_generate_v7() NOT NULL,
+    phone_no          varchar(13) NOT NULL UNIQUE,
+    phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_phone PRIMARY KEY (id_phone)
+);
 
 CREATE TABLE public.person (
     id_person            UUID DEFAULT uuid_generate_v7() NOT NULL,
@@ -83,7 +93,7 @@ CREATE TABLE public.person (
     CONSTRAINT pk_person PRIMARY KEY (id_person),
     CONSTRAINT fk_person_gender FOREIGN KEY (id_gender) REFERENCES public.gender(id_gender),
     CONSTRAINT fk_person_family FOREIGN KEY (id_family) REFERENCES public.family(id_family),
-    CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public.home(id_address),
+    CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public."address"(id_address),
     CONSTRAINT fk_person_phone FOREIGN KEY (id_phone) REFERENCES public.phone(id_phone)
 );
 
@@ -373,24 +383,24 @@ BEFORE UPDATE ON public.phone
 FOR EACH ROW
 EXECUTE PROCEDURE update_phone_updated_at();
 
--- home updated_at trigger
-CREATE OR REPLACE FUNCTION update_home_updated_at()
+-- address updated_at trigger
+CREATE OR REPLACE FUNCTION update_address_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Update person_updated_at that is related to this home
+    -- Update person_updated_at that is related to this address
     UPDATE public.person
     SET person_updated_at = now()
-    WHERE id_person = (SELECT id_person FROM public.home WHERE id_address = NEW.id_address);
+    WHERE id_person = (SELECT id_person FROM public."address" WHERE id_address = NEW.id_address);
 
-    NEW.home_updated_at = now();
+    NEW.address_updated_at = now();
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_home_updated_at
-BEFORE UPDATE ON public.home
+CREATE TRIGGER update_address_updated_at
+BEFORE UPDATE ON public."address"
 FOR EACH ROW
-EXECUTE PROCEDURE update_home_updated_at();
+EXECUTE PROCEDURE update_address_updated_at();
 
 -- employee updated_at trigger
 CREATE OR REPLACE FUNCTION update_employee_updated_at()

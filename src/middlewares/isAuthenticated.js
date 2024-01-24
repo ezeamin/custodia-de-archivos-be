@@ -28,7 +28,6 @@ export const isAuthenticated = (req, res, next) => {
     next();
   } catch (err) {
     // invalid token
-    console.error('🟥', err);
     res.status(HttpStatus.UNAUTHORIZED).json({
       data: null,
       message: 'Token no valido o expirado',

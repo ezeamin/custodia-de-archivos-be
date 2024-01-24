@@ -184,6 +184,7 @@ employeeRouter.put(
   '/:employeeId/image',
   isAuthenticated,
   isAdmin,
+  upload.single('imgFile'),
   Employees.PutController.updateEmployeeImage,
 );
 employeeRouter.put(

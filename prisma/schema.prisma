@@ -18,6 +18,17 @@ model absence {
   employee           employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_absence_employee")
 }
 
+model address {
+  id_address         String    @id(map: "pk_address") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_street          String    @db.Uuid
+  street_number      Int
+  door               String?   @db.VarChar(4)
+  address_created_at DateTime  @default(now()) @db.Timestamp(6)
+  address_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  street             street    @relation(fields: [id_street], references: [id_street], onDelete: NoAction, onUpdate: NoAction, map: "fk_address_street")
+  person             person[]
+}
+
 model area {
   id_area  String     @id(map: "pk_area") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   area     String     @unique @db.VarChar(20)
@@ -120,20 +131,6 @@ model gender {
   person    person[]
 }
 
-model home {
-  id_address      String    @id(map: "pk_home") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_locality     String    @db.Uuid
-  id_province     String    @db.Uuid
-  street          String    @db.VarChar(40)
-  street_number   Int
-  door            String?   @db.VarChar(4)
-  home_created_at DateTime  @default(now()) @db.Timestamp(6)
-  home_updated_at DateTime? @default(now()) @db.Timestamp(6)
-  locality        locality  @relation(fields: [id_locality], references: [id_locality], onDelete: NoAction, onUpdate: NoAction, map: "fk_home_locality")
-  province        province  @relation(fields: [id_province], references: [id_province], onDelete: NoAction, onUpdate: NoAction, map: "fk_home_province")
-  person          person[]
-}
-
 model late_arrival {
   id_late_arrival          String    @id(map: "pk_late_arrival") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_employee              String    @db.Uuid
@@ -167,9 +164,12 @@ model license_type {
 }
 
 model locality {
-  id_locality String @id(map: "pk_localidad") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  locality    String @unique @db.VarChar(30)
-  home        home[]
+  id_locality     String   @id(map: "pk_localidad") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_province     String   @db.Uuid
+  locality_api_id String   @unique @db.VarChar(20)
+  locality        String   @unique @db.VarChar(30)
+  province        province @relation(fields: [id_province], references: [id_province], onDelete: NoAction, onUpdate: NoAction, map: "fk_locality_province")
+  street          street[]
 }
 
 model login {
@@ -196,6 +196,16 @@ model notification {
   notification_doc                    notification_doc[]
 }
 
+model notification_doc {
+  id_notification_doc         String       @id(map: "pk_notification_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_notification             String       @db.Uuid
+  notification_doc_url        String       @db.VarChar(250)
+  notification_doc_name       String       @db.VarChar(50)
+  notification_doc_created_at DateTime     @default(now()) @db.Timestamp(6)
+  notification_doc_updated_at DateTime?    @default(now()) @db.Timestamp(6)
+  notification                notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_doc_notification")
+}
+
 model notification_type {
   id_notification_type  String         @id(map: "pk_notification_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   title_notification    String         @db.VarChar(100)
@@ -219,7 +229,7 @@ model person {
   person_created_at     DateTime      @default(now()) @db.Timestamp(6)
   person_updated_at     DateTime?     @default(now()) @db.Timestamp(6)
   employee              employee[]
-  home                  home?         @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
+  address               address?      @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
   family                family?       @relation(fields: [id_family], references: [id_family], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_family")
   gender                gender        @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
   phone                 phone?        @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
@@ -228,16 +238,26 @@ model person {
 
 model phone {
   id_phone         String    @id(map: "pk_phone") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  phone_no         Int
+  phone_no         String    @unique @db.VarChar(13)
   phone_created_at DateTime  @default(now()) @db.Timestamp(6)
   phone_updated_at DateTime? @default(now()) @db.Timestamp(6)
   person           person[]
 }
 
 model province {
-  id_province String @id(map: "pk_province") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  province    String @unique @db.VarChar(50)
-  home        home[]
+  id_province     String     @id(map: "pk_province") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  province_api_id String     @unique @db.VarChar(20)
+  province        String     @unique @db.VarChar(50)
+  locality        locality[]
+}
+
+model street {
+  id_street     String    @id(map: "pk_street") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_locality   String    @db.Uuid
+  street_api_id String    @unique @db.VarChar(20)
+  street        String    @unique @db.VarChar(75)
+  address       address[]
+  locality      locality  @relation(fields: [id_locality], references: [id_locality], onDelete: NoAction, onUpdate: NoAction, map: "fk_street_locality")
 }
 
 model third_party {
@@ -293,16 +313,6 @@ model user_type {
   id_user_type String @id(map: "pk_user_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   user_type    String @unique @db.VarChar(15)
   user         user[]
-}
-
-model notification_doc {
-  id_notification_doc         String       @id(map: "pk_notification_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_notification             String       @db.Uuid
-  notification_doc_url        String       @db.VarChar(250)
-  notification_doc_name       String       @db.VarChar(50)
-  notification_doc_created_at DateTime     @default(now()) @db.Timestamp(6)
-  notification_doc_updated_at DateTime?    @default(now()) @db.Timestamp(6)
-  notification                notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_doc_notification")
 }
 
 model vacation {

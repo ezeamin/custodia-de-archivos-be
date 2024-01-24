@@ -7,6 +7,7 @@ import {
   toLocalTz,
 } from '../../../helpers/helpers.js';
 import { getDownloadLink } from '../../../helpers/cloudinary.js';
+import { ISODateRegex } from '../../../helpers/regex.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -108,7 +109,19 @@ export class GetController {
           area: true,
           person: {
             include: {
-              home: true,
+              address: {
+                include: {
+                  street: {
+                    include: {
+                      locality: {
+                        include: {
+                          province: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
               phone: true,
               family: true,
               gender: true,
@@ -126,13 +139,24 @@ export class GetController {
         firstname: employee.person.name,
         birthdate: toLocalTz(employee.person.birth_date),
         workingHours: employee.working_hours,
-        address: employee.person.home
+        address: employee.person.address
           ? {
-              street: employee.person.home.street,
-              streetNumber: employee.person.home.street_number,
-              apt: employee.person.home.door,
-              state: employee.person.home.province,
-              locality: employee.person.home.locality,
+              street: {
+                id: employee.person.address.street.street_api_id,
+                description: employee.person.address.street.street,
+              },
+              locality: {
+                id: employee.person.address.street.locality.locality_api_id,
+                description: employee.person.address.street.locality.locality,
+              },
+              state: {
+                id: employee.person.address.street.locality.province
+                  .province_api_id,
+                description:
+                  employee.person.address.street.locality.province.province,
+              },
+              streetNumber: employee.person.address.street_number,
+              apt: employee.person.address.door,
             }
           : null,
         phone: employee.person.phone ? employee.person.phone.phone_no : null,
@@ -220,6 +244,9 @@ export class GetController {
         where: {
           id_employee: employeeId,
         },
+        orderBy: {
+          modification_date: 'desc',
+        },
         include: {
           user: true,
         },
@@ -229,18 +256,26 @@ export class GetController {
         let prev = record.previous_value;
         let curr = record.current_value;
 
-        const isPrevDate = prev && dayjs(prev).isValid();
-        const isCurrDate = curr && dayjs(curr).isValid();
+        const isPrevDate =
+          prev &&
+          typeof prev === 'string' &&
+          ISODateRegex.test(prev) &&
+          dayjs(prev).isValid();
+        const isCurrDate =
+          curr &&
+          typeof curr === 'string' &&
+          ISODateRegex.test(curr) &&
+          dayjs(curr).isValid();
 
         if (isPrevDate) {
-          const format = prev.includes('T')
+          const format = !prev.includes('00:00:00')
             ? 'DD/MM/YYYY - HH:mm:ss'
             : 'DD/MM/YYYY';
           prev = dayjs(toLocalTz(prev)).format(format);
         }
 
         if (isCurrDate) {
-          const format = curr.includes('T')
+          const format = !curr.includes('00:00:00')
             ? 'DD/MM/YYYY - HH:mm:ss'
             : 'DD/MM/YYYY';
           curr = dayjs(toLocalTz(curr)).format(format);
