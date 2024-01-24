@@ -32,13 +32,14 @@ export class DeleteController {
         return;
       }
 
-      await prisma.employee_doc.delete({
+      await prisma.employee_doc.update({
         where: {
           id_employee_doc: docId,
         },
+        data: {
+          employee_doc_isactive: false,
+        },
       });
-
-      await deleteFile(doc.employee_doc_url);
 
       res.json({
         data: null,
@@ -48,7 +49,8 @@ export class DeleteController {
       registerChange({
         changedField: 'employee_doc',
         changedFieldLabel: 'Eliminación de Documento',
-        previousValue: doc.employee_doc_name,
+        changedTable: 'employee_doc',
+        previousValue: doc.employee_doc_url,
         newValue: null,
         modifyingUser: req.user.id,
         employeeId: doc.id_employee,
@@ -102,6 +104,7 @@ export class DeleteController {
       registerChange({
         changedField: 'license',
         changedFieldLabel: 'Eliminación de Licencia',
+        changedTable: 'license',
         previousValue: license.license_type.title_license,
         newValue: null,
         modifyingUser: req.user.id,
@@ -153,6 +156,7 @@ export class DeleteController {
       registerChange({
         changedField: 'vacation',
         changedFieldLabel: 'Eliminación de Vacaciones',
+        changedTable: 'vacation',
         previousValue: vacation.start_date_vacation,
         newValue: null,
         modifyingUser: req.user.id,

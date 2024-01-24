@@ -49,6 +49,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'id_status',
       changedFieldLabel: 'Estado',
       previousValue: employeePreviousData.id_status,
@@ -64,6 +65,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'id_area',
       changedFieldLabel: 'Area',
       previousValue: employeePreviousData.id_area,
@@ -79,6 +81,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'email',
       changedFieldLabel: 'Email',
       previousValue: employeePreviousData.email,
@@ -94,6 +97,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'position',
       changedFieldLabel: 'Puesto',
       previousValue: employeePreviousData.position,
@@ -109,6 +113,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'employment_date',
       changedFieldLabel: 'Fecha de Ingreso',
       previousValue: employeePreviousData.employment_date,
@@ -124,6 +129,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'termination_date',
       changedFieldLabel: 'Fecha de Egreso',
       previousValue: employeePreviousData.termination_date,
@@ -139,6 +145,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'no_file',
       changedFieldLabel: 'Número de Legajo',
       previousValue: employeePreviousData.no_file,
@@ -154,6 +161,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'employee',
       changedField: 'working_hours',
       changedFieldLabel: 'Horas de Trabajo',
       previousValue: employeePreviousData.working_hours,
@@ -173,10 +181,11 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'phone',
       changedField: 'phone_no',
       changedFieldLabel: 'Teléfono',
-      previousValue: phonePreviousData ? phonePreviousData.phone_no : null,
-      newValue: phoneNewData.phone_no,
+      previousValue: phonePreviousData ? phonePreviousData.id_phone : null,
+      newValue: phoneNewData.id,
     });
   }
 
@@ -193,12 +202,11 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'street',
       changedField: 'street',
       changedFieldLabel: 'Calle',
-      previousValue: addressPreviousData
-        ? addressPreviousData.street.street
-        : null,
-      newValue: streetNewData.street,
+      previousValue: addressPreviousData ? addressPreviousData.street.id : null,
+      newValue: streetNewData.id,
     });
   }
 
@@ -212,12 +220,13 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'locality',
       changedField: 'locality',
       changedFieldLabel: 'Localidad',
       previousValue: addressPreviousData
-        ? addressPreviousData.street.locality.locality
+        ? addressPreviousData.street.locality.id
         : null,
-      newValue: localityNewData.locality,
+      newValue: localityNewData.locality.id,
     });
   }
 
@@ -231,12 +240,13 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'province',
       changedField: 'province',
       changedFieldLabel: 'Provincia',
       previousValue: addressPreviousData
-        ? addressPreviousData.street.locality.province.province
+        ? addressPreviousData.street.locality.province.id
         : null,
-      newValue: provinceNewData.province,
+      newValue: provinceNewData.id,
     });
   }
 
@@ -249,6 +259,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'address',
       changedField: 'street_number',
       changedFieldLabel: 'Número',
       previousValue: addressPreviousData
@@ -266,6 +277,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'address',
       changedField: 'door',
       changedFieldLabel: 'Departamento',
       previousValue: addressPreviousData ? addressPreviousData.door : null,
@@ -285,6 +297,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'person',
       changedField: 'name',
       changedFieldLabel: 'Nombre',
       previousValue: personPreviousData.name,
@@ -300,6 +313,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'person',
       changedField: 'surname',
       changedFieldLabel: 'Apellido',
       previousValue: personPreviousData.surname,
@@ -315,6 +329,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'person',
       changedField: 'birth_date',
       changedFieldLabel: 'Fecha de Nacimiento',
       previousValue: personPreviousData.birth_date,
@@ -331,6 +346,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'person',
       changedField: 'identification_number',
       changedFieldLabel: 'DNI',
       previousValue: personPreviousData.identification_number,
@@ -339,6 +355,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'user',
       changedField: 'username',
       changedFieldLabel: 'Nombre de Usuario',
       previousValue: personPreviousData.identification_number,
@@ -354,6 +371,7 @@ export const registerEmployeeUpdateChanges = async (
     registerChange({
       modifyingUser: userId,
       employeeId: previousData.id_employee,
+      changedTable: 'gender',
       changedField: 'id_gender',
       changedFieldLabel: 'Género',
       previousValue: personPreviousData.id_gender,

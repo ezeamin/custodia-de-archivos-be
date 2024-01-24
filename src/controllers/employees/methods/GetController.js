@@ -1,5 +1,4 @@
 import HttpStatus from 'http-status-codes';
-import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import {
@@ -7,7 +6,7 @@ import {
   toLocalTz,
 } from '../../../helpers/helpers.js';
 import { getDownloadLink } from '../../../helpers/cloudinary.js';
-import { ISODateRegex } from '../../../helpers/regex.js';
+import { formatHistoryData } from '../../../helpers/formatHistoryData.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -26,6 +25,11 @@ export class GetController {
           area: true,
           person: true,
           employee_status: true,
+        },
+        orderBy: {
+          person: {
+            surname: 'asc',
+          },
         },
         where: {
           OR: [
@@ -216,6 +220,7 @@ export class GetController {
       const docs = await prisma.employee_doc.findMany({
         where: {
           id_employee: employeeId,
+          employee_doc_isactive: true,
         },
       });
 
@@ -242,11 +247,20 @@ export class GetController {
   // @param - employeeId
   static async employeeHistory(req, res) {
     const {
+      query: { page = 0, entries = 10 },
       params: { employeeId },
     } = req;
 
     try {
-      const history = await prisma.employee_history.findMany({
+      const countPromise = prisma.employee_history.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      const historyPromise = prisma.employee_history.findMany({
+        skip: page * entries,
+        take: +entries,
         where: {
           id_employee: employeeId,
         },
@@ -258,50 +272,16 @@ export class GetController {
         },
       });
 
-      const formattedData = history.map((record) => {
-        let prev = record.previous_value;
-        let curr = record.current_value;
+      const [count, history] = await Promise.all([
+        countPromise,
+        historyPromise,
+      ]);
 
-        const isPrevDate =
-          prev &&
-          typeof prev === 'string' &&
-          ISODateRegex.test(prev) &&
-          dayjs(prev).isValid();
-        const isCurrDate =
-          curr &&
-          typeof curr === 'string' &&
-          ISODateRegex.test(curr) &&
-          dayjs(curr).isValid();
-
-        if (isPrevDate) {
-          const format = !prev.includes('00:00:00')
-            ? 'DD/MM/YYYY - HH:mm:ss'
-            : 'DD/MM/YYYY';
-          prev = dayjs(toLocalTz(prev)).format(format);
-        }
-
-        if (isCurrDate) {
-          const format = !curr.includes('00:00:00')
-            ? 'DD/MM/YYYY - HH:mm:ss'
-            : 'DD/MM/YYYY';
-          curr = dayjs(toLocalTz(curr)).format(format);
-        }
-
-        return {
-          id: record.id_employee_history,
-          date: toLocalTz(record.modification_date),
-          field: record.modified_field_label,
-          previousValue: prev,
-          newValue: curr,
-          user: {
-            id: record.id_modifying_user,
-            description: record.user.username,
-          },
-        };
-      });
+      const formattedData = formatHistoryData(history);
 
       res.json({
         data: formattedData,
+        totalElements: count,
         message: 'Employee history retrieved successfully',
       });
     } catch (e) {
@@ -566,7 +546,7 @@ export class GetController {
     try {
       const types = await prisma.license_type.findMany({
         where: {
-          license_isactive: true,
+          license_type_isactive: true,
         },
       });
 
@@ -599,7 +579,7 @@ export class GetController {
       const type = await prisma.license_type.findUnique({
         where: {
           id_license_type: licenseTypeId,
-          license_isactive: true,
+          license_type_isactive: true,
         },
       });
 
@@ -634,7 +614,7 @@ export class GetController {
     try {
       const types = await prisma.training_type.findMany({
         where: {
-          training_isactive: true,
+          training_type_isactive: true,
         },
       });
 
@@ -667,7 +647,7 @@ export class GetController {
       const type = await prisma.training_type.findUnique({
         where: {
           id_training_type: trainingTypeId,
-          training_isactive: true,
+          training_type_isactive: true,
         },
       });
 

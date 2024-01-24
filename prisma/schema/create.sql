@@ -158,7 +158,8 @@ CREATE UNIQUE INDEX unq_id_user ON public."user" (id_user);
 CREATE TABLE public.employee_history (
     id_history           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee          UUID NOT NULL,
-    id_modifying_user    UUID NOT NULL,
+    id_submitted_by      UUID NOT NULL,
+    modified_table       varchar(50) NOT NULL,
     modified_field       varchar(30) NOT NULL,
     modified_field_label varchar(50) NOT NULL,
     previous_value       jsonb,
@@ -166,97 +167,108 @@ CREATE TABLE public.employee_history (
     modification_date    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT pk_employee_history PRIMARY KEY (id_history),
     CONSTRAINT fk_employee_history_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
-    CONSTRAINT fk_employee_history_user FOREIGN KEY (id_modifying_user) REFERENCES public."user"(id_user)
+    CONSTRAINT fk_employee_history_user FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.extra_hours (
     id_extra_hours           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee              UUID NOT NULL,
+    id_submitted_by          UUID NOT NULL,
     date_extra_hours         date NOT NULL,
     qty_extra_hours          integer NOT NULL,
     observation_extra_hours  varchar(200),
     extra_hours_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     extra_hours_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_extra_hours PRIMARY KEY (id_extra_hours),
-    CONSTRAINT fk_extra_hours_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_extra_hours_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_extra_hours_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.formal_warning (
     id_formal_warning           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee                 UUID NOT NULL,
+    id_submitted_by             UUID NOT NULL,
     reason_formal_warning       varchar(200) NOT NULL,
     date_formal_warning         date NOT NULL,
     formal_warning_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     formal_warning_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_formal_warning PRIMARY KEY (id_formal_warning),
-    CONSTRAINT fk_formal_warning_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_formal_warning_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_formal_warning_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.late_arrival (
     id_late_arrival      UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee          UUID NOT NULL,
+    id_submitted_by      UUID NOT NULL,
     date_late_arrival    date NOT NULL,
     time_late_arrival    char(5) NOT NULL,
     observation_late_arrival varchar(200),
     late_arrival_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     late_arrival_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_late_arrival PRIMARY KEY (id_late_arrival),
-    CONSTRAINT fk_late_arrival_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_late_arrival_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_late_arrival_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.license_type (
-    id_license_type      UUID DEFAULT uuid_generate_v7() NOT NULL,
-    title_license        varchar(30) NOT NULL UNIQUE,
-    description_license  varchar(100) NOT NULL,
-    license_isactive     boolean DEFAULT true NOT NULL ,
+    id_license_type                 UUID DEFAULT uuid_generate_v7() NOT NULL,
+    title_license                   varchar(30) NOT NULL UNIQUE,
+    description_license             varchar(100) NOT NULL,
+    license_type_isactive           boolean DEFAULT true NOT NULL ,
     CONSTRAINT pk_license_type PRIMARY KEY (id_license_type)
 );
 
 CREATE TABLE public.notification_type (
-    id_notification_type UUID DEFAULT uuid_generate_v7() NOT NULL,
-    title_notification   varchar(100) NOT NULL,
-    start_hour           char(5) NOT NULL,
-    end_hour             char(5) NOT NULL,
+    id_notification_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    title_notification          varchar(100) NOT NULL,
+    start_hour                  char(5) NOT NULL,
+    end_hour                    char(5) NOT NULL,
     -- TODO: Check if this is the correct way to store the roles
-    allowed_roles        varchar(200) NOT NULL,
-    notification_isactive boolean DEFAULT true NOT NULL ,
+    allowed_roles               varchar(200) NOT NULL,
+    notification_type_isactive  boolean DEFAULT true NOT NULL ,
     CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
 );
 
 CREATE TABLE public.training_type (
-    id_training_type           UUID DEFAULT uuid_generate_v7() NOT NULL,
-    title_training_type        varchar(30) NOT NULL UNIQUE,
-    description_training_type  varchar(100) NOT NULL,
-    training_isactive          boolean DEFAULT true NOT NULL,
+    id_training_type                UUID DEFAULT uuid_generate_v7() NOT NULL,
+    title_training_type             varchar(30) NOT NULL UNIQUE,
+    description_training_type       varchar(100) NOT NULL,
+    training_type_isactive          boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_id_training_type PRIMARY KEY (id_training_type)
 );
 
 CREATE TABLE public.vacation (
     id_vacation            UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_employee             UUID NOT NULL,
+    id_employee            UUID NOT NULL,
+    id_submitted_by        UUID NOT NULL,
     start_date_vacation    date NOT NULL,
     end_date_vacation      date NOT NULL,
     observation_vacation   varchar(200),
     vacation_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     vacation_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_vacation PRIMARY KEY (id_vacation),
-    CONSTRAINT fk_vacations_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_vacations_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_vacations_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.absence (
     id_absence           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee          UUID NOT NULL,
+    id_submitted_by      UUID NOT NULL,
     date_absence         date NOT NULL,
     reason_absence       varchar(50) NOT NULL,
     absence_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     absence_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_absence PRIMARY KEY (id_absence),
-    CONSTRAINT fk_absence_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_absence_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_absence_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.license (
     id_license           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_license_type      UUID NOT NULL,
+    id_submitted_by      UUID NOT NULL,
     id_employee          UUID NOT NULL,
     start_date_license   date NOT NULL,
     end_date_license     date NOT NULL,
@@ -265,7 +277,8 @@ CREATE TABLE public.license (
     license_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_license PRIMARY KEY (id_license),
     CONSTRAINT fk_license_type FOREIGN KEY (id_license_type) REFERENCES public.license_type(id_license_type),
-    CONSTRAINT fk_license_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_license_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_license_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE UNIQUE INDEX unq_id_license ON public.license (id_license);
@@ -274,6 +287,7 @@ CREATE TABLE public.training (
     id_training          UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_training_type     UUID NOT NULL,
     id_employee          UUID NOT NULL,
+    id_submitted_by      UUID NOT NULL,
     date_training        date NOT NULL,
     reason_training      varchar(200),
     observation_training varchar(200),
@@ -281,7 +295,8 @@ CREATE TABLE public.training (
     training_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_training PRIMARY KEY (id_training),
     CONSTRAINT fk_training_type FOREIGN KEY (id_training_type) REFERENCES public.training_type(id_training_type),
-    CONSTRAINT fk_training_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_training_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_training_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE UNIQUE INDEX unq_id_training ON public.training (id_training);
@@ -314,12 +329,15 @@ CREATE TABLE public.notification (
 CREATE TABLE public.employee_doc (
     id_employee_doc               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee                   UUID NOT NULL,
+    id_submitted_by               UUID NOT NULL,
     employee_doc_url              varchar(250) NOT NULL,
     employee_doc_name             varchar(50) NOT NULL,
+    employee_doc_isactive         boolean DEFAULT true NOT NULL,
     employee_doc_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     employee_doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_employee_doc PRIMARY KEY (id_employee_doc),
-    CONSTRAINT fk_employee_doc_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+    CONSTRAINT fk_employee_doc_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_employee_doc_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.notification_doc (
@@ -627,10 +645,11 @@ VALUES (
     '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa'  -- Password: "admin"
 );
 
-INSERT INTO public.employee_history (id_employee,id_modifying_user,modified_field,modified_field_label,previous_value,current_value)
+INSERT INTO public.employee_history (id_employee,id_submitted_by,modified_table,modified_field,modified_field_label,previous_value,current_value)
 VALUES (
     '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
     '1249cbd7-5184-45d4-bd18-04a3f0769e99',
+    'employee',
     'employee',
     'Creación de Empleado',
     NULL,

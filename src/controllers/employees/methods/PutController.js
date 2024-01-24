@@ -50,7 +50,7 @@ export class PutController {
         return;
       }
 
-      const formattedData = formatEmployeeData(req.body);
+      let formattedData = formatEmployeeData(req.body);
 
       // -------------------------
       // A - Address changes
@@ -149,6 +149,23 @@ export class PutController {
             },
           });
         }
+
+        // Update origin
+        formattedData = {
+          ...formattedData,
+          street: {
+            ...formattedData.street,
+            id: streetId,
+          },
+          locality: {
+            ...formattedData.locality,
+            id: localityId,
+          },
+          province: {
+            ...formattedData.province,
+            id: provinceId,
+          },
+        };
       }
 
       // -------------------------
@@ -192,6 +209,14 @@ export class PutController {
             },
           });
         }
+
+        formattedData = {
+          ...formattedData,
+          phone: {
+            ...formattedData.phone,
+            id: phone.id_phone,
+          },
+        };
       }
 
       // -------------------------
@@ -337,6 +362,7 @@ export class PutController {
       registerChange({
         changedField: 'employee_img_url',
         changedFieldLabel: 'Imagen de Empleado',
+        changedTable: 'employee',
         previousValue: previousImageUrl,
         newValue: imageUrl,
         modifyingUser: req.user.id,
@@ -394,6 +420,7 @@ export class PutController {
       registerChange({
         changedField: 'employee_doc_name',
         changedFieldLabel: 'Nombre de Documento',
+        changedTable: 'employee_doc',
         previousValue: doc.employee_doc_name,
         newValue: newName,
         modifyingUser: req.user.id,

@@ -3,6 +3,7 @@ import { prisma } from './prisma.js';
 export const registerChange = async ({
   changedField,
   changedFieldLabel,
+  changedTable,
   previousValue,
   newValue,
   modifyingUser,
@@ -11,6 +12,7 @@ export const registerChange = async ({
   console.log('🟢', {
     changedField,
     changedFieldLabel,
+    changedTable,
     previousValue,
     newValue,
     modifyingUser,
@@ -20,8 +22,9 @@ export const registerChange = async ({
   try {
     await prisma.employee_history.create({
       data: {
-        id_modifying_user: modifyingUser,
+        id_submitted_by: modifyingUser,
         id_employee: employeeId,
+        modified_table: changedTable,
         modified_field: changedField,
         modified_field_label: changedFieldLabel,
         current_value: newValue,

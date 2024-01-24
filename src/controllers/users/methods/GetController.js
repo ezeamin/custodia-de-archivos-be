@@ -6,7 +6,91 @@ import { toLocalTz } from '../../../helpers/helpers.js';
 
 export class GetController {
   static async users(req, res) {
-    res.sendStatus(500);
+    const {
+      query: { page = 0, entries = 10, query = '', role = '' },
+      user: { id: userId },
+    } = req;
+
+    try {
+      const countPromise = prisma.user.count();
+      const dataPromise = prisma.user.findMany({
+        skip: page * entries,
+        take: +entries,
+        include: {
+          employee: {
+            include: {
+              person: true,
+            },
+          },
+          user_type: true,
+        },
+        where: {
+          NOT: {
+            id_user: userId,
+          },
+          user_type: {
+            user_type: {
+              contains: role,
+              mode: 'insensitive',
+            },
+          },
+          employee: {
+            OR: [
+              {
+                person: {
+                  name: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+              {
+                person: {
+                  surname: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+              {
+                person: {
+                  identification_number: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const [count, data] = await Promise.all([countPromise, dataPromise]);
+
+      const formattedData = data.map((user) => ({
+        id: user.id_user,
+        username: user.username,
+        imgSrc: user.employee.picture_url,
+        firstname: user.employee.person.name,
+        lastname: user.employee.person.surname,
+        role: {
+          id: user.user_type.id_user_type,
+          description: user.user_type.user_type.toUpperCase(),
+        },
+      }));
+
+      res.json({
+        data: formattedData,
+        totalElements: count,
+        message: 'Usuarios obtenidos exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al obtener los usuarios',
+      });
+    }
   }
 
   static async loginLogs(req, res) {

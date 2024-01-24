@@ -1,4 +1,5 @@
 import HttpStatus from 'http-status-codes';
+import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
@@ -83,6 +84,7 @@ export class PostController {
       registerChange({
         changedField: 'employee',
         changedFieldLabel: 'Creación de Empleado',
+        changedTable: 'employee',
         previousValue: null,
         newValue: new Date().toISOString(),
         modifyingUser: req.user.id,
@@ -127,6 +129,7 @@ export class PostController {
   static async createEmployeeDoc(req, res) {
     const {
       params: { employeeId },
+      user: { id: loggedUserId },
     } = req;
 
     let docUrl = '';
@@ -179,12 +182,26 @@ export class PostController {
               id_employee: employeeId,
             },
           },
+          user: {
+            connect: {
+              id_user: loggedUserId,
+            },
+          },
         },
       });
 
       res.json({
         data: null,
         message: 'Documento creado exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'employee_doc',
+        changedField: 'employee_doc',
+        changedFieldLabel: 'Carga de Documento',
+        previousValue: null,
+        newValue: `${filename} - ${dayjs().format('DD/MM/YYYY - HH:mm:ss')}`,
+        modifyingUser: req.user.id,
       });
     } catch (e) {
       console.error('🟥', e);
@@ -201,6 +218,7 @@ export class PostController {
     const {
       params: { employeeId },
       body: { date, reason },
+      user: { id: loggedUserId },
     } = req;
 
     try {
@@ -211,6 +229,11 @@ export class PostController {
           employee: {
             connect: {
               id_employee: employeeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },
@@ -235,9 +258,8 @@ export class PostController {
     const {
       params: { employeeId },
       body: { typeId, fromDate, toDate, observations },
+      user: { id: loggedUserId },
     } = req;
-
-    console.log(req.body);
 
     try {
       await prisma.license.create({
@@ -253,6 +275,11 @@ export class PostController {
           license_type: {
             connect: {
               id_license_type: typeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },
@@ -277,6 +304,7 @@ export class PostController {
     const {
       params: { employeeId },
       body: { fromDate, toDate, observations },
+      user: { id: loggedUserId },
     } = req;
 
     try {
@@ -288,6 +316,11 @@ export class PostController {
           employee: {
             connect: {
               id_employee: employeeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },
@@ -312,6 +345,7 @@ export class PostController {
     const {
       params: { employeeId },
       body: { date, reason, typeId, observations },
+      user: { id: loggedUserId },
     } = req;
 
     try {
@@ -328,6 +362,11 @@ export class PostController {
           training_type: {
             connect: {
               id_training_type: typeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },
@@ -362,6 +401,7 @@ export class PostController {
     const {
       params: { employeeId },
       body: { date, reason },
+      user: { id: loggedUserId },
     } = req;
 
     try {
@@ -372,6 +412,11 @@ export class PostController {
           employee: {
             connect: {
               id_employee: employeeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },
@@ -406,6 +451,7 @@ export class PostController {
     const {
       params: { employeeId },
       body: { date, hour, observations },
+      user: { id: loggedUserId },
     } = req;
 
     try {
@@ -417,6 +463,11 @@ export class PostController {
           employee: {
             connect: {
               id_employee: employeeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },
@@ -441,6 +492,7 @@ export class PostController {
     const {
       params: { employeeId },
       body: { date, hours, observations },
+      user: { id: loggedUserId },
     } = req;
 
     try {
@@ -452,6 +504,11 @@ export class PostController {
           employee: {
             connect: {
               id_employee: employeeId,
+            },
+          },
+          user: {
+            connect: {
+              id_user: loggedUserId,
             },
           },
         },

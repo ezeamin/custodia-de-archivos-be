@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes';
 import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
+import { registerChange } from '../../../helpers/registerChange.js';
 
 export class PutController {
   static async resetPassword(req, res) {
@@ -51,6 +52,16 @@ export class PutController {
       res.json({
         data: null,
         message: 'Contraseña actualizada exitosamente',
+      });
+
+      registerChange({
+        modifyingUser: userId,
+        changedTable: 'user',
+        changedField: 'password',
+        changedFieldLabel: 'Contraseña',
+        employeeId: user.id_employee,
+        newValue: '***',
+        previousValue: '***',
       });
     } catch (error) {
       console.error('🟥', error);
