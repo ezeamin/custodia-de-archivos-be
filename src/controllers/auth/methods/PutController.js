@@ -25,6 +25,17 @@ export class PutController {
         return;
       }
 
+      const isSamePassword = bcrypt.compareSync(password, user.password);
+
+      if (isSamePassword) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message:
+            'La contraseña no puede ser la misma que actualmente utiliza.',
+        });
+        return;
+      }
+
       const hashedPassword = bcrypt.hashSync(password, 10);
 
       await prisma.user.update({
@@ -33,6 +44,7 @@ export class PutController {
         },
         data: {
           password: hashedPassword,
+          has_changed_def_pass: true,
         },
       });
 

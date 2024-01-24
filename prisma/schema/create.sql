@@ -143,6 +143,7 @@ CREATE TABLE public."user" (
     id_third_party       UUID ,
     username             varchar(8) NOT NULL UNIQUE,
     "password"           varchar(100) NOT NULL,
+    has_changed_def_pass boolean DEFAULT false NOT NULL,
     user_isactive        boolean DEFAULT true NOT NULL,
     user_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     user_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,

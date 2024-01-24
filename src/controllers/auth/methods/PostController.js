@@ -59,6 +59,7 @@ export class PostController {
           name: userInDB.id_employee
             ? userInDB.employee.person.name
             : userInDB.third_party.person.name,
+          hasChangedPass: userInDB.has_changed_def_pass,
           role: userInDB.user_type.user_type.toUpperCase(),
         },
       };
@@ -79,7 +80,10 @@ export class PostController {
         secure: true,
       });
       res.json({
-        data: { token: accessToken },
+        data: {
+          token: accessToken,
+          shouldChangePass: !userInDB.has_changed_def_pass,
+        },
         message: 'Login exitoso',
       });
 
@@ -105,11 +109,14 @@ export class PostController {
       // (payload, secretKey, options)
       const { user } = jwt.verify(refreshToken, JWT_SECRET_KEY);
 
+      if (!user.hasChangedPass) throw new Error('Usuario no activado');
+
       // 2- Generate new JWT
       const userInfo = {
         user: {
           id: user.id,
           name: user.name,
+          hasChangedPass: user.hasChangedPass,
           role: user.role,
         },
       };

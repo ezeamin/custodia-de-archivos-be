@@ -300,6 +300,7 @@ model user {
   user_isactive                               Boolean            @default(true)
   user_created_at                             DateTime           @default(now()) @db.Timestamp(6)
   user_updated_at                             DateTime?          @default(now()) @db.Timestamp(6)
+  has_changed_def_pass                        Boolean            @default(false)
   employee_history                            employee_history[]
   login                                       login[]
   notification_notification_id_receptorTouser notification[]     @relation("notification_id_receptorTouser")
