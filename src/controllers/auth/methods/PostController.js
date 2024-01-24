@@ -8,6 +8,7 @@ import { envs } from '../../../helpers/envs.js';
 import { prisma } from '../../../helpers/prisma.js';
 
 import { recoverMailOptions } from '../../../helpers/recoverMail.js';
+import { registerLogin } from '../../../helpers/registerLogin.js';
 
 const { JWT_SECRET_KEY } = envs;
 
@@ -78,6 +79,8 @@ export class PostController {
         data: { token: accessToken },
         message: 'Login exitoso',
       });
+
+      registerLogin(req, userInDB.id_user);
     } catch (err) {
       console.error('🟥', err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

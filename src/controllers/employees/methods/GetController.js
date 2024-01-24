@@ -1,4 +1,5 @@
 import HttpStatus from 'http-status-codes';
+import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import {
@@ -194,17 +195,39 @@ export class GetController {
         },
       });
 
-      const formattedData = history.map((record) => ({
-        id: record.id_employee_history,
-        date: toLocalTz(record.modification_date),
-        field: record.modified_field_label,
-        previousValue: record.previous_value,
-        newValue: record.current_value,
-        user: {
-          id: record.id_modifying_user,
-          description: record.user.username,
-        },
-      }));
+      const formattedData = history.map((record) => {
+        let prev = record.previous_value;
+        let curr = record.current_value;
+
+        const isPrevDate = prev && dayjs(prev).isValid();
+        const isCurrDate = curr && dayjs(curr).isValid();
+
+        if (isPrevDate) {
+          const format = prev.includes('T')
+            ? 'DD/MM/YYYY - HH:mm:ss'
+            : 'DD/MM/YYYY';
+          prev = dayjs(toLocalTz(prev)).format(format);
+        }
+
+        if (isCurrDate) {
+          const format = curr.includes('T')
+            ? 'DD/MM/YYYY - HH:mm:ss'
+            : 'DD/MM/YYYY';
+          curr = dayjs(toLocalTz(curr)).format(format);
+        }
+
+        return {
+          id: record.id_employee_history,
+          date: toLocalTz(record.modification_date),
+          field: record.modified_field_label,
+          previousValue: prev,
+          newValue: curr,
+          user: {
+            id: record.id_modifying_user,
+            description: record.user.username,
+          },
+        };
+      });
 
       res.json({
         data: formattedData,

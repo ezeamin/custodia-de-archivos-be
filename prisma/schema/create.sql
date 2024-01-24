@@ -1,46 +1,46 @@
 CREATE SCHEMA IF NOT EXISTS public;
 
 -- Enable UUID extension if not already enabled
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_uuidv7";
 
 CREATE TABLE public.area (
-    id_area   UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_area   UUID DEFAULT uuid_generate_v7() NOT NULL,
     area      varchar(20) NOT NULL UNIQUE,
     CONSTRAINT pk_area PRIMARY KEY (id_area)
 );
 
 CREATE TABLE public.employee_status (
-    id_status            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_status            UUID DEFAULT uuid_generate_v7() NOT NULL,
     title_status         varchar(10) NOT NULL UNIQUE,
     CONSTRAINT pk_employee_status PRIMARY KEY (id_status)
 );
 
 CREATE TABLE public.family_relationship_type (
-    id_family_relationship_type    UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_family_relationship_type    UUID DEFAULT uuid_generate_v7() NOT NULL,
     relationship_type              varchar(20) NOT NULL,
     CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
 );
 
 CREATE TABLE public.family (
-    id_family            UUID DEFAULT uuid_generate_v4() NOT NULL,
-    id_relationship_type UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_family            UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_relationship_type UUID DEFAULT uuid_generate_v7() NOT NULL,
     CONSTRAINT pk_family PRIMARY KEY (id_family)
 );
 
 CREATE TABLE public.gender (
-    id_gender            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_gender            UUID DEFAULT uuid_generate_v7() NOT NULL,
     gender               varchar(15) NOT NULL UNIQUE,
     CONSTRAINT pk_gender PRIMARY KEY (id_gender)
 );
 
 CREATE TABLE public.locality (
-    id_locality          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_locality          UUID DEFAULT uuid_generate_v7() NOT NULL,
     locality             varchar(30) NOT NULL UNIQUE,
     CONSTRAINT pk_localidad PRIMARY KEY (id_locality)
 );
 
 CREATE TABLE public.phone (
-    id_phone          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_phone          UUID DEFAULT uuid_generate_v7() NOT NULL,
     phone_no          integer NOT NULL,
     phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -48,13 +48,13 @@ CREATE TABLE public.phone (
 );
 
 CREATE TABLE public.province (
-    id_province       UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_province       UUID DEFAULT uuid_generate_v7() NOT NULL,
     province          varchar(50) NOT NULL UNIQUE,
     CONSTRAINT pk_province PRIMARY KEY (id_province)
 );
 
 CREATE TABLE public.home (
-    id_address           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_address           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_locality          UUID NOT NULL,
     id_province          UUID NOT NULL,
     street               varchar(40) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE public.home (
 
 
 CREATE TABLE public.person (
-    id_person            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_person            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_gender            UUID NOT NULL,
     id_family            UUID ,
     id_address           UUID ,
@@ -90,19 +90,19 @@ CREATE TABLE public.person (
 CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
 
 CREATE TABLE public.user_type (
-    id_user_type     UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_user_type     UUID DEFAULT uuid_generate_v7() NOT NULL,
     user_type        varchar(15) NOT NULL UNIQUE,
     CONSTRAINT pk_user_type PRIMARY KEY (id_user_type)
 );
 
 CREATE TABLE public.third_party (
-    id_third_party       UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_third_party       UUID DEFAULT uuid_generate_v7() NOT NULL,
     role_description     varchar(20) NOT NULL,
     CONSTRAINT pk PRIMARY KEY (id_third_party)
 );
 
 CREATE TABLE public.employee (
-    id_employee          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee          UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_person            UUID NOT NULL,
     id_status            UUID NOT NULL,
     id_area              UUID NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE public.employee (
 CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
 
 CREATE TABLE public."user" (
-    id_user              UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_user              UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_user_type         UUID NOT NULL,
     id_employee          UUID ,
     id_third_party       UUID ,
@@ -142,7 +142,7 @@ CREATE TABLE public."user" (
 CREATE UNIQUE INDEX unq_id_user ON public."user" (id_user);
 
 CREATE TABLE public.employee_history (
-    id_history           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_history           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee          UUID NOT NULL,
     id_modifying_user    UUID NOT NULL,
     modified_field       varchar(30) NOT NULL,
@@ -156,17 +156,19 @@ CREATE TABLE public.employee_history (
 );
 
 CREATE TABLE public.extra_hours (
-    id_extra_hours           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_extra_hours           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee              UUID NOT NULL,
     date_extra_hours         date NOT NULL,
     qty_extra_hours          integer NOT NULL,
     observation_extra_hours  varchar(200),
+    extra_hours_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    extra_hours_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_extra_hours PRIMARY KEY (id_extra_hours),
     CONSTRAINT fk_extra_hours_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.formal_warning (
-    id_formal_warning           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_formal_warning           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee                 UUID NOT NULL,
     reason_formal_warning       varchar(200) NOT NULL,
     date_formal_warning         date NOT NULL,
@@ -177,7 +179,7 @@ CREATE TABLE public.formal_warning (
 );
 
 CREATE TABLE public.late_arrival (
-    id_late_arrival      UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_late_arrival      UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee          UUID NOT NULL,
     date_late_arrival    date NOT NULL,
     time_late_arrival    char(5) NOT NULL,
@@ -189,7 +191,7 @@ CREATE TABLE public.late_arrival (
 );
 
 CREATE TABLE public.license_type (
-    id_license_type      UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_license_type      UUID DEFAULT uuid_generate_v7() NOT NULL,
     title_license        varchar(30) NOT NULL UNIQUE,
     description_license  varchar(100) NOT NULL,
     license_isactive     boolean DEFAULT true NOT NULL ,
@@ -197,7 +199,7 @@ CREATE TABLE public.license_type (
 );
 
 CREATE TABLE public.notification_type (
-    id_notification_type UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_notification_type UUID DEFAULT uuid_generate_v7() NOT NULL,
     title_notification   varchar(100) NOT NULL,
     start_hour           char(5) NOT NULL,
     end_hour             char(5) NOT NULL,
@@ -208,7 +210,7 @@ CREATE TABLE public.notification_type (
 );
 
 CREATE TABLE public.training_type (
-    id_training_type           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_training_type           UUID DEFAULT uuid_generate_v7() NOT NULL,
     title_training_type        varchar(30) NOT NULL UNIQUE,
     description_training_type  varchar(100) NOT NULL,
     training_isactive          boolean DEFAULT true NOT NULL,
@@ -216,7 +218,7 @@ CREATE TABLE public.training_type (
 );
 
 CREATE TABLE public.vacation (
-    id_vacation            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_vacation            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee             UUID NOT NULL,
     start_date_vacation    date NOT NULL,
     end_date_vacation      date NOT NULL,
@@ -228,16 +230,18 @@ CREATE TABLE public.vacation (
 );
 
 CREATE TABLE public.absence (
-    id_absence           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_absence           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee          UUID NOT NULL,
     date_absence         date NOT NULL,
     reason_absence       varchar(50) NOT NULL,
+    absence_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    absence_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_absence PRIMARY KEY (id_absence),
     CONSTRAINT fk_absence_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.license (
-    id_license           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_license           UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_license_type      UUID NOT NULL,
     id_employee          UUID NOT NULL,
     start_date_license   date NOT NULL,
@@ -253,7 +257,7 @@ CREATE TABLE public.license (
 CREATE UNIQUE INDEX unq_id_license ON public.license (id_license);
 
 CREATE TABLE public.training (
-    id_training          UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_training          UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_training_type     UUID NOT NULL,
     id_employee          UUID NOT NULL,
     date_training        date NOT NULL,
@@ -269,16 +273,17 @@ CREATE TABLE public.training (
 CREATE UNIQUE INDEX unq_id_training ON public.training (id_training);
 
 CREATE TABLE public.login (
-    id_log               UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_log               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_user              UUID NOT NULL,
     ip_address           varchar(15) NOT NULL,
     user_agent           varchar(150) NOT NULL,
+    log_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT pk_login PRIMARY KEY (id_log),
     CONSTRAINT fk_login_user FOREIGN KEY (id_user) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.notification (
-    id_notification            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_notification            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_notification_type       UUID NOT NULL,
     id_sender                  UUID NOT NULL,
     id_receptor                UUID NOT NULL,
@@ -293,7 +298,7 @@ CREATE TABLE public.notification (
 );
 
 CREATE TABLE public.employee_doc (
-    id_employee_doc               UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee_doc               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee                   UUID NOT NULL,
     employee_doc_url              varchar(250) NOT NULL,
     employee_doc_name             varchar(50) NOT NULL,
@@ -304,7 +309,7 @@ CREATE TABLE public.employee_doc (
 );
 
 CREATE TABLE public.notification_doc (
-    id_notification_doc               UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_notification_doc               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_notification                   UUID NOT NULL,
     notification_doc_url              varchar(250) NOT NULL,
     notification_doc_name             varchar(50) NOT NULL,
@@ -314,24 +319,258 @@ CREATE TABLE public.notification_doc (
     CONSTRAINT fk_notification_doc_notification FOREIGN KEY (id_notification) REFERENCES public.notification(id_notification)
 );
 
--- Insert data into tables
+---------------------------------------------------------------
+-- TRIGGERS
+---------------------------------------------------------------
 
-INSERT INTO public.gender (gender)
+-- person updated_at trigger
+CREATE OR REPLACE FUNCTION update_person_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.person_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_person_updated_at
+BEFORE UPDATE ON public.person
+FOR EACH ROW
+EXECUTE PROCEDURE update_person_updated_at();
+
+-- employee_doc updated_at trigger
+CREATE OR REPLACE FUNCTION update_employee_doc_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.employee_doc_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_employee_doc_updated_at
+BEFORE UPDATE ON public.employee_doc
+FOR EACH ROW
+EXECUTE PROCEDURE update_employee_doc_updated_at();
+
+-- phone updated_at trigger -> Should also update person_updated_at
+CREATE OR REPLACE FUNCTION update_phone_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+-- Update person_updated_at that is related to this phone
+    UPDATE public.person
+    SET person_updated_at = now()
+    WHERE id_person = (SELECT id_person FROM public.phone WHERE id_phone = NEW.id_phone);
+
+    NEW.phone_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_phone_updated_at
+BEFORE UPDATE ON public.phone
+FOR EACH ROW
+EXECUTE PROCEDURE update_phone_updated_at();
+
+-- home updated_at trigger
+CREATE OR REPLACE FUNCTION update_home_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Update person_updated_at that is related to this home
+    UPDATE public.person
+    SET person_updated_at = now()
+    WHERE id_person = (SELECT id_person FROM public.home WHERE id_address = NEW.id_address);
+
+    NEW.home_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_home_updated_at
+BEFORE UPDATE ON public.home
+FOR EACH ROW
+EXECUTE PROCEDURE update_home_updated_at();
+
+-- employee updated_at trigger
+CREATE OR REPLACE FUNCTION update_employee_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.employee_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_employee_updated_at
+BEFORE UPDATE ON public.employee
+FOR EACH ROW
+EXECUTE PROCEDURE update_employee_updated_at();
+
+-- user updated_at trigger
+CREATE OR REPLACE FUNCTION update_user_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.user_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_user_updated_at
+BEFORE UPDATE ON public."user"
+FOR EACH ROW
+EXECUTE PROCEDURE update_user_updated_at();
+
+-- formal_warning updated_at trigger
+CREATE OR REPLACE FUNCTION update_formal_warning_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.formal_warning_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_formal_warning_updated_at
+BEFORE UPDATE ON public.formal_warning
+FOR EACH ROW
+EXECUTE PROCEDURE update_formal_warning_updated_at();
+
+-- late_arrival updated_at trigger
+CREATE OR REPLACE FUNCTION update_late_arrival_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.late_arrival_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_late_arrival_updated_at
+BEFORE UPDATE ON public.late_arrival
+FOR EACH ROW
+EXECUTE PROCEDURE update_late_arrival_updated_at();
+
+-- vacation updated_at trigger
+CREATE OR REPLACE FUNCTION update_vacation_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.vacation_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_vacation_updated_at
+BEFORE UPDATE ON public.vacation
+FOR EACH ROW
+EXECUTE PROCEDURE update_vacation_updated_at();
+
+-- license updated_at trigger
+CREATE OR REPLACE FUNCTION update_license_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.license_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_license_updated_at
+BEFORE UPDATE ON public.license
+FOR EACH ROW
+EXECUTE PROCEDURE update_license_updated_at();
+
+-- absence updated_at trigger
+CREATE OR REPLACE FUNCTION update_absence_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.absence_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_absence_updated_at
+BEFORE UPDATE ON public.absence
+FOR EACH ROW
+EXECUTE PROCEDURE update_absence_updated_at();
+
+-- training updated_at trigger
+CREATE OR REPLACE FUNCTION update_training_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.training_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_training_updated_at
+BEFORE UPDATE ON public.training
+FOR EACH ROW
+EXECUTE PROCEDURE update_training_updated_at();
+
+-- extra_hours updated_at trigger
+CREATE OR REPLACE FUNCTION update_extra_hours_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.extra_hours_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_extra_hours_updated_at
+BEFORE UPDATE ON public.extra_hours
+FOR EACH ROW
+EXECUTE PROCEDURE update_extra_hours_updated_at();
+
+-- notification updated_at trigger
+CREATE OR REPLACE FUNCTION update_notification_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.notification_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_notification_updated_at
+BEFORE UPDATE ON public.notification
+FOR EACH ROW
+EXECUTE PROCEDURE update_notification_updated_at();
+
+-- notification_doc updated_at trigger
+CREATE OR REPLACE FUNCTION update_notification_doc_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.notification_doc_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_notification_doc_updated_at
+BEFORE UPDATE ON public.notification_doc
+FOR EACH ROW
+EXECUTE PROCEDURE update_notification_doc_updated_at();
+
+---------------------------------------------------------------
+-- INSERT DEFAULT VALUES
+---------------------------------------------------------------
+
+INSERT INTO public.gender (id_gender,gender)
 VALUES
-    ('Masculino'),
-    ('Femenino'),
-    ('Otro');
+    ('018d3b85-ad41-71c2-a317-95f3fa1a632d','Masculino'),
+    ('018d3b85-ad41-7211-91f3-c9c1a59d7d75','Femenino'),
+    ('018d3b85-ad41-7604-be77-b3668698a7da','Otro');
 
-INSERT INTO public.area (area)
+INSERT INTO public.area (id_area,area)
 VALUES
-    ('Mantenimiento'),
-    ('Administración'),('Almacenamiento'),('Ventas'),('Compras'),('Producción'),('Recursos Humanos'),('Contabilidad'),('Sistemas'),('Gerencia');
+    ('018d3b85-ad41-77e2-aaa7-4fcc12ba0132','Mantenimiento'),
+    ('018d3b85-ad41-7ebf-b39d-2f042aeef39b','Administración'),
+    ('018d3b85-ad41-7b89-a115-53129e20a558','Almacenamiento'),
+    ('018d3b85-ad41-752d-96dc-550186aafccd','Ventas'),
+    ('018d3b85-ad41-7ce6-a177-930a835ca677','Compras'),
+    ('018d3b85-ad41-752f-972c-30102846b42c','Producción'),
+    ('018d3b85-ad41-7d49-b328-b71e34a42396','Recursos Humanos'),
+    ('018d3b85-ad41-74d4-a5b5-8c08718dbce8','Contabilidad'),
+    ('018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a','Sistemas'),
+    ('018d3b85-ad41-789e-b615-cd610c5c131f','Gerencia');
 
-INSERT INTO public.employee_status (title_status) VALUES
-  ('active'),
-  ('suspended'),
-  ('inactive'),
-  ('deleted');
+INSERT INTO public.employee_status (id_status, title_status) VALUES
+  ('018d3b85-ad41-70bf-a4b3-b248a73b7bf8','active'),
+  ('018d3b85-ad41-7c07-8ac9-00c4a6d0f4f8','suspended'),
+  ('018d3b85-ad41-705d-b6ac-eff17a2cbb63','inactive'),
+  ('018d3b85-ad41-74b8-9bd4-9f7b27b02176','deleted');
 
 INSERT INTO public.user_type (id_user_type, user_type) VALUES
   ('32deb906-6292-4908-9cfc-02394fd4ab28','admin'),
@@ -339,9 +578,46 @@ INSERT INTO public.user_type (id_user_type, user_type) VALUES
   ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
 
 -- Insert default admin user
-INSERT INTO public."user" (id_user_type, username, "password")
+INSERT INTO public."user" (id_user,id_user_type, username, "password")
 VALUES (
+    '1249cbd7-5184-45d4-bd18-04a3f0769e99',
     '32deb906-6292-4908-9cfc-02394fd4ab28',   -- admin
-    43706393,
+    43706393, -- username
     '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa'  -- Password: "admin"
+);
+
+-- Insert example person
+INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)
+VALUES (
+    '018d3b85-ad41-7129-b181-0f1fc7c70573',
+    '018d3b85-ad41-71c2-a317-95f3fa1a632d',
+    'Ezequiel',
+    'Amin',
+    '2002-02-17',
+    43706393
+);
+
+-- Insert example employee
+INSERT INTO public.employee (id_employee,id_person,id_status,id_area,no_file,email,employment_date,position,working_hours,picture_url)
+VALUES (
+    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
+    '018d3b85-ad41-7129-b181-0f1fc7c70573',
+    '018d3b85-ad41-70bf-a4b3-b248a73b7bf8',
+    '018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a',
+    1000,
+    'ezequielamin@outlook.com',
+    '2021-02-17',
+    'Programador',
+    8,
+    'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg'
+);
+
+INSERT INTO public.employee_history (id_employee,id_modifying_user,modified_field,modified_field_label,previous_value,current_value)
+VALUES (
+    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
+    '1249cbd7-5184-45d4-bd18-04a3f0769e99',
+    'employee',
+    'Creación de Empleado',
+    NULL,
+    to_jsonb(now())
 );

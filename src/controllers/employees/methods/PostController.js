@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
+import { registerChange } from '../../../helpers/registerChange.js';
 
 export class PostController {
   static async createEmployee(req, res) {
@@ -77,6 +78,14 @@ export class PostController {
       res.json({
         data: null,
         message: 'Empleado creado exitosamente',
+      });
+
+      registerChange({
+        changedField: 'employee',
+        changedFieldLabel: 'Creación de Empleado',
+        previousValue: null,
+        newValue: new Date().toISOString(),
+        modifyingUser: req.user.id,
       });
     } catch (e) {
       if (e.code === 'P2002') {
