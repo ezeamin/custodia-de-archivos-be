@@ -11,8 +11,10 @@ import { getDownloadLink } from '../../../helpers/cloudinary.js';
 export class GetController {
   static async employees(req, res) {
     const {
-      query: { page = 0, entries = 10 },
+      query: { page = 0, entries = 10, query = '' },
     } = req;
+
+    // query searches by name or surname or identification_number of person associated to employee
 
     try {
       const countPromise = prisma.employee.count();
@@ -23,6 +25,34 @@ export class GetController {
           area: true,
           person: true,
           employee_status: true,
+        },
+        where: {
+          OR: [
+            {
+              person: {
+                name: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+            {
+              person: {
+                surname: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+            {
+              person: {
+                identification_number: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
         },
       });
 

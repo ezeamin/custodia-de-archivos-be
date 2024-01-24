@@ -57,7 +57,7 @@ export class PostController {
             create: {
               name: req.body.name,
               surname: req.body.lastname,
-              identification_number: +req.body.dni,
+              identification_number: req.body.dni,
               birth_date: req.body.birthdate,
               id_gender: req.body.genderId,
             },

@@ -77,7 +77,7 @@ CREATE TABLE public.person (
     name                 varchar(50) NOT NULL,
     surname              varchar(50) NOT NULL,
     birth_date           date NOT NULL,
-    identification_number integer NOT NULL UNIQUE,
+    identification_number varchar(8) NOT NULL UNIQUE,
     person_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     person_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_person PRIMARY KEY (id_person),
@@ -128,7 +128,7 @@ CREATE TABLE public."user" (
     id_user_type         UUID NOT NULL,
     id_employee          UUID ,
     id_third_party       UUID ,
-    username             integer NOT NULL UNIQUE,
+    username             varchar(8) NOT NULL UNIQUE,
     "password"           varchar(100) NOT NULL,
     user_isactive        boolean DEFAULT true NOT NULL,
     user_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -582,7 +582,7 @@ INSERT INTO public."user" (id_user,id_user_type, username, "password")
 VALUES (
     '1249cbd7-5184-45d4-bd18-04a3f0769e99',
     '32deb906-6292-4908-9cfc-02394fd4ab28',   -- admin
-    43706393, -- username
+    '43706393', -- username
     '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa'  -- Password: "admin"
 );
 
@@ -594,7 +594,7 @@ VALUES (
     'Ezequiel',
     'Amin',
     '2002-02-17',
-    43706393
+    '43706393'
 );
 
 -- Insert example employee

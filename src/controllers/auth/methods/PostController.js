@@ -22,7 +22,7 @@ export class PostController {
       // 1- Search user in DB
       const userInDB = await prisma.user.findUnique({
         where: {
-          username: +username,
+          username,
         },
         include: {
           employee: {

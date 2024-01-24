@@ -215,7 +215,7 @@ model person {
   name                  String     @db.VarChar(50)
   surname               String     @db.VarChar(50)
   birth_date            DateTime   @db.Date
-  identification_number Int        @unique
+  identification_number String     @unique @db.VarChar(8)
   person_created_at     DateTime   @default(now()) @db.Timestamp(6)
   person_updated_at     DateTime?  @default(now()) @db.Timestamp(6)
   employee              employee[]
@@ -271,7 +271,7 @@ model user {
   id_user_type                                String             @db.Uuid
   id_employee                                 String?            @db.Uuid
   id_third_party                              String?            @db.Uuid
-  username                                    Int                @unique
+  username                                    String             @unique @db.VarChar(8)
   password                                    String             @db.VarChar(100)
   user_isactive                               Boolean            @default(true)
   user_created_at                             DateTime           @default(now()) @db.Timestamp(6)
