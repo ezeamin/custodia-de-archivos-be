@@ -188,27 +188,347 @@ export class PostController {
   }
 
   // @param - employeeId
-  static async createEmployeeAbsence(req, res) {}
+  static async createEmployeeAbsence(req, res) {
+    const {
+      params: { employeeId },
+      body: { date, reason },
+    } = req;
+
+    try {
+      await prisma.absence.create({
+        data: {
+          date_absence: date,
+          reason_absence: reason,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Ausencia creada exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la ausencia. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
-  static async createEmployeeLicense(req, res) {}
+  static async createEmployeeLicense(req, res) {
+    const {
+      params: { employeeId },
+      body: { typeId, fromDate, toDate, observations },
+    } = req;
+
+    console.log(req.body);
+
+    try {
+      await prisma.license.create({
+        data: {
+          start_date_license: fromDate,
+          end_date_license: toDate,
+          observation_license: observations,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+          license_type: {
+            connect: {
+              id_license_type: typeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Licencia creada exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la licencia. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
-  static async createEmployeeVacation(req, res) {}
+  static async createEmployeeVacation(req, res) {
+    const {
+      params: { employeeId },
+      body: { fromDate, toDate, observations },
+    } = req;
+
+    try {
+      await prisma.vacation.create({
+        data: {
+          start_date_vacation: fromDate,
+          end_date_vacation: toDate,
+          observation_vacation: observations,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Vacaciones creadas exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear las vacaciones. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
-  static async createEmployeeTraining(req, res) {}
+  static async createEmployeeTraining(req, res) {
+    const {
+      params: { employeeId },
+      body: { date, reason, typeId, observations },
+    } = req;
+
+    try {
+      await prisma.training.create({
+        data: {
+          date_training: date,
+          reason_training: reason,
+          observation_training: observations,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+          training_type: {
+            connect: {
+              id_training_type: typeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Capacitación creada exitosamente',
+      });
+    } catch (e) {
+      if (e.code === 'P2002') {
+        if (e.meta.target.includes('date_training')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'La capacitación ingresada ya existe',
+          });
+          return;
+        }
+      }
+
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la capacitación. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
-  static async createEmployeeFormalWarning(req, res) {}
+  static async createEmployeeFormalWarning(req, res) {
+    const {
+      params: { employeeId },
+      body: { date, reason },
+    } = req;
+
+    try {
+      await prisma.formal_warning.create({
+        data: {
+          date_formal_warning: date,
+          reason_formal_warning: reason,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Amonestación formal creada exitosamente',
+      });
+    } catch (e) {
+      if (e.code === 'P2002') {
+        if (e.meta.target.includes('date_formal_warning')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'La amonestación formal ingresada ya existe',
+          });
+          return;
+        }
+      }
+
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la amonestación formal. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
-  static async createEmployeeLateArrival(req, res) {}
+  static async createEmployeeLateArrival(req, res) {
+    const {
+      params: { employeeId },
+      body: { date, hour, observations },
+    } = req;
+
+    try {
+      await prisma.late_arrival.create({
+        data: {
+          date_late_arrival: date,
+          time_late_arrival: hour,
+          observation_late_arrival: observations,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Llegada tarde creada exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la llegada tarde. Intente de nuevo más tarde.',
+      });
+    }
+  }
 
   // @param - employeeId
-  static async createEmployeeExtraHour(req, res) {}
+  static async createEmployeeExtraHour(req, res) {
+    const {
+      params: { employeeId },
+      body: { date, hours, observations },
+    } = req;
 
-  static async createLicenseType(req, res) {}
+    try {
+      await prisma.extra_hours.create({
+        data: {
+          date_extra_hours: date,
+          qty_extra_hours: hours,
+          observation_extra_hours: observations,
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+        },
+      });
 
-  static async createTrainingType(req, res) {}
+      res.json({
+        data: null,
+        message: 'Hora extra creada exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la hora extra. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  static async createLicenseType(req, res) {
+    const { title, description } = req.body;
+
+    try {
+      await prisma.license_type.create({
+        data: {
+          title_license: title,
+          description_license: description,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Tipo de licencia creado exitosamente',
+      });
+    } catch (e) {
+      if (e.code === 'P2002') {
+        if (e.meta.target.includes('title_license')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'El tipo de licencia ingresado ya existe',
+          });
+          return;
+        }
+      }
+
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el tipo de licencia. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  static async createTrainingType(req, res) {
+    const { title, description } = req.body;
+
+    try {
+      await prisma.training_type.create({
+        data: {
+          title_training_type: title,
+          description_training_type: description,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Tipo de capacitación creado exitosamente',
+      });
+    } catch (e) {
+      if (e.code === 'P2002') {
+        if (e.meta.target.includes('title_training')) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: 'El tipo de capacitación ingresado ya existe',
+          });
+          return;
+        }
+      }
+
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el tipo de capacitación. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

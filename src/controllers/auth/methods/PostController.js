@@ -5,6 +5,7 @@ import nodemailer from 'nodemailer';
 
 // import UsersModel from '../models/UserSchema.js';
 import { envs } from '../../../helpers/envs.js';
+import { prisma } from '../../../helpers/prisma.js';
 
 import { recoverMailOptions } from '../../../helpers/recoverMail.js';
 
@@ -17,25 +18,20 @@ export class PostController {
     } = req;
 
     try {
-      // 1- (Try to) Search user in DB
-      // const userInDB = await UsersModel.findOne({
-      //   username: username.trim(),
-      //   isActive: true,
-      // });
-      const userInDB = {
-        password:
-          '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa', // admin
-        _doc: {
-          _id: '60d0b1b9b5f7e7a8c0d7c6c3',
-          firstname: 'Admin',
-          lastname: 'Admin',
-          username: 'admin',
-          role: {
-            id: '60d0b1b9b5f7e7a8c0d7c6c2',
-            name: 'admin',
-          },
+      // 1- Search user in DB
+      const userInDB = await prisma.user.findUnique({
+        where: {
+          username: +username,
         },
-      };
+        include: {
+          employee: {
+            include: {
+              person: true,
+            },
+          },
+          user_type: true,
+        },
+      });
 
       // 2- Validate credentials
       // Cases:
@@ -53,14 +49,13 @@ export class PostController {
       }
 
       // 3- Generate JWT
-      // Everything is correct, generate JWT
-      // We remove the password and isActive from the user object,
-      // so that it doesn´t get sent to the FE
       const userInfo = {
         user: {
-          id: userInDB._doc._id,
-          name: userInDB._doc.firstname,
-          role: userInDB._doc.role.name.toUpperCase(),
+          id: userInDB.id_user,
+          name: userInDB.id_employee
+            ? userInDB.employee.person.name
+            : 'Solo lectura',
+          role: userInDB.user_type.user_type.toUpperCase(),
         },
       };
 

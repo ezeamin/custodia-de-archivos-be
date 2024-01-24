@@ -10,8 +10,10 @@ datasource db {
 
 model absence {
   id_absence     String   @id(map: "pk_absence") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee    String   @db.Uuid
   date_absence   DateTime @db.Date
   reason_absence String   @db.VarChar(50)
+  employee       employee @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_absence_employee")
 }
 
 model area {
@@ -34,12 +36,19 @@ model employee {
   picture_url         String             @db.VarChar(300)
   employee_created_at DateTime           @default(now()) @db.Timestamp(6)
   employee_updated_at DateTime?          @default(now()) @db.Timestamp(6)
+  absence             absence[]
   area                area               @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
   person              person             @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
   employee_status     employee_status    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
   employee_doc        employee_doc[]
   employee_history    employee_history[]
+  extra_hours         extra_hours[]
+  formal_warning      formal_warning[]
+  late_arrival        late_arrival[]
+  license             license[]
+  training            training[]
   user                user[]
+  vacation            vacation[]
 }
 
 model employee_doc {
@@ -53,15 +62,16 @@ model employee_doc {
 }
 
 model employee_history {
-  id_history        String   @id(map: "pk_employee_history") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  id_employee       String   @db.Uuid
-  id_modifying_user String   @db.Uuid
-  modified_field    String   @db.VarChar(30)
-  previous_value    Json?
-  current_value     Json?
-  modification_date DateTime @default(now()) @db.Timestamp(6)
-  employee          employee @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_history_employee")
-  user              user     @relation(fields: [id_modifying_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_history_user")
+  id_history           String   @id(map: "pk_employee_history") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee          String   @db.Uuid
+  id_modifying_user    String   @db.Uuid
+  modified_field       String   @db.VarChar(30)
+  modified_field_label String   @db.VarChar(50)
+  previous_value       Json?
+  current_value        Json?
+  modification_date    DateTime @default(now()) @db.Timestamp(6)
+  employee             employee @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_history_employee")
+  user                 user     @relation(fields: [id_modifying_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_history_user")
 }
 
 model employee_status {
@@ -71,9 +81,12 @@ model employee_status {
 }
 
 model extra_hours {
-  id_extra_hours   String   @id(map: "pk_extra_hours") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  date_extra_hours DateTime @db.Date
-  qty_extra_hours  Int
+  id_extra_hours          String   @id(map: "pk_extra_hours") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee             String   @db.Uuid
+  date_extra_hours        DateTime @db.Date
+  qty_extra_hours         Int
+  observation_extra_hours String?  @db.VarChar(200)
+  employee                employee @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_extra_hours_employee")
 }
 
 model family {
@@ -89,10 +102,12 @@ model family_relationship_type {
 
 model formal_warning {
   id_formal_warning         String    @id(map: "pk_formal_warning") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  desc_formal_warning       String    @db.VarChar(200)
+  id_employee               String    @db.Uuid
+  reason_formal_warning     String    @db.VarChar(200)
   date_formal_warning       DateTime  @db.Date
   formal_warning_created_at DateTime  @default(now()) @db.Timestamp(6)
   formal_warning_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  employee                  employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_formal_warning_employee")
 }
 
 model gender {
@@ -116,21 +131,27 @@ model home {
 }
 
 model late_arrival {
-  id_late_arrival         String    @id(map: "pk_late_arrival") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  date_late_arrival       DateTime  @db.Date
-  time_late_arrival       DateTime  @db.Time(6)
-  late_arrival_created_at DateTime  @default(now()) @db.Timestamp(6)
-  late_arrival_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  id_late_arrival          String    @id(map: "pk_late_arrival") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee              String    @db.Uuid
+  date_late_arrival        DateTime  @db.Date
+  time_late_arrival        String    @db.Char(5)
+  observation_late_arrival String?   @db.VarChar(200)
+  late_arrival_created_at  DateTime  @default(now()) @db.Timestamp(6)
+  late_arrival_updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  employee                 employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_late_arrival_employee")
 }
 
 model license {
-  id_license         String       @id(map: "pk_license") @unique(map: "unq_id_license") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  id_license_type    String       @db.Uuid
-  start_date_license DateTime     @db.Date
-  end_date_license   DateTime     @db.Date
-  license_created_at DateTime     @default(now()) @db.Timestamp(6)
-  license_updated_at DateTime?    @default(now()) @db.Timestamp(6)
-  license_type       license_type @relation(fields: [id_license_type], references: [id_license_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_license_type")
+  id_license          String       @id(map: "pk_license") @unique(map: "unq_id_license") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_license_type     String       @db.Uuid
+  id_employee         String       @db.Uuid
+  start_date_license  DateTime     @db.Date
+  end_date_license    DateTime     @db.Date
+  observation_license String?      @db.VarChar(200)
+  license_created_at  DateTime     @default(now()) @db.Timestamp(6)
+  license_updated_at  DateTime?    @default(now()) @db.Timestamp(6)
+  employee            employee     @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_license_employee")
+  license_type        license_type @relation(fields: [id_license_type], references: [id_license_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_license_type")
 }
 
 model license_type {
@@ -172,9 +193,9 @@ model notification {
 
 model notification_type {
   id_notification_type  String         @id(map: "pk_notification_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  title_notification    Int            @unique
-  start_hour            DateTime       @db.Time(6)
-  end_hour              DateTime       @db.Time(6)
+  title_notification    String         @db.VarChar(100)
+  start_hour            String         @db.Char(5)
+  end_hour              String         @db.Char(5)
   allowed_roles         String         @db.VarChar(200)
   notification_isactive Boolean        @default(true)
   notification          notification[]
@@ -220,19 +241,23 @@ model third_party {
 }
 
 model training {
-  id_training         String        @id(map: "pk_training") @unique(map: "unq_id_training") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  id_training_type    String        @db.Uuid
-  reason_training     String?       @db.VarChar(200)
-  training_created_at DateTime      @default(now()) @db.Timestamp(6)
-  training_updated_at DateTime?     @default(now()) @db.Timestamp(6)
-  training_type       training_type @relation(fields: [id_training_type], references: [id_training_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_training_type")
+  id_training          String        @id(map: "pk_training") @unique(map: "unq_id_training") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_training_type     String        @db.Uuid
+  id_employee          String        @db.Uuid
+  date_training        DateTime      @db.Date
+  reason_training      String?       @db.VarChar(200)
+  observation_training String?       @db.VarChar(200)
+  training_created_at  DateTime      @default(now()) @db.Timestamp(6)
+  training_updated_at  DateTime?     @default(now()) @db.Timestamp(6)
+  employee             employee      @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_training_employee")
+  training_type        training_type @relation(fields: [id_training_type], references: [id_training_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_training_type")
 }
 
 model training_type {
   id_training_type          String     @id(map: "pk_id_training_type") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   title_training_type       String     @unique @db.VarChar(30)
   description_training_type String     @db.VarChar(100)
-  training_isactive         Boolean
+  training_isactive         Boolean    @default(true)
   training                  training[]
 }
 
@@ -261,14 +286,6 @@ model user_type {
   user         user[]
 }
 
-model vacations {
-  id_vacations         String    @id(map: "pk_vacations") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  start_date_vacations DateTime  @db.Date
-  end_date_vacations   DateTime  @db.Date
-  vacations_created_at DateTime  @default(now()) @db.Timestamp(6)
-  vacations_updated_at DateTime? @default(now()) @db.Timestamp(6)
-}
-
 model notification_doc {
   id_notification_doc         String       @id(map: "pk_notification_doc") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   id_notification             String       @db.Uuid
@@ -277,4 +294,15 @@ model notification_doc {
   notification_doc_created_at DateTime     @default(now()) @db.Timestamp(6)
   notification_doc_updated_at DateTime?    @default(now()) @db.Timestamp(6)
   notification                notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_doc_notification")
+}
+
+model vacation {
+  id_vacation          String    @id(map: "pk_vacation") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id_employee          String    @db.Uuid
+  start_date_vacation  DateTime  @db.Date
+  end_date_vacation    DateTime  @db.Date
+  observation_vacation String?   @db.VarChar(200)
+  vacation_created_at  DateTime  @default(now()) @db.Timestamp(6)
+  vacation_updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  employee             employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_vacations_employee")
 }

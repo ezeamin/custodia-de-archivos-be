@@ -146,6 +146,7 @@ CREATE TABLE public.employee_history (
     id_employee          UUID NOT NULL,
     id_modifying_user    UUID NOT NULL,
     modified_field       varchar(30) NOT NULL,
+    modified_field_label varchar(50) NOT NULL,
     previous_value       jsonb,
     current_value        jsonb,
     modification_date    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -155,43 +156,51 @@ CREATE TABLE public.employee_history (
 );
 
 CREATE TABLE public.extra_hours (
-    id_extra_hours       UUID DEFAULT uuid_generate_v4() NOT NULL,
-    date_extra_hours     date NOT NULL,
-    qty_extra_hours      integer NOT NULL,
-    CONSTRAINT pk_extra_hours PRIMARY KEY (id_extra_hours)
+    id_extra_hours           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee              UUID NOT NULL,
+    date_extra_hours         date NOT NULL,
+    qty_extra_hours          integer NOT NULL,
+    observation_extra_hours  varchar(200),
+    CONSTRAINT pk_extra_hours PRIMARY KEY (id_extra_hours),
+    CONSTRAINT fk_extra_hours_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.formal_warning (
-    id_formal_warning    UUID DEFAULT uuid_generate_v4() NOT NULL,
-    desc_formal_warning  varchar(200) NOT NULL,
-    date_formal_warning  date NOT NULL,
-    formal_warning_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    formal_warning_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_formal_warning PRIMARY KEY (id_formal_warning)
+    id_formal_warning           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee                 UUID NOT NULL,
+    reason_formal_warning       varchar(200) NOT NULL,
+    date_formal_warning         date NOT NULL,
+    formal_warning_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    formal_warning_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_formal_warning PRIMARY KEY (id_formal_warning),
+    CONSTRAINT fk_formal_warning_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.late_arrival (
     id_late_arrival      UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee          UUID NOT NULL,
     date_late_arrival    date NOT NULL,
-    time_late_arrival    time NOT NULL,
+    time_late_arrival    char(5) NOT NULL,
+    observation_late_arrival varchar(200),
     late_arrival_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     late_arrival_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_late_arrival PRIMARY KEY (id_late_arrival)
+    CONSTRAINT pk_late_arrival PRIMARY KEY (id_late_arrival),
+    CONSTRAINT fk_late_arrival_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.license_type (
     id_license_type      UUID DEFAULT uuid_generate_v4() NOT NULL,
     title_license        varchar(30) NOT NULL UNIQUE,
     description_license  varchar(100) NOT NULL,
-    license_isactive     boolean NOT NULL DEFAULT true,
+    license_isactive     boolean DEFAULT true NOT NULL ,
     CONSTRAINT pk_license_type PRIMARY KEY (id_license_type)
 );
 
 CREATE TABLE public.notification_type (
     id_notification_type UUID DEFAULT uuid_generate_v4() NOT NULL,
-    title_notification   integer NOT NULL UNIQUE,
-    start_hour           time NOT NULL,
-    end_hour             time NOT NULL,
+    title_notification   varchar(100) NOT NULL,
+    start_hour           char(5) NOT NULL,
+    end_hour             char(5) NOT NULL,
     -- TODO: Check if this is the correct way to store the roles
     allowed_roles        varchar(200) NOT NULL,
     notification_isactive boolean DEFAULT true NOT NULL ,
@@ -202,35 +211,43 @@ CREATE TABLE public.training_type (
     id_training_type           UUID DEFAULT uuid_generate_v4() NOT NULL,
     title_training_type        varchar(30) NOT NULL UNIQUE,
     description_training_type  varchar(100) NOT NULL,
-    training_isactive          boolean NOT NULL,
+    training_isactive          boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_id_training_type PRIMARY KEY (id_training_type)
 );
 
-CREATE TABLE public.vacations (
-    id_vacations         UUID DEFAULT uuid_generate_v4() NOT NULL,
-    start_date_vacations date NOT NULL,
-    end_date_vacations   date NOT NULL,
-    vacations_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    vacations_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_vacations PRIMARY KEY (id_vacations)
+CREATE TABLE public.vacation (
+    id_vacation            UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee             UUID NOT NULL,
+    start_date_vacation    date NOT NULL,
+    end_date_vacation      date NOT NULL,
+    observation_vacation   varchar(200),
+    vacation_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    vacation_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_vacation PRIMARY KEY (id_vacation),
+    CONSTRAINT fk_vacations_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.absence (
     id_absence           UUID DEFAULT uuid_generate_v4() NOT NULL,
+    id_employee          UUID NOT NULL,
     date_absence         date NOT NULL,
     reason_absence       varchar(50) NOT NULL,
-    CONSTRAINT pk_absence PRIMARY KEY (id_absence)
+    CONSTRAINT pk_absence PRIMARY KEY (id_absence),
+    CONSTRAINT fk_absence_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE TABLE public.license (
     id_license           UUID DEFAULT uuid_generate_v4() NOT NULL,
     id_license_type      UUID NOT NULL,
+    id_employee          UUID NOT NULL,
     start_date_license   date NOT NULL,
     end_date_license     date NOT NULL,
+    observation_license  varchar(200),
     license_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     license_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_license PRIMARY KEY (id_license),
-    CONSTRAINT fk_license_type FOREIGN KEY (id_license_type) REFERENCES public.license_type(id_license_type)
+    CONSTRAINT fk_license_type FOREIGN KEY (id_license_type) REFERENCES public.license_type(id_license_type),
+    CONSTRAINT fk_license_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE UNIQUE INDEX unq_id_license ON public.license (id_license);
@@ -238,11 +255,15 @@ CREATE UNIQUE INDEX unq_id_license ON public.license (id_license);
 CREATE TABLE public.training (
     id_training          UUID DEFAULT uuid_generate_v4() NOT NULL,
     id_training_type     UUID NOT NULL,
+    id_employee          UUID NOT NULL,
+    date_training        date NOT NULL,
     reason_training      varchar(200),
+    observation_training varchar(200),
     training_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     training_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_training PRIMARY KEY (id_training),
-    CONSTRAINT fk_training_type FOREIGN KEY (id_training_type) REFERENCES public.training_type(id_training_type)
+    CONSTRAINT fk_training_type FOREIGN KEY (id_training_type) REFERENCES public.training_type(id_training_type),
+    CONSTRAINT fk_training_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
 CREATE UNIQUE INDEX unq_id_training ON public.training (id_training);
@@ -311,3 +332,16 @@ INSERT INTO public.employee_status (title_status) VALUES
   ('suspended'),
   ('inactive'),
   ('deleted');
+
+INSERT INTO public.user_type (id_user_type, user_type) VALUES
+  ('32deb906-6292-4908-9cfc-02394fd4ab28','admin'),
+  ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee'),
+  ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
+
+-- Insert default admin user
+INSERT INTO public."user" (id_user_type, username, "password")
+VALUES (
+    '32deb906-6292-4908-9cfc-02394fd4ab28',   -- admin
+    43706393,
+    '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa'  -- Password: "admin"
+);

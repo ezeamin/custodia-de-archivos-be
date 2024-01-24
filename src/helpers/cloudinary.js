@@ -41,10 +41,19 @@ export const handleUpload = async (req, privateDoc = false) => {
 };
 
 export const getDownloadLink = (originalUrl) => {
-  const publicId = originalUrl.split('/').pop().split('.')[0];
+  const publicId = originalUrl.split('/').pop();
   const extension = originalUrl.split('.').pop();
 
   return cloudinary.utils.private_download_url(publicId, extension, {
     resource_type: 'raw',
+    type: 'private',
+  });
+};
+
+export const deleteFile = async (originalUrl, privateDoc = false) => {
+  const publicId = originalUrl.split('/').pop();
+
+  await cloudinary.uploader.destroy(publicId, {
+    type: privateDoc ? 'private' : 'upload',
   });
 };
