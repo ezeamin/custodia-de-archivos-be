@@ -94,6 +94,7 @@ export class GetController {
         lastname: employee.person.surname,
         firstname: employee.person.name,
         birthdate: toLocalTz(employee.person.birth_date),
+        workingHours: employee.working_hours,
         address: employee.person.home
           ? {
               street: employee.person.home.street,
@@ -492,7 +493,42 @@ export class GetController {
 
   // @param - licenseTypeId
   static async licensesTypesById(req, res) {
-    res.sendStatus(400);
+    const {
+      params: { licenseTypeId },
+    } = req;
+
+    try {
+      const type = await prisma.license_type.findUnique({
+        where: {
+          id_license_type: licenseTypeId,
+        },
+      });
+
+      if (!type) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El tipo de licencia no existe',
+        });
+        return;
+      }
+
+      const formattedData = {
+        id: type.id_license_type,
+        title: type.title_license,
+        description: type.description_license,
+      };
+
+      res.json({
+        data: formattedData,
+        message: 'License type retrieved successfully',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al intentar obtener el tipo de licencia',
+      });
+    }
   }
 
   static async trainingsTypes(req, res) {
@@ -520,6 +556,41 @@ export class GetController {
 
   // @param - trainingTypeId
   static async trainingsTypesById(req, res) {
-    res.sendStatus(400);
+    const {
+      params: { trainingTypeId },
+    } = req;
+
+    try {
+      const type = await prisma.training_type.findUnique({
+        where: {
+          id_training_type: trainingTypeId,
+        },
+      });
+
+      if (!type) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El tipo de capacitación no existe',
+        });
+        return;
+      }
+
+      const formattedData = {
+        id: type.id_training_type,
+        title: type.title_training_type,
+        description: type.description_training_type,
+      };
+
+      res.json({
+        data: formattedData,
+        message: 'Training type retrieved successfully',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al intentar obtener el tipo de capacitación',
+      });
+    }
   }
 }

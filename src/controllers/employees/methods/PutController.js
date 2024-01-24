@@ -5,10 +5,14 @@ import { registerChange } from '../../../helpers/registerChange.js';
 
 export class PutController {
   // @param - employeeId
-  static async updateEmployee(req, res) {}
+  static async updateEmployee(req, res) {
+    res.sendStatus(500);
+  }
 
   // @param - employeeId
-  static async updateEmployeeImage(req, res) {}
+  static async updateEmployeeImage(req, res) {
+    res.sendStatus(500);
+  }
 
   // @param - employeeId
   // @param - docId
@@ -68,8 +72,12 @@ export class PutController {
   }
 
   // @param - licenseTypeId
-  static async updateLicenseType(req, res) {}
+  static async updateLicenseType(req, res) {
+    res.sendStatus(500);
+  }
 
   // @param - trainingTypeId
-  static async updateTrainingType(req, res) {}
+  static async updateTrainingType(req, res) {
+    res.sendStatus(500);
+  }
 }
