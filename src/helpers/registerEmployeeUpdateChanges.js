@@ -336,6 +336,14 @@ export const registerEmployeeUpdateChanges = async (
       previousValue: personPreviousData.identification_number,
       newValue: personNewData.identification_number,
     });
+    registerChange({
+      modifyingUser: userId,
+      employeeId: previousData.id_employee,
+      changedField: 'username',
+      changedFieldLabel: 'Nombre de Usuario',
+      previousValue: personPreviousData.identification_number,
+      newValue: personNewData.identification_number,
+    });
   }
 
   if (

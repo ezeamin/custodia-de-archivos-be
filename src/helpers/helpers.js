@@ -21,12 +21,10 @@ export const toUTC = (date) => {
   if (date === undefined) return undefined;
   if (date === null) return null;
 
-  // if (typeof date === 'string' && date.includes('Z')) {
-  //   return date;
-  // }
-
-  // const utcDate = dayjs(date).subtract(3, 'hour');
-  // return utcDate.format();
-
   return new Date(date).toISOString();
+};
+
+export const generateFirstPassword = () => {
+  const password = Math.random().toString(36).slice(-8);
+  return password.toString();
 };

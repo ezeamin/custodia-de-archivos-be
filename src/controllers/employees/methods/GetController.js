@@ -131,6 +131,12 @@ export class GetController {
         },
       });
 
+      const user = await prisma.user.findUnique({
+        where: {
+          username: employee.person.identification_number,
+        },
+      });
+
       const formattedData = {
         id: employee.id_employee,
         dni: employee.person.identification_number,
@@ -167,9 +173,9 @@ export class GetController {
         },
         startDate: toLocalTz(employee.employment_date),
         endDate: toLocalTz(employee.termination_date),
-        user: employee.id_user
+        user: user
           ? {
-              id: employee.id_user,
+              id: user.id_user,
             }
           : null,
         age: calculateDateDiffInAges(employee.person.birth_date),

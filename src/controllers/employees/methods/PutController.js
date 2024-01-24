@@ -224,6 +224,18 @@ export class PutController {
         });
       }
 
+      // Also change username from users' table if identification_number changed
+      if (formattedData.person.identification_number) {
+        await prisma.user.update({
+          where: {
+            username: employeeOriginalData.person.identification_number,
+          },
+          data: {
+            username: formattedData.person.identification_number,
+          },
+        });
+      }
+
       res.json({
         data: null,
         message: 'Empleado actualizado exitosamente',
