@@ -7,7 +7,7 @@ import { registerChange } from '../../../helpers/registerChange.js';
 export class DeleteController {
   // @param - employeeId
   static async deleteEmployee(req, res) {
-    res.sendStatus(500);
+    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
   }
 
   // @param - employeeId
@@ -170,11 +170,90 @@ export class DeleteController {
 
   // @param - licenseTypeId
   static async deleteLicenseType(req, res) {
-    res.sendStatus(500);
+    // only set licensetype_isactive to false
+    const {
+      params: { licenseTypeId },
+    } = req;
+
+    try {
+      const licenseType = await prisma.license_type.findUnique({
+        where: {
+          id_license_type: licenseTypeId,
+        },
+      });
+
+      if (!licenseType) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El tipo de licencia no existe',
+        });
+        return;
+      }
+
+      await prisma.license_type.update({
+        where: {
+          id_license_type: licenseTypeId,
+        },
+        data: {
+          license_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Tipo de licencia eliminada exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar el tipo de licencia. Intente de nuevo más tarde.',
+      });
+    }
   }
 
   // @param - trainingTypeId
   static async deleteTrainingType(req, res) {
-    res.sendStatus(500);
+    const {
+      params: { trainingTypeId },
+    } = req;
+
+    try {
+      const trainingType = await prisma.training_type.findUnique({
+        where: {
+          id_training_type: trainingTypeId,
+        },
+      });
+
+      if (!trainingType) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El tipo de capacitación no existe',
+        });
+        return;
+      }
+
+      await prisma.training_type.update({
+        where: {
+          id_training_type: trainingTypeId,
+        },
+        data: {
+          training_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Tipo de capacitación eliminada exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar el tipo de capacitación. Intente de nuevo más tarde.',
+      });
+    }
   }
 }

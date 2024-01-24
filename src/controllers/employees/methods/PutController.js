@@ -399,11 +399,93 @@ export class PutController {
 
   // @param - licenseTypeId
   static async updateLicenseType(req, res) {
-    res.sendStatus(500);
+    const {
+      params: { licenseTypeId },
+      body: { title, description },
+    } = req;
+
+    try {
+      const licenseType = await prisma.license_type.findUnique({
+        where: {
+          id_license_type: licenseTypeId,
+        },
+      });
+
+      if (!licenseType) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El tipo de licencia no existe',
+        });
+        return;
+      }
+
+      await prisma.license_type.update({
+        where: {
+          id_license_type: licenseTypeId,
+        },
+        data: {
+          title_license: title,
+          description_license: description,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Tipo de licencia actualizado exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al actualizar el tipo de licencia. Intente de nuevo más tarde.',
+      });
+    }
   }
 
   // @param - trainingTypeId
   static async updateTrainingType(req, res) {
-    res.sendStatus(500);
+    const {
+      params: { trainingTypeId },
+      body: { title, description },
+    } = req;
+
+    try {
+      const trainingType = await prisma.training_type.findUnique({
+        where: {
+          id_training_type: trainingTypeId,
+        },
+      });
+
+      if (!trainingType) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El tipo de capacitación no existe',
+        });
+        return;
+      }
+
+      await prisma.training_type.update({
+        where: {
+          id_training_type: trainingTypeId,
+        },
+        data: {
+          title_training_type: title,
+          description_training_type: description,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Tipo de capacitación actualizado exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al actualizar el tipo de capacitación. Intente de nuevo más tarde.',
+      });
+    }
   }
 }

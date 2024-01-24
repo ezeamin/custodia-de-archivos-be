@@ -558,7 +558,11 @@ export class GetController {
 
   static async licensesTypes(_, res) {
     try {
-      const types = await prisma.license_type.findMany();
+      const types = await prisma.license_type.findMany({
+        where: {
+          license_isactive: true,
+        },
+      });
 
       const formattedData = types.map((type) => ({
         id: type.id_license_type,
@@ -589,6 +593,7 @@ export class GetController {
       const type = await prisma.license_type.findUnique({
         where: {
           id_license_type: licenseTypeId,
+          license_isactive: true,
         },
       });
 
@@ -621,7 +626,11 @@ export class GetController {
 
   static async trainingsTypes(req, res) {
     try {
-      const types = await prisma.training_type.findMany();
+      const types = await prisma.training_type.findMany({
+        where: {
+          training_isactive: true,
+        },
+      });
 
       const formattedData = types.map((type) => ({
         id: type.id_training_type,
@@ -652,6 +661,7 @@ export class GetController {
       const type = await prisma.training_type.findUnique({
         where: {
           id_training_type: trainingTypeId,
+          training_isactive: true,
         },
       });
 

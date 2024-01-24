@@ -232,13 +232,13 @@ employeeRouter.delete(
   Employees.DeleteController.deleteEmployeeVacation,
 );
 employeeRouter.delete(
-  '/employees/licenses/:licenseTypeId',
+  '/licenses/types/:licenseTypeId',
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteLicenseType,
 );
 employeeRouter.delete(
-  '/employees/trainings/:trainingId',
+  '/trainings/types/:trainingTypeId',
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteTrainingType,
