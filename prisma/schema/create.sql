@@ -97,8 +97,11 @@ CREATE TABLE public.user_type (
 
 CREATE TABLE public.third_party (
     id_third_party       UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_person            UUID NOT NULL,
     role_description     varchar(20) NOT NULL,
-    CONSTRAINT pk PRIMARY KEY (id_third_party)
+    email                varchar(75) NOT NULL UNIQUE,
+    CONSTRAINT pk PRIMARY KEY (id_third_party),
+    CONSTRAINT fk_third_party_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
 );
 
 CREATE TABLE public.employee (
@@ -577,15 +580,6 @@ INSERT INTO public.user_type (id_user_type, user_type) VALUES
   ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee'),
   ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
 
--- Insert default admin user
-INSERT INTO public."user" (id_user,id_user_type, username, "password")
-VALUES (
-    '1249cbd7-5184-45d4-bd18-04a3f0769e99',
-    '32deb906-6292-4908-9cfc-02394fd4ab28',   -- admin
-    '43706393', -- username
-    '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa'  -- Password: "admin"
-);
-
 -- Insert example person
 INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)
 VALUES (
@@ -610,6 +604,16 @@ VALUES (
     'Programador',
     8,
     'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg'
+);
+
+-- Insert default admin user
+INSERT INTO public."user" (id_user,id_user_type,id_employee,username,"password")
+VALUES (
+    '1249cbd7-5184-45d4-bd18-04a3f0769e99',
+    '32deb906-6292-4908-9cfc-02394fd4ab28',   -- admin
+    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',   -- id_employee (Ezequiel Amin)
+    '43706393', -- username
+    '$2a$10$pl90EGBF.N/hGh18/KtjBuP4q/M056tDH8LXy2UT8d4PFQ1CD/OFa'  -- Password: "admin"
 );
 
 INSERT INTO public.employee_history (id_employee,id_modifying_user,modified_field,modified_field_label,previous_value,current_value)

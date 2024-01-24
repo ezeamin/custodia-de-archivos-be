@@ -22,7 +22,6 @@ export const post_recoverPasswordSchema = Joi.object({
 
 export const post_resetPasswordSchema = Joi.object({
   password: passwordRules(),
-  repeatPassword: Joi.ref('password'),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',

@@ -9,6 +9,7 @@ import {
 } from '../../helpers/validationSchemas/authSchemas.js';
 
 import { Auth } from '../../controllers/auth/index.js';
+import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 
 export const authRouter = express.Router();
 
@@ -29,6 +30,7 @@ authRouter.post(
 // PUT ----------------------------
 authRouter.put(
   '/reset-password',
+  isAuthenticated,
   (req, res, next) => validateBody(req, res, next, post_resetPasswordSchema),
   Auth.PutController.resetPassword,
 );

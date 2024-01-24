@@ -30,6 +30,9 @@ export class PostController {
               person: true,
             },
           },
+          third_party: {
+            include: { person: true },
+          },
           user_type: true,
         },
       });
@@ -55,7 +58,7 @@ export class PostController {
           id: userInDB.id_user,
           name: userInDB.id_employee
             ? userInDB.employee.person.name
-            : 'Solo lectura',
+            : userInDB.third_party.person.name,
           role: userInDB.user_type.user_type.toUpperCase(),
         },
       };
@@ -84,10 +87,8 @@ export class PostController {
     } catch (err) {
       console.error('🟥', err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        errors: {
-          data: null,
-          message: `ERROR: ${err}`,
-        },
+        data: null,
+        message: `Ocurrió un error al iniciar sesión`,
       });
     }
   }
@@ -149,13 +150,21 @@ export class PostController {
     } = req;
 
     try {
-      // 1- (Try to) Search user in DB
-      // const userInDB = await UsersModel.findOne({
-      //   //! Change to EmployeesModel
-      //   username: username.trim(),
-      //   isActive: true,
-      // });
-      const userInDB = null;
+      // 1- Search user in DB
+      const userInDB = await prisma.user.findUnique({
+        where: {
+          username,
+        },
+        include: {
+          employee: {
+            include: {
+              person: true,
+            },
+          },
+          third_party: true,
+          user_type: true,
+        },
+      });
 
       // 2- Validate credentials
       // Cases:
@@ -168,24 +177,19 @@ export class PostController {
         return;
       }
 
-      const userEmail = userInDB.email;
-      const hiddenEmail = userEmail.replace(/.{3}(?=@)/g, '***');
+      const userEmail = userInDB.employee.email || userInDB.third_party.email;
+      const hiddenEmail = `${userEmail.slice(0, 3)}***${userEmail.slice(
+        userEmail.indexOf('@') - 2,
+      )}`;
 
-      // 3- Send email to FE
-      res.json({
-        data: { email: hiddenEmail },
-        message: 'Usuario encontrado',
-      });
-
-      // 4- Generate JWT
+      // 3- Generate JWT
       const userInfo = {
         user: {
-          id: userInDB._doc._id,
-          firstname: userInDB._doc.firstname,
-          lastname: userInDB._doc.lastname,
-          username: userInDB._doc.username,
-          email: userInDB._doc.email,
-          role: userInDB._doc.role,
+          id: userInDB.id_user,
+          name: userInDB.id_employee
+            ? userInDB.employee.person.name
+            : userInDB.third_party.person.name,
+          role: userInDB.user_type.user_type.toUpperCase(),
         },
       };
 
@@ -194,37 +198,50 @@ export class PostController {
         expiresIn: '30m',
       });
 
-      // 5- Send email to user
-      const mailOptions = recoverMailOptions({ user: userInDB._doc, token });
+      // 4- Send email to user
+      const mailOptions = recoverMailOptions({ user: userInDB, token });
 
       const transporter = nodemailer.createTransport({
-        service: envs.MAIL.HOST,
+        host: envs.MAIL.HOST,
+        port: envs.MAIL.PORT,
+        tls: {
+          rejectUnauthorized: false,
+        },
         auth: {
           user: envs.MAIL.USER,
           pass: envs.MAIL.PASS,
         },
       });
 
-      transporter.sendMail(mailOptions, (err, info) => {
+      transporter.sendMail(mailOptions, (err) => {
         if (err) {
           console.error(
-            `🟥 RECOVER MAIL FAILED FOR ${userEmail} - ${userInDB._doc.username}:`,
+            `🟥 RECOVER MAIL FAILED FOR ${userEmail} - ${userInDB.username}:`,
             err,
           );
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            errors: {
+              data: null,
+              message: `Error generando mail`,
+            },
+          });
           return;
         }
+
+        // 5- Send email to FE
+        res.json({
+          data: { email: hiddenEmail },
+          message: 'Usuario encontrado',
+        });
         console.log(
-          `🟩 RECOVER MAIL SENT TO ${userEmail} - ${userInDB._doc.username}:`,
-          info,
+          `🟩 RECOVER MAIL SENT TO ${userEmail} - ${userInDB.username}`,
         );
       });
     } catch (err) {
       console.error('🟥', err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        errors: {
-          data: null,
-          message: `ERROR: ${err}`,
-        },
+        data: null,
+        message: `Ocurrió un error al intentar recuperar la contraseña`,
       });
     }
   }
@@ -243,10 +260,8 @@ export class PostController {
     } catch (err) {
       console.error('🟥', err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        errors: {
-          data: null,
-          message: `ERROR: ${err}`,
-        },
+        data: null,
+        message: `Ocurrió un error al cerrar sesión. Intente refrescar la pantalla`,
       });
     }
   }

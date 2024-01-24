@@ -207,22 +207,23 @@ model notification_type {
 }
 
 model person {
-  id_person             String     @id(map: "pk_person") @unique(map: "unq_id_person") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_gender             String     @db.Uuid
-  id_family             String?    @db.Uuid
-  id_address            String?    @db.Uuid
-  id_phone              String?    @db.Uuid
-  name                  String     @db.VarChar(50)
-  surname               String     @db.VarChar(50)
-  birth_date            DateTime   @db.Date
-  identification_number String     @unique @db.VarChar(8)
-  person_created_at     DateTime   @default(now()) @db.Timestamp(6)
-  person_updated_at     DateTime?  @default(now()) @db.Timestamp(6)
+  id_person             String        @id(map: "pk_person") @unique(map: "unq_id_person") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_gender             String        @db.Uuid
+  id_family             String?       @db.Uuid
+  id_address            String?       @db.Uuid
+  id_phone              String?       @db.Uuid
+  name                  String        @db.VarChar(50)
+  surname               String        @db.VarChar(50)
+  birth_date            DateTime      @db.Date
+  identification_number String        @unique @db.VarChar(8)
+  person_created_at     DateTime      @default(now()) @db.Timestamp(6)
+  person_updated_at     DateTime?     @default(now()) @db.Timestamp(6)
   employee              employee[]
-  home                  home?      @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
-  family                family?    @relation(fields: [id_family], references: [id_family], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_family")
-  gender                gender     @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
-  phone                 phone?     @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
+  home                  home?         @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
+  family                family?       @relation(fields: [id_family], references: [id_family], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_family")
+  gender                gender        @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
+  phone                 phone?        @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
+  third_party           third_party[]
 }
 
 model phone {
@@ -241,7 +242,10 @@ model province {
 
 model third_party {
   id_third_party   String @id(map: "pk") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_person        String @db.Uuid
   role_description String @db.VarChar(20)
+  email            String @unique @db.VarChar(75)
+  person           person @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_third_party_person")
   user             user[]
 }
 
