@@ -183,6 +183,7 @@ export class DeleteController {
       const licenseType = await prisma.license_type.findUnique({
         where: {
           id_license_type: licenseTypeId,
+          license_type_isactive: true,
         },
       });
 
@@ -199,7 +200,7 @@ export class DeleteController {
           id_license_type: licenseTypeId,
         },
         data: {
-          license_isactive: false,
+          license_type_isactive: false,
         },
       });
 
@@ -227,6 +228,7 @@ export class DeleteController {
       const trainingType = await prisma.training_type.findUnique({
         where: {
           id_training_type: trainingTypeId,
+          training_type_isactive: true,
         },
       });
 
@@ -243,7 +245,7 @@ export class DeleteController {
           id_training_type: trainingTypeId,
         },
         data: {
-          training_isactive: false,
+          training_type_isactive: false,
         },
       });
 

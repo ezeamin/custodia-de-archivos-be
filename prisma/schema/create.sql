@@ -337,7 +337,7 @@ CREATE TABLE public.employee_doc (
     employee_doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_employee_doc PRIMARY KEY (id_employee_doc),
     CONSTRAINT fk_employee_doc_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
-    CONSTRAINT fk_employee_doc_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
+    CONSTRAINT fk_user_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.notification_doc (

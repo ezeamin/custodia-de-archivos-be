@@ -67,16 +67,16 @@ model employee {
 }
 
 model employee_doc {
-  id_employee_doc                         String    @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_employee                             String    @db.Uuid
-  id_submitted_by                         String    @db.Uuid
-  employee_doc_url                        String    @db.VarChar(250)
-  employee_doc_name                       String    @db.VarChar(50)
-  employee_doc_isactive                   Boolean   @default(true)
-  employee_doc_created_at                 DateTime  @default(now()) @db.Timestamp(6)
-  employee_doc_updated_at                 DateTime? @default(now()) @db.Timestamp(6)
-  employee                                employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_employee")
-  user_employee_doc_id_submitted_byTouser user      @relation("employee_doc_id_submitted_byTouser", fields: [id_submitted_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_submitted_by")
+  id_employee_doc         String    @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_employee             String    @db.Uuid
+  id_submitted_by         String    @db.Uuid
+  employee_doc_url        String    @db.VarChar(250)
+  employee_doc_name       String    @db.VarChar(50)
+  employee_doc_isactive   Boolean   @default(true)
+  employee_doc_created_at DateTime  @default(now()) @db.Timestamp(6)
+  employee_doc_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  employee                employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_employee")
+  user                    user      @relation(fields: [id_submitted_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_submitted_by")
 }
 
 model employee_history {
@@ -307,31 +307,31 @@ model training_type {
 }
 
 model user {
-  id_user                                         String             @id(map: "pk_user") @unique(map: "unq_id_user") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_user_type                                    String             @db.Uuid
-  id_employee                                     String?            @db.Uuid
-  id_third_party                                  String?            @db.Uuid
-  username                                        String             @unique @db.VarChar(8)
-  password                                        String             @db.VarChar(100)
-  has_changed_def_pass                            Boolean            @default(false)
-  user_isactive                                   Boolean            @default(true)
-  user_created_at                                 DateTime           @default(now()) @db.Timestamp(6)
-  user_updated_at                                 DateTime?          @default(now()) @db.Timestamp(6)
-  absence                                         absence[]
-  employee_doc_employee_doc_id_submitted_byTouser employee_doc[]     @relation("employee_doc_id_submitted_byTouser")
-  employee_history                                employee_history[]
-  extra_hours                                     extra_hours[]
-  formal_warning                                  formal_warning[]
-  late_arrival                                    late_arrival[]
-  license                                         license[]
-  login                                           login[]
-  notification_notification_id_receptorTouser     notification[]     @relation("notification_id_receptorTouser")
-  notification_notification_id_senderTouser       notification[]     @relation("notification_id_senderTouser")
-  training                                        training[]
-  employee                                        employee?          @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_employee")
-  third_party                                     third_party?       @relation(fields: [id_third_party], references: [id_third_party], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_third_party")
-  user_type                                       user_type          @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
-  vacation                                        vacation[]
+  id_user                                     String             @id(map: "pk_user") @unique(map: "unq_id_user") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_user_type                                String             @db.Uuid
+  id_employee                                 String?            @db.Uuid
+  id_third_party                              String?            @db.Uuid
+  username                                    String             @unique @db.VarChar(8)
+  password                                    String             @db.VarChar(100)
+  has_changed_def_pass                        Boolean            @default(false)
+  user_isactive                               Boolean            @default(true)
+  user_created_at                             DateTime           @default(now()) @db.Timestamp(6)
+  user_updated_at                             DateTime?          @default(now()) @db.Timestamp(6)
+  absence                                     absence[]
+  employee_doc                                employee_doc[]
+  employee_history                            employee_history[]
+  extra_hours                                 extra_hours[]
+  formal_warning                              formal_warning[]
+  late_arrival                                late_arrival[]
+  license                                     license[]
+  login                                       login[]
+  notification_notification_id_receptorTouser notification[]     @relation("notification_id_receptorTouser")
+  notification_notification_id_senderTouser   notification[]     @relation("notification_id_senderTouser")
+  training                                    training[]
+  employee                                    employee?          @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_employee")
+  third_party                                 third_party?       @relation(fields: [id_third_party], references: [id_third_party], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_third_party")
+  user_type                                   user_type          @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
+  vacation                                    vacation[]
 }
 
 model user_type {
