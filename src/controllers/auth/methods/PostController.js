@@ -52,6 +52,15 @@ export class PostController {
         return;
       }
 
+      if (!userInDB.user_isactive) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message:
+            'El usuario ya no se encuentra activo. Contacte con el administrador',
+        });
+        return;
+      }
+
       // 3- Generate JWT
       const userInfo = {
         user: {
@@ -172,6 +181,15 @@ export class PostController {
           user_type: true,
         },
       });
+
+      if (!userInDB.user_isactive) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message:
+            'El usuario ya no se encuentra activo. Contacte con el administrador',
+        });
+        return;
+      }
 
       // 2- Validate credentials
       // Cases:

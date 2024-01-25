@@ -5,11 +5,15 @@ import { prisma } from '../../../helpers/prisma.js';
 export class GetController {
   static async status(_, res) {
     try {
-      const data = await prisma.employee_status.findMany();
+      const data = await prisma.employee_status.findMany({
+        where: {
+          status_isactive: true,
+        },
+      });
 
       const formattedData = data.map((item) => ({
         id: item.id_status,
-        description: item.title_status,
+        description: item.status,
       }));
 
       res.json({
@@ -27,7 +31,11 @@ export class GetController {
 
   static async roles(_, res) {
     try {
-      const data = await prisma.user_type.findMany();
+      const data = await prisma.user_type.findMany({
+        where: {
+          user_type_isactive: true,
+        },
+      });
 
       const formattedData = data.map((item) => ({
         id: item.id_user_type,
@@ -49,7 +57,11 @@ export class GetController {
 
   static async genders(_, res) {
     try {
-      const data = await prisma.gender.findMany();
+      const data = await prisma.gender.findMany({
+        where: {
+          gender_isactive: true,
+        },
+      });
 
       const formattedData = data.map((item) => ({
         id: item.id_gender,
@@ -71,7 +83,11 @@ export class GetController {
 
   static async areas(_, res) {
     try {
-      const data = await prisma.area.findMany();
+      const data = await prisma.area.findMany({
+        where: {
+          area_isactive: true,
+        },
+      });
 
       const formattedData = data.map((item) => ({
         id: item.id_area,

@@ -1,21 +1,14 @@
+import nodemailer from 'nodemailer';
+
 import { envs } from './envs.js';
 
 const frontendUrl = envs.CLIENT_URL;
 
-export const newUserMail = ({ user, username, password }) => {
-  console.log(user);
-  const isEmployee = !!user.id_employee;
-  const name = isEmployee
-    ? `${user.employee.person.name} ${user.employee.person.surname}`
-    : `${user.third_party.person.name} ${user.third_party.person.surname}`;
-
-  const email = isEmployee ? user.employee.email : user.third_party.email;
-
-  return {
-    from: envs.MAIL.USER,
-    to: email,
-    subject: 'Creación de usuario - Custodia de Archivos',
-    html: `
+const newUserMail = ({ name, email, username, password }) => ({
+  from: envs.MAIL.USER,
+  to: email,
+  subject: 'Creación de usuario - Custodia de Archivos',
+  html: `
     <main style="font-size: 16px; font-family: Arial;">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKVsleoz5dKEcoHobs-CFh8hnLYaUilXbcfJBMpf8Oo0LXXldeQBaSg8uRIPkObtqCIAs&usqp=CAU" alt="Custodia de archivos" width="100px" />
         <h1 style="font-size: 20px; font-weight: bold; margin-top: 2rem;">Nuevo usuario</h1>
@@ -34,5 +27,37 @@ export const newUserMail = ({ user, username, password }) => {
         <p>Equipo de Custodia de Archivos.</p>
     </main>
       `,
-  };
+});
+
+export const sendNewUserMail = async ({ name, email, username, password }) => {
+  try {
+    // 4- Send email to user
+    const mailOptions = newUserMail({ name, email, username, password });
+
+    const transporter = nodemailer.createTransport({
+      host: envs.MAIL.HOST,
+      port: envs.MAIL.PORT,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      auth: {
+        user: envs.MAIL.USER,
+        pass: envs.MAIL.PASS,
+      },
+    });
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        console.error(
+          `🟥 USER CREATION MAIL FAILED FOR ${email} - ${username}:`,
+          err,
+        );
+        return;
+      }
+
+      console.log(`🟩 USER CREATION MAIL SENT TO ${email} - ${username}`);
+    });
+  } catch (err) {
+    console.error('🟥', err);
+  }
 };

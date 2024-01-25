@@ -29,7 +29,7 @@ const optionsMap = {
   },
   employee_status: {
     id_status: true,
-    title_status: true,
+    status: true,
   },
   user_type: {
     id_user_type: true,
@@ -100,7 +100,8 @@ const isDate = (value) => {
 };
 
 const getDateFormat = (value) => {
-  if (value.includes('00:00:00')) return 'DD/MM/YYYY';
+  if (value.includes('03:00:00') || value.includes('00:00:00'))
+    return 'DD/MM/YYYY';
   return 'DD/MM/YYYY - HH:mm:ss';
 };
 

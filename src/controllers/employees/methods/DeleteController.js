@@ -1,7 +1,6 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { deleteFile } from '../../../helpers/cloudinary.js';
 import { registerChange } from '../../../helpers/registerChange.js';
 
 export class DeleteController {
@@ -21,6 +20,7 @@ export class DeleteController {
       const doc = await prisma.employee_doc.findUnique({
         where: {
           id_employee_doc: docId,
+          employee_doc_isactive: true,
         },
       });
 
@@ -76,6 +76,7 @@ export class DeleteController {
       const license = await prisma.license.findUnique({
         where: {
           id_license: licenseId,
+          license_isactive: true,
         },
         include: {
           license_type: true,
@@ -90,9 +91,13 @@ export class DeleteController {
         return;
       }
 
-      await prisma.license.delete({
+      await prisma.license.update({
         where: {
           id_license: licenseId,
+          license_isactive: true,
+        },
+        data: {
+          license_isactive: false,
         },
       });
 
@@ -131,6 +136,7 @@ export class DeleteController {
       const vacation = await prisma.vacation.findUnique({
         where: {
           id_vacation: vacationId,
+          vacation_isactive: true,
         },
       });
 
@@ -142,9 +148,13 @@ export class DeleteController {
         return;
       }
 
-      await prisma.vacation.delete({
+      await prisma.vacation.update({
         where: {
           id_vacation: vacationId,
+          vacation_isactive: true,
+        },
+        data: {
+          vacation_isactive: false,
         },
       });
 
@@ -198,6 +208,7 @@ export class DeleteController {
       await prisma.license_type.update({
         where: {
           id_license_type: licenseTypeId,
+          license_type_isactive: true,
         },
         data: {
           license_type_isactive: false,
@@ -243,6 +254,7 @@ export class DeleteController {
       await prisma.training_type.update({
         where: {
           id_training_type: trainingTypeId,
+          training_type_isactive: true,
         },
         data: {
           training_type_isactive: false,

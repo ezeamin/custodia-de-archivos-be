@@ -15,6 +15,7 @@ export class PutController {
       const user = await prisma.user.findUnique({
         where: {
           id_user: userId,
+          user_isactive: true,
         },
       });
 

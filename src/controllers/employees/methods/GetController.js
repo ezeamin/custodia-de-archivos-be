@@ -12,9 +12,39 @@ export class GetController {
     } = req;
 
     // query searches by name or surname or identification_number of person associated to employee
+    const searchFilters = {
+      OR: [
+        {
+          person: {
+            name: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          person: {
+            surname: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          person: {
+            identification_number: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ],
+    };
 
     try {
-      const countPromise = prisma.employee.count();
+      const countPromise = prisma.employee.count({
+        where: searchFilters,
+      });
       const dataPromise = prisma.employee.findMany({
         skip: page * entries,
         take: +entries,
@@ -28,34 +58,7 @@ export class GetController {
             surname: 'asc',
           },
         },
-        where: {
-          OR: [
-            {
-              person: {
-                name: {
-                  contains: query,
-                  mode: 'insensitive',
-                },
-              },
-            },
-            {
-              person: {
-                surname: {
-                  contains: query,
-                  mode: 'insensitive',
-                },
-              },
-            },
-            {
-              person: {
-                identification_number: {
-                  contains: query,
-                  mode: 'insensitive',
-                },
-              },
-            },
-          ],
-        },
+        where: searchFilters,
       });
 
       const [count, data] = await Promise.all([countPromise, dataPromise]);
@@ -76,7 +79,7 @@ export class GetController {
         fileNumber: employee.no_file,
         status: {
           id: employee.id_status,
-          description: employee.employee_status.title_status,
+          description: employee.employee_status.status,
         },
       }));
 
@@ -189,7 +192,7 @@ export class GetController {
         fileNumber: employee.no_file,
         status: {
           id: employee.id_status,
-          description: employee.employee_status.title_status,
+          description: employee.employee_status.status,
         },
       };
 
@@ -301,6 +304,7 @@ export class GetController {
       const absences = await prisma.absence.findMany({
         where: {
           id_employee: employeeId,
+          absence_isactive: true,
         },
       });
 
@@ -334,6 +338,7 @@ export class GetController {
       const licenses = await prisma.license.findMany({
         where: {
           id_employee: employeeId,
+          license_isactive: true,
         },
         include: {
           license_type: true,
@@ -375,6 +380,7 @@ export class GetController {
       const vacations = await prisma.vacation.findMany({
         where: {
           id_employee: employeeId,
+          vacation_isactive: true,
         },
       });
 
@@ -408,6 +414,7 @@ export class GetController {
       const trainings = await prisma.training.findMany({
         where: {
           id_employee: employeeId,
+          training_isactive: true,
         },
         include: {
           training_type: true,
@@ -448,6 +455,7 @@ export class GetController {
       const formalWarnings = await prisma.formal_warning.findMany({
         where: {
           id_employee: employeeId,
+          formal_warning_isactive: true,
         },
       });
 
@@ -481,6 +489,7 @@ export class GetController {
       const lateArrivals = await prisma.late_arrival.findMany({
         where: {
           id_employee: employeeId,
+          late_arrival_isactive: true,
         },
       });
 
@@ -515,6 +524,7 @@ export class GetController {
       const extraHours = await prisma.extra_hours.findMany({
         where: {
           id_employee: employeeId,
+          extra_hours_isactive: true,
         },
       });
 
@@ -607,7 +617,7 @@ export class GetController {
     }
   }
 
-  static async trainingsTypes(req, res) {
+  static async trainingsTypes(_, res) {
     try {
       const types = await prisma.training_type.findMany({
         where: {

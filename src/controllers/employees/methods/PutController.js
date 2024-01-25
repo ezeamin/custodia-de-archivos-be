@@ -389,6 +389,7 @@ export class PutController {
       const doc = await prisma.employee_doc.findUnique({
         where: {
           id_employee_doc: docId,
+          employee_doc_isactive: true,
         },
       });
 
@@ -447,6 +448,7 @@ export class PutController {
       const licenseType = await prisma.license_type.findUnique({
         where: {
           id_license_type: licenseTypeId,
+          license_type_isactive: true,
         },
       });
 
@@ -493,6 +495,7 @@ export class PutController {
       const trainingType = await prisma.training_type.findUnique({
         where: {
           id_training_type: trainingTypeId,
+          training_type_isactive: true,
         },
       });
 

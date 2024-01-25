@@ -12,15 +12,10 @@ export class DeleteController {
     } = req;
 
     try {
-      const user_type = await prisma.user_type.findUnique({
-        where: {
-          user_type: 'employee',
-        },
-      });
-
       const user = await prisma.user.findUnique({
         where: {
           id_user: userId,
+          user_isactive: true,
         },
       });
 
@@ -32,12 +27,16 @@ export class DeleteController {
         return;
       }
 
-      await prisma.user.update({
+      const newUser = await prisma.user.update({
         where: {
           id_user: userId,
         },
         data: {
-          id_user_type: user_type.id_user_type,
+          user_type: {
+            connect: {
+              user_type: 'employee',
+            },
+          },
         },
       });
 
@@ -52,7 +51,7 @@ export class DeleteController {
         changedField: 'user_type',
         changedFieldLabel: 'Rol de usuario',
         employeeId: user.id_employee,
-        newValue: user_type.id_user_type,
+        newValue: newUser.id_user_type,
         previousValue: user.id_user_type,
       });
     } catch (error) {
@@ -64,7 +63,48 @@ export class DeleteController {
     }
   }
 
+  // @param userId
   static async deleteReadOnlyUser(req, res) {
-    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+    const {
+      params: { userId },
+    } = req;
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id_user: userId,
+          user_isactive: true,
+        },
+      });
+
+      if (!user) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El usuario no existe',
+        });
+        return;
+      }
+
+      await prisma.user.update({
+        where: {
+          id_user: userId,
+          user_isactive: true,
+        },
+        data: {
+          user_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Usuario eliminado exitosamente',
+      });
+    } catch (error) {
+      console.error('🟥', error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: `Ocurrió un error al eliminar el usuario`,
+      });
+    }
   }
 }

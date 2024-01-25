@@ -4,14 +4,16 @@ CREATE SCHEMA IF NOT EXISTS public;
 CREATE EXTENSION IF NOT EXISTS "pg_uuidv7";
 
 CREATE TABLE public.area (
-    id_area   UUID DEFAULT uuid_generate_v7() NOT NULL,
-    area      varchar(20) NOT NULL UNIQUE,
+    id_area         UUID DEFAULT uuid_generate_v7() NOT NULL,
+    area            varchar(20) NOT NULL UNIQUE,
+    area_isactive   boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_area PRIMARY KEY (id_area)
 );
 
 CREATE TABLE public.employee_status (
     id_status            UUID DEFAULT uuid_generate_v7() NOT NULL,
-    title_status         varchar(10) NOT NULL UNIQUE,
+    "status"             varchar(10) NOT NULL UNIQUE,
+    status_isactive      boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_employee_status PRIMARY KEY (id_status)
 );
 
@@ -30,6 +32,7 @@ CREATE TABLE public.family (
 CREATE TABLE public.gender (
     id_gender            UUID DEFAULT uuid_generate_v7() NOT NULL,
     gender               varchar(15) NOT NULL UNIQUE,
+    gender_isactive      boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_gender PRIMARY KEY (id_gender)
 );
 
@@ -80,7 +83,7 @@ CREATE TABLE public.phone (
 
 CREATE TABLE public.person (
     id_person            UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_gender            UUID NOT NULL,
+    id_gender            UUID ,
     id_family            UUID ,
     id_address           UUID ,
     id_phone             UUID ,
@@ -88,6 +91,7 @@ CREATE TABLE public.person (
     surname              varchar(50) NOT NULL,
     birth_date           timestamp NOT NULL,
     identification_number varchar(8) NOT NULL UNIQUE,
+    person_isactive      boolean DEFAULT true NOT NULL,
     person_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     person_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_person PRIMARY KEY (id_person),
@@ -100,15 +104,16 @@ CREATE TABLE public.person (
 CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
 
 CREATE TABLE public.user_type (
-    id_user_type     UUID DEFAULT uuid_generate_v7() NOT NULL,
-    user_type        varchar(15) NOT NULL UNIQUE,
+    id_user_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    user_type           varchar(15) NOT NULL UNIQUE,
+    user_type_isactive  boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_user_type PRIMARY KEY (id_user_type)
 );
 
 CREATE TABLE public.third_party (
     id_third_party       UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_person            UUID NOT NULL,
-    role_description     varchar(20) NOT NULL,
+    "description"        varchar(100),
     email                varchar(75) NOT NULL UNIQUE,
     CONSTRAINT pk PRIMARY KEY (id_third_party),
     CONSTRAINT fk_third_party_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
@@ -126,6 +131,7 @@ CREATE TABLE public.employee (
     position             varchar(100) NOT NULL,
     working_hours        integer DEFAULT 0,
     picture_url          varchar(300) NOT NULL,
+    employee_isactive    boolean DEFAULT true NOT NULL,
     employee_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     employee_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_employee PRIMARY KEY (id_employee),
@@ -177,6 +183,7 @@ CREATE TABLE public.extra_hours (
     date_extra_hours         date NOT NULL,
     qty_extra_hours          integer NOT NULL,
     observation_extra_hours  varchar(200),
+    extra_hours_isactive     boolean DEFAULT true NOT NULL,
     extra_hours_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     extra_hours_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_extra_hours PRIMARY KEY (id_extra_hours),
@@ -190,6 +197,7 @@ CREATE TABLE public.formal_warning (
     id_submitted_by             UUID NOT NULL,
     reason_formal_warning       varchar(200) NOT NULL,
     date_formal_warning         timestamp NOT NULL,
+    formal_warning_isactive     boolean DEFAULT true NOT NULL,
     formal_warning_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     formal_warning_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_formal_warning PRIMARY KEY (id_formal_warning),
@@ -204,6 +212,7 @@ CREATE TABLE public.late_arrival (
     date_late_arrival    timestamp NOT NULL,
     time_late_arrival    char(5) NOT NULL,
     observation_late_arrival varchar(200),
+    late_arrival_isactive   boolean DEFAULT true NOT NULL,
     late_arrival_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     late_arrival_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_late_arrival PRIMARY KEY (id_late_arrival),
@@ -245,6 +254,7 @@ CREATE TABLE public.vacation (
     start_date_vacation    timestamp NOT NULL,
     end_date_vacation      timestamp NOT NULL,
     observation_vacation   varchar(200),
+    vacation_isactive      boolean DEFAULT true NOT NULL,
     vacation_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     vacation_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_vacation PRIMARY KEY (id_vacation),
@@ -258,6 +268,7 @@ CREATE TABLE public.absence (
     id_submitted_by      UUID NOT NULL,
     date_absence         timestamp NOT NULL,
     reason_absence       varchar(50) NOT NULL,
+    absence_isactive     boolean DEFAULT true NOT NULL,
     absence_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     absence_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_absence PRIMARY KEY (id_absence),
@@ -273,6 +284,7 @@ CREATE TABLE public.license (
     start_date_license   timestamp NOT NULL,
     end_date_license     timestamp NOT NULL,
     observation_license  varchar(200),
+    license_isactive     boolean DEFAULT true NOT NULL,
     license_created_at   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     license_updated_at   timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_license PRIMARY KEY (id_license),
@@ -291,6 +303,7 @@ CREATE TABLE public.training (
     date_training        timestamp NOT NULL,
     reason_training      varchar(200),
     observation_training varchar(200),
+    training_isactive    boolean DEFAULT true NOT NULL,
     training_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     training_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_training PRIMARY KEY (id_training),
@@ -318,6 +331,7 @@ CREATE TABLE public.notification (
     id_receptor                UUID NOT NULL,
     message                    varchar(500) NOT NULL,
     read_status                boolean NOT NULL,
+    notification_isactive      boolean DEFAULT true NOT NULL,
     notification_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     notification_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_notification PRIMARY KEY (id_notification),
@@ -598,7 +612,7 @@ VALUES
     ('018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a','Sistemas'),
     ('018d3b85-ad41-789e-b615-cd610c5c131f','Gerencia');
 
-INSERT INTO public.employee_status (id_status, title_status) VALUES
+INSERT INTO public.employee_status (id_status, "status") VALUES
   ('018d3b85-ad41-70bf-a4b3-b248a73b7bf8','active'),
   ('018d3b85-ad41-7c07-8ac9-00c4a6d0f4f8','suspended'),
   ('018d3b85-ad41-705d-b6ac-eff17a2cbb63','inactive'),

@@ -3,6 +3,9 @@ import UAParser from 'ua-parser-js';
 
 import { prisma } from '../../../helpers/prisma.js';
 
+const DEFAULT_IMAGE_URL =
+  'https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg';
+
 export class GetController {
   static async users(req, res) {
     const {
@@ -10,29 +13,49 @@ export class GetController {
       user: { id: userId },
     } = req;
 
-    try {
-      const countPromise = prisma.user.count();
-      const dataPromise = prisma.user.findMany({
-        skip: page * entries,
-        take: +entries,
-        include: {
-          employee: {
-            include: {
-              person: true,
-            },
-          },
-          user_type: true,
+    const searchFilters = {
+      user_isactive: true,
+      NOT: {
+        id_user: userId,
+      },
+      user_type: {
+        user_type: {
+          contains: role,
+          mode: 'insensitive',
         },
-        where: {
-          NOT: {
-            id_user: userId,
+      },
+      OR: [
+        {
+          third_party: {
+            OR: [
+              {
+                person: {
+                  name: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+              {
+                person: {
+                  surname: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+              {
+                person: {
+                  identification_number: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            ],
           },
-          user_type: {
-            user_type: {
-              contains: role,
-              mode: 'insensitive',
-            },
-          },
+        },
+        {
           employee: {
             OR: [
               {
@@ -62,6 +85,30 @@ export class GetController {
             ],
           },
         },
+      ],
+    };
+
+    try {
+      const countPromise = prisma.user.count({
+        where: searchFilters,
+      });
+      const dataPromise = prisma.user.findMany({
+        skip: page * entries,
+        take: +entries,
+        include: {
+          employee: {
+            include: {
+              person: true,
+            },
+          },
+          third_party: {
+            include: {
+              person: true,
+            },
+          },
+          user_type: true,
+        },
+        where: searchFilters,
       });
 
       const [count, data] = await Promise.all([countPromise, dataPromise]);
@@ -69,13 +116,20 @@ export class GetController {
       const formattedData = data.map((user) => ({
         id: user.id_user,
         username: user.username,
-        imgSrc: user.employee.picture_url,
-        firstname: user.employee.person.name,
-        lastname: user.employee.person.surname,
+        imgSrc: user.employee ? user.employee.picture_url : DEFAULT_IMAGE_URL,
+        firstname: user.employee
+          ? user.employee.person.name
+          : user.third_party.person.name,
+        lastname: user.employee
+          ? user.employee.person.surname
+          : user.third_party.person.surname,
         role: {
           id: user.user_type.id_user_type,
           description: user.user_type.user_type.toUpperCase(),
         },
+        description: user.third_party
+          ? user.third_party.description
+          : undefined,
       }));
 
       res.json({

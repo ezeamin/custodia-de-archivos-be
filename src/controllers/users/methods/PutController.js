@@ -12,25 +12,33 @@ export class PutController {
     } = req;
 
     try {
-      const user_type = await prisma.user_type.findUnique({
-        where: {
-          user_type: 'admin',
-        },
-      });
-
-      // To get id_employee for change registration
+      // To get id_employee and id_user_type (old) for change registration
       const user = await prisma.user.findUnique({
         where: {
           id_user: userId,
+          user_isactive: true,
         },
       });
 
-      await prisma.user.update({
+      if (!user) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El usuario no existe',
+        });
+        return;
+      }
+
+      const newUser = await prisma.user.update({
         where: {
           id_user: userId,
+          user_isactive: true,
         },
         data: {
-          id_user_type: user_type.id_user_type,
+          user_type: {
+            connect: {
+              user_type: 'admin',
+            },
+          },
         },
       });
 
@@ -45,7 +53,7 @@ export class PutController {
         changedField: 'user_type',
         changedFieldLabel: 'Rol de usuario',
         employeeId: user.id_employee,
-        newValue: user_type.id_user_type,
+        newValue: newUser.id_user_type,
         previousValue: user.id_user_type,
       });
     } catch (error) {

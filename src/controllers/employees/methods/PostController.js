@@ -70,7 +70,7 @@ export class PostController {
           },
           employee_status: {
             connect: {
-              title_status: 'active',
+              status: 'active',
             },
           },
         },
