@@ -2,6 +2,7 @@ import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { isAdmin } from '../../middlewares/isAdmin.js';
+import { isAdminOrReadOnly } from '../../middlewares/isAdminOrReadOnly.js';
 
 import { Employees } from '../../controllers/employees/index.js';
 
@@ -15,91 +16,91 @@ export const employeeRouter = express.Router();
 employeeRouter.get(
   '/',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employees,
 );
 employeeRouter.get(
   '/:employeeId',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeById,
 );
 employeeRouter.get(
   '/:employeeId/docs',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeDocs,
 );
 employeeRouter.get(
   '/:employeeId/history',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeHistory,
 );
 employeeRouter.get(
   '/:employeeId/absences',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeAbsences,
 );
 employeeRouter.get(
   '/:employeeId/licenses',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeLicenses,
 );
 employeeRouter.get(
   '/:employeeId/vacations',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeVacations,
 );
 employeeRouter.get(
   '/:employeeId/trainings',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeTrainings,
 );
 employeeRouter.get(
   '/:employeeId/formal-warnings',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeFormalWarnings,
 );
 employeeRouter.get(
   '/:employeeId/late-arrivals',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeLateArrivals,
 );
 employeeRouter.get(
   '/:employeeId/extra-hours',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.employeeExtraHours,
 );
 employeeRouter.get(
   '/licenses/types',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.licensesTypes,
 );
 employeeRouter.get(
   '/licenses/types/:licenseTypeId',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.licensesTypesById,
 );
 employeeRouter.get(
   '/trainings/types',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.trainingsTypes,
 );
 employeeRouter.get(
   '/trainings/types/:trainingTypeId',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Employees.GetController.trainingsTypesById,
 );
 

@@ -2,5 +2,5 @@
 export const roles = {
   ADMIN: 'ADMIN',
   EMPLOYEE: 'EMPLOYEE',
-  READ_ONLY: 'READ_ONLY',
+  THIRD_PARTY: 'THIRD_PARTY',
 };

@@ -2,17 +2,23 @@ import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { isAdmin } from '../../middlewares/isAdmin.js';
+import { isAdminOrReadOnly } from '../../middlewares/isAdminOrReadOnly.js';
 
 import { Users } from '../../controllers/users/index.js';
 
 export const userRouter = express.Router();
 
 // GET ---------------------------
-userRouter.get('/', isAuthenticated, isAdmin, Users.GetController.users);
+userRouter.get(
+  '/',
+  isAuthenticated,
+  isAdminOrReadOnly,
+  Users.GetController.users,
+);
 userRouter.get(
   '/login-logs',
   isAuthenticated,
-  isAdmin,
+  isAdminOrReadOnly,
   Users.GetController.loginLogs,
 );
 
