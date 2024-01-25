@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "build": "prisma db pull && prisma generate && build src/index.js --bundle --platform=node --outfile=dist/index.cjs --minify",
+    "build": "prisma db pull && prisma generate && esbuild src/index.js --bundle --platform=node --outfile=dist/index.cjs --minify",
     "start": "node --env-file=.env dist/index.cjs",
     "dev": "node --watch --env-file=.env src/index.js",
     "lint": "node config/pre-build.js --ignore-build --fix",
