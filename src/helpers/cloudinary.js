@@ -60,4 +60,4 @@ export const deleteFile = async (originalUrl, privateDoc = false) => {
 
 export const deleteAllFiles = async () => {
   await cloudinary.api.delete_all_resources();
-}
+};

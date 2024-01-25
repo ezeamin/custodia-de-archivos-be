@@ -9,16 +9,6 @@ export const registerChange = async ({
   modifyingUser,
   employeeId,
 }) => {
-  console.log('🟢', {
-    changedField,
-    changedFieldLabel,
-    changedTable,
-    previousValue,
-    newValue,
-    modifyingUser,
-    employeeId,
-  });
-
   try {
     await prisma.employee_history.create({
       data: {

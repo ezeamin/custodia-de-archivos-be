@@ -18,6 +18,9 @@ export class PostController {
       body: { username, password },
     } = req;
 
+    console.log(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
+    console.log(req.headers);
+
     try {
       // 1- Search user in DB
       const userInDB = await prisma.user.findUnique({

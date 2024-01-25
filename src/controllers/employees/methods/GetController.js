@@ -1,9 +1,7 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import {
-  calculateDateDiffInAges,
-} from '../../../helpers/helpers.js';
+import { calculateDateDiffInAges } from '../../../helpers/helpers.js';
 import { getDownloadLink } from '../../../helpers/cloudinary.js';
 import { formatHistoryData } from '../../../helpers/formatHistoryData.js';
 
