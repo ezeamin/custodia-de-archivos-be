@@ -17,18 +17,6 @@ CREATE TABLE public.employee_status (
     CONSTRAINT pk_employee_status PRIMARY KEY (id_status)
 );
 
-CREATE TABLE public.family_relationship_type (
-    id_family_relationship_type    UUID DEFAULT uuid_generate_v7() NOT NULL,
-    relationship_type              varchar(20) NOT NULL,
-    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
-);
-
-CREATE TABLE public.family (
-    id_family            UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_relationship_type UUID DEFAULT uuid_generate_v7() NOT NULL,
-    CONSTRAINT pk_family PRIMARY KEY (id_family)
-);
-
 CREATE TABLE public.gender (
     id_gender            UUID DEFAULT uuid_generate_v7() NOT NULL,
     gender               varchar(15) NOT NULL UNIQUE,
@@ -79,6 +67,24 @@ CREATE TABLE public.phone (
     phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_phone PRIMARY KEY (id_phone)
+);
+
+CREATE TABLE public.family_relationship_type (
+    id_family_relationship_type    UUID DEFAULT uuid_generate_v7() NOT NULL,
+    relationship_type              varchar(20) NOT NULL,
+    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
+);
+
+CREATE TABLE public.family (
+    id_family               UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_employee             UUID NOT NULL,
+    id_family_member        UUID NOT NULL,
+    id_relationship_type    UUID DEFAULT uuid_generate_v7() NOT NULL,
+    family_isactive         boolean DEFAULT true NOT NULL,
+    family_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    family_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_family PRIMARY KEY (id_family),
+    CONSTRAINT fk_family_relationship_type FOREIGN KEY (id_relationship_type) REFERENCES public.family_relationship_type(id_family_relationship_type)
 );
 
 CREATE TABLE public.person (
@@ -141,6 +147,9 @@ CREATE TABLE public.employee (
 );
 
 CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
+
+ALTER TABLE public.family ADD CONSTRAINT fk_family_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee);
+ALTER TABLE public.family ADD CONSTRAINT fk_family_family_member FOREIGN KEY (id_family_member) REFERENCES public.person(id_person);
 
 CREATE TABLE public."user" (
     id_user              UUID DEFAULT uuid_generate_v7() NOT NULL,
@@ -435,6 +444,20 @@ BEFORE UPDATE ON public."address"
 FOR EACH ROW
 EXECUTE PROCEDURE update_address_updated_at();
 
+-- family updated_at trigger
+CREATE OR REPLACE FUNCTION update_family_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.family_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_family_updated_at
+BEFORE UPDATE ON public.family
+FOR EACH ROW
+EXECUTE PROCEDURE update_family_updated_at();
+
 -- employee updated_at trigger
 CREATE OR REPLACE FUNCTION update_employee_updated_at()
 RETURNS TRIGGER AS $$
@@ -622,6 +645,19 @@ INSERT INTO public.user_type (id_user_type, user_type) VALUES
   ('32deb906-6292-4908-9cfc-02394fd4ab28','admin'),
   ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee'),
   ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
+
+INSERT INTO public.family_relationship_type (id_family_relationship_type, relationship_type) VALUES
+  ('018d4131-99a7-7301-95f5-f1851f99af92','Padre'),
+  ('018d4131-99a7-7be7-8806-86232190920d','Madre'),
+  ('018d4131-99a7-76a7-b028-90262b1ea22f','Hermano'),
+  ('018d4131-99a7-7d97-b802-e7e60c762b37','Hijo'),
+  ('018d4131-99a7-72c1-ae5e-d021667a7739','Abuelo'),
+  ('018d4131-99a7-7a4d-8daf-e03c84bf6708','Tio'),
+  ('018d4131-99a7-7538-b160-ba114ded2ddc','Primo'),
+  ('018d4131-99a7-7e65-81e5-8bb048d0fc31','Sobrino'),
+  ('018d4131-99a7-747d-8861-ea674c345ea0','Suegro'),
+  ('018d4131-99a7-7165-af6f-0b6d7de55694','Cónyuge'),
+  ('018d4131-99a7-7c4d-9b9f-5b1b8b1b1b1b','Otro');
 
 -- Insert example person
 INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)
