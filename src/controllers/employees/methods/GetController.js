@@ -3,7 +3,6 @@ import HttpStatus from 'http-status-codes';
 import { prisma } from '../../../helpers/prisma.js';
 import {
   calculateDateDiffInAges,
-  toLocalTz,
 } from '../../../helpers/helpers.js';
 import { getDownloadLink } from '../../../helpers/cloudinary.js';
 import { formatHistoryData } from '../../../helpers/formatHistoryData.js';
@@ -147,7 +146,7 @@ export class GetController {
         imgSrc: employee.picture_url,
         lastname: employee.person.surname,
         firstname: employee.person.name,
-        birthdate: toLocalTz(employee.person.birth_date),
+        birthdate: employee.person.birth_date,
         workingHours: employee.working_hours,
         address: employee.person.address
           ? {
@@ -175,8 +174,8 @@ export class GetController {
           id: employee.person.id_gender,
           description: employee.person.gender.gender,
         },
-        startDate: toLocalTz(employee.employment_date),
-        endDate: toLocalTz(employee.termination_date),
+        startDate: employee.employment_date,
+        endDate: employee.termination_date,
         user: user
           ? {
               id: user.id_user,
@@ -277,7 +276,7 @@ export class GetController {
         historyPromise,
       ]);
 
-      const formattedData = formatHistoryData(history);
+      const formattedData = await formatHistoryData(history);
 
       res.json({
         data: formattedData,
@@ -309,7 +308,7 @@ export class GetController {
 
       const formattedData = absences.map((absence) => ({
         id: absence.id_absence,
-        date: toLocalTz(absence.date_absence),
+        date: absence.date_absence,
         reason: absence.reason_absence,
       }));
 
@@ -345,8 +344,8 @@ export class GetController {
 
       const formattedData = licenses.map((license) => ({
         id: license.id_license,
-        startDate: toLocalTz(license.start_date_license),
-        endDate: toLocalTz(license.end_date_license),
+        startDate: license.start_date_license,
+        endDate: license.end_date_license,
         type: {
           id: license.license_type.id_license_type,
           description: license.license_type.title_license,
@@ -383,8 +382,8 @@ export class GetController {
 
       const formattedData = vacations.map((vacation) => ({
         id: vacation.id_vacation,
-        startDate: toLocalTz(vacation.start_date_vacation),
-        endDate: toLocalTz(vacation.end_date_vacation),
+        startDate: vacation.start_date_vacation,
+        endDate: vacation.end_date_vacation,
         observations: vacation.observation_vacation,
       }));
 
@@ -419,7 +418,7 @@ export class GetController {
 
       const formattedData = trainings.map((training) => ({
         id: training.id_training,
-        date: toLocalTz(training.date_training),
+        date: training.date_training,
         reason: training.reason_training,
         type: {
           id: training.training_type.id_training_type,

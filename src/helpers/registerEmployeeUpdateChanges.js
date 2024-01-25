@@ -1,4 +1,3 @@
-import { toUTC } from './helpers.js';
 import { registerChange } from './registerChange.js';
 
 export const registerEmployeeUpdateChanges = async (
@@ -11,8 +10,8 @@ export const registerEmployeeUpdateChanges = async (
     id_area: previousData.id_area,
     email: previousData.email,
     position: previousData.position,
-    employment_date: toUTC(previousData.employment_date),
-    termination_date: toUTC(previousData.termination_date),
+    employment_date: previousData.employment_date,
+    termination_date: previousData.termination_date,
     no_file: previousData.no_file,
     working_hours: previousData.working_hours,
   };
@@ -23,7 +22,7 @@ export const registerEmployeeUpdateChanges = async (
     id_phone: previousData.person.id_phone,
     name: previousData.person.name,
     surname: previousData.person.surname,
-    birth_date: toUTC(previousData.person.birth_date),
+    birth_date: previousData.person.birth_date,
     identification_number: previousData.person.identification_number,
   };
   const phonePreviousData = previousData.person.phone || null;
@@ -226,7 +225,7 @@ export const registerEmployeeUpdateChanges = async (
       previousValue: addressPreviousData
         ? addressPreviousData.street.locality.id
         : null,
-      newValue: localityNewData.locality.id,
+      newValue: localityNewData.id,
     });
   }
 
@@ -261,7 +260,7 @@ export const registerEmployeeUpdateChanges = async (
       employeeId: previousData.id_employee,
       changedTable: 'address',
       changedField: 'street_number',
-      changedFieldLabel: 'Número',
+      changedFieldLabel: 'Número de Puerta',
       previousValue: addressPreviousData
         ? addressPreviousData.street_number
         : null,

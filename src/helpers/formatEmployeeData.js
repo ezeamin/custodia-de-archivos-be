@@ -1,5 +1,3 @@
-import { toUTC } from './helpers.js';
-
 export const formatEmployeeData = (originalData) => {
   const newData = {
     employee: {
@@ -7,16 +5,16 @@ export const formatEmployeeData = (originalData) => {
       id_area: originalData.areaId,
       email: originalData.email,
       position: originalData.position,
-      employment_date: toUTC(originalData.startDate),
-      termination_date: toUTC(originalData.endDate),
+      employment_date: originalData.startDate,
+      termination_date: originalData.endDate,
       no_file: originalData.fileNumber,
       working_hours: originalData.workingHours,
     },
     person: {
-      id_gender: originalData.gender?.id,
+      id_gender: originalData.genderId,
       name: originalData.name,
       surname: originalData.lastname,
-      birth_date: toUTC(originalData.birthdate),
+      birth_date: originalData.birthdate,
       identification_number: originalData.dni,
     },
     address: {

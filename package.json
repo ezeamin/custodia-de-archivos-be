@@ -11,7 +11,8 @@
     "lint": "node config/pre-build.js --ignore-build --fix",
     "prettier:check": "prettier -c .",
     "prettier:write": "prettier -w .",
-    "prisma:reset": "prisma db pull && prisma generate"
+    "prisma:reset": "prisma db pull && prisma generate",
+    "cloudinary:reset": "node --env-file=.env prisma/deleteCloudinary.js"
   },
   "keywords": [
     "rolling",

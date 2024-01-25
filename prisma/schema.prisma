@@ -12,7 +12,7 @@ model absence {
   id_absence         String    @id(map: "pk_absence") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_employee        String    @db.Uuid
   id_submitted_by    String    @db.Uuid
-  date_absence       DateTime  @db.Date
+  date_absence       DateTime  @db.Timestamp(6)
   reason_absence     String    @db.VarChar(50)
   absence_created_at DateTime  @default(now()) @db.Timestamp(6)
   absence_updated_at DateTime? @default(now()) @db.Timestamp(6)
@@ -44,8 +44,8 @@ model employee {
   id_area             String             @db.Uuid
   no_file             Int                @unique
   email               String             @unique @db.VarChar(75)
-  employment_date     DateTime           @db.Date
-  termination_date    DateTime?          @db.Date
+  employment_date     DateTime           @db.Timestamp(6)
+  termination_date    DateTime?          @db.Timestamp(6)
   position            String             @db.VarChar(100)
   working_hours       Int?               @default(0)
   picture_url         String             @db.VarChar(300)
@@ -128,7 +128,7 @@ model formal_warning {
   id_employee               String    @db.Uuid
   id_submitted_by           String    @db.Uuid
   reason_formal_warning     String    @db.VarChar(200)
-  date_formal_warning       DateTime  @db.Date
+  date_formal_warning       DateTime  @db.Timestamp(6)
   formal_warning_created_at DateTime  @default(now()) @db.Timestamp(6)
   formal_warning_updated_at DateTime? @default(now()) @db.Timestamp(6)
   employee                  employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_formal_warning_employee")
@@ -145,7 +145,7 @@ model late_arrival {
   id_late_arrival          String    @id(map: "pk_late_arrival") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_employee              String    @db.Uuid
   id_submitted_by          String    @db.Uuid
-  date_late_arrival        DateTime  @db.Date
+  date_late_arrival        DateTime  @db.Timestamp(6)
   time_late_arrival        String    @db.Char(5)
   observation_late_arrival String?   @db.VarChar(200)
   late_arrival_created_at  DateTime  @default(now()) @db.Timestamp(6)
@@ -159,8 +159,8 @@ model license {
   id_license_type     String       @db.Uuid
   id_submitted_by     String       @db.Uuid
   id_employee         String       @db.Uuid
-  start_date_license  DateTime     @db.Date
-  end_date_license    DateTime     @db.Date
+  start_date_license  DateTime     @db.Timestamp(6)
+  end_date_license    DateTime     @db.Timestamp(6)
   observation_license String?      @db.VarChar(200)
   license_created_at  DateTime     @default(now()) @db.Timestamp(6)
   license_updated_at  DateTime?    @default(now()) @db.Timestamp(6)
@@ -238,7 +238,7 @@ model person {
   id_phone              String?       @db.Uuid
   name                  String        @db.VarChar(50)
   surname               String        @db.VarChar(50)
-  birth_date            DateTime      @db.Date
+  birth_date            DateTime      @db.Timestamp(6)
   identification_number String        @unique @db.VarChar(8)
   person_created_at     DateTime      @default(now()) @db.Timestamp(6)
   person_updated_at     DateTime?     @default(now()) @db.Timestamp(6)
@@ -288,7 +288,7 @@ model training {
   id_training_type     String        @db.Uuid
   id_employee          String        @db.Uuid
   id_submitted_by      String        @db.Uuid
-  date_training        DateTime      @db.Date
+  date_training        DateTime      @db.Timestamp(6)
   reason_training      String?       @db.VarChar(200)
   observation_training String?       @db.VarChar(200)
   training_created_at  DateTime      @default(now()) @db.Timestamp(6)
@@ -344,8 +344,8 @@ model vacation {
   id_vacation          String    @id(map: "pk_vacation") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_employee          String    @db.Uuid
   id_submitted_by      String    @db.Uuid
-  start_date_vacation  DateTime  @db.Date
-  end_date_vacation    DateTime  @db.Date
+  start_date_vacation  DateTime  @db.Timestamp(6)
+  end_date_vacation    DateTime  @db.Timestamp(6)
   observation_vacation String?   @db.VarChar(200)
   vacation_created_at  DateTime  @default(now()) @db.Timestamp(6)
   vacation_updated_at  DateTime? @default(now()) @db.Timestamp(6)

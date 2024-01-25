@@ -2,7 +2,6 @@ import HttpStatus from 'http-status-codes';
 import UAParser from 'ua-parser-js';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { toLocalTz } from '../../../helpers/helpers.js';
 
 export class GetController {
   static async users(req, res) {
@@ -127,7 +126,7 @@ export class GetController {
         return {
           id: log.id_log,
           username: log.user.username,
-          date: toLocalTz(log.log_created_at),
+          date: log.log_created_at,
           ipAddress: log.ip_address,
           userAgent: `${parser.getBrowser().name} ${parser.getBrowser().version} - ${parser.getOS().name} ${parser.getOS().version}`,
         };

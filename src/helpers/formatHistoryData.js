@@ -1,40 +1,147 @@
 import dayjs from 'dayjs';
-import { ISODateRegex } from './regex.js';
-import { toLocalTz } from './helpers.js';
+import { ISODateRegex, uuidRegex } from './regex.js';
+import { prisma } from './prisma.js';
 
-export const formatHistoryData = (data) => {
+const optionsMap = {
+  phone: {
+    id_phone: true,
+    phone_no: true,
+  },
+  province: {
+    id_province: true,
+    province: true,
+  },
+  locality: {
+    id_locality: true,
+    locality: true,
+  },
+  street: {
+    id_street: true,
+    street: true,
+  },
+  gender: {
+    id_gender: true,
+    gender: true,
+  },
+  area: {
+    id_area: true,
+    area: true,
+  },
+  employee_status: {
+    id_status: true,
+    title_status: true,
+  },
+  user_type: {
+    id_user_type: true,
+    user_type: true,
+  },
+};
+
+const getTableInformation = async (data) => {
+  const names = Array.from(
+    new Set(
+      data.map((record) => {
+        if (
+          uuidRegex.test(record.previous_value) ||
+          uuidRegex.test(record.current_value)
+        )
+          return record.modified_table;
+        return null;
+      }),
+    ),
+  ).filter(Boolean);
+  const tables = {};
+  const promises = [];
+
+  for (let i = 0; i < names.length; i += 1) {
+    const tableName = names[i];
+
+    const dbDataPromise = prisma[tableName].findMany({
+      select: optionsMap[tableName],
+    });
+    promises.push(dbDataPromise);
+  }
+
+  const dbData = await Promise.all(promises);
+
+  for (let i = 0; i < names.length; i += 1) {
+    const tableName = names[i];
+    tables[tableName] = dbData[i];
+  }
+
+  // map all "id_something" fields to "id"
+  for (let i = 0; i < names.length; i += 1) {
+    const tableName = names[i];
+    const options = tables[tableName];
+
+    const idFieldName = Object.keys(options[0]).find((el) =>
+      el.includes('id_'),
+    );
+    const nameFieldName = Object.keys(options[0]).find(
+      (el) => !el.includes('id_') && !el.includes('api_'),
+    );
+
+    tables[tableName] = options.map((el) => ({
+      id: el[idFieldName],
+      description: el[nameFieldName],
+    }));
+  }
+
+  return tables;
+};
+
+const isDate = (value) => {
+  return (
+    value &&
+    typeof value === 'string' &&
+    ISODateRegex.test(value) &&
+    dayjs(value).isValid()
+  );
+};
+
+const getDateFormat = (value) => {
+  if (value.includes('00:00:00')) return 'DD/MM/YYYY';
+  return 'DD/MM/YYYY - HH:mm:ss';
+};
+
+export const formatHistoryData = async (data) => {
+  const tables = await getTableInformation(data);
+
   return data.map((record) => {
     let prev = record.previous_value;
     let curr = record.current_value;
 
-    const isPrevDate =
-      prev &&
-      typeof prev === 'string' &&
-      ISODateRegex.test(prev) &&
-      dayjs(prev).isValid();
-    const isCurrDate =
-      curr &&
-      typeof curr === 'string' &&
-      ISODateRegex.test(curr) &&
-      dayjs(curr).isValid();
+    const isPrevDate = isDate(prev);
+    const isCurrDate = isDate(curr);
 
     if (isPrevDate) {
-      const format = !prev.includes('00:00:00')
-        ? 'DD/MM/YYYY - HH:mm:ss'
-        : 'DD/MM/YYYY';
-      prev = dayjs(toLocalTz(prev)).format(format);
+      const format = getDateFormat(prev);
+      prev = dayjs(prev).format(format);
     }
 
     if (isCurrDate) {
-      const format = !curr.includes('00:00:00')
-        ? 'DD/MM/YYYY - HH:mm:ss'
-        : 'DD/MM/YYYY';
-      curr = dayjs(toLocalTz(curr)).format(format);
+      const format = getDateFormat(curr);
+      curr = dayjs(curr).format(format);
+    }
+
+    if (!isPrevDate && !isCurrDate) {
+      const isPrevUUID = uuidRegex.test(prev);
+      const isCurrUUID = uuidRegex.test(curr);
+
+      const tableName = record.modified_table;
+      const options = tables[tableName];
+
+      if (options) {
+        if (prev && isPrevUUID)
+          prev = options.find((el) => el.id === prev)?.description || prev;
+        if (curr && isCurrUUID)
+          curr = options.find((el) => el.id === curr)?.description || curr;
+      }
     }
 
     return {
       id: record.id_history,
-      date: toLocalTz(record.modification_date),
+      date: record.modification_date,
       field: record.modified_field_label,
       previousValue: prev,
       newValue: curr,
