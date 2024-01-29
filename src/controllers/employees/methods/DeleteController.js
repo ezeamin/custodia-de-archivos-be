@@ -314,7 +314,7 @@ export class DeleteController {
 
       // If the person is not used in another employee, set it to inactive
       if (!employeeWithFamilyMember) {
-        prisma.person.update({
+        await prisma.person.update({
           where: {
             id_person: familyMember.id_person,
           },

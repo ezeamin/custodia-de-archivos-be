@@ -42,7 +42,7 @@ model area {
 
 model employee {
   id_employee         String             @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_person           String             @db.Uuid
+  id_person           String             @unique @db.Uuid
   id_status           String             @db.Uuid
   id_area             String             @db.Uuid
   no_file             Int                @unique
@@ -251,7 +251,7 @@ model person {
   person_isactive       Boolean            @default(true)
   person_created_at     DateTime           @default(now()) @db.Timestamp(6)
   person_updated_at     DateTime?          @default(now()) @db.Timestamp(6)
-  employee              employee[]
+  employee              employee?
   family_member         family_member[]
   address               address?           @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
   civil_status_type     civil_status_type? @relation(fields: [id_civil_status], references: [id_civil_status_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_civil_status")

@@ -759,11 +759,13 @@ export class GetController {
         name: familyMember.person.name,
         lastname: familyMember.person.surname,
         dni: familyMember.person.identification_number,
-        gender: {
-          id: familyMember.person.gender.id_gender,
-          description: familyMember.person.gender.gender,
-        },
-        phone: familyMember.person.phone.phone_no,
+        gender: familyMember.person.gender
+          ? {
+              id: familyMember.person.gender.id_gender,
+              description: familyMember.person.gender.gender,
+            }
+          : null,
+        phone: familyMember.person.phone?.phone_no || null,
         relationship: {
           id: familyMember.family_relationship_type.id_family_relationship_type,
           description:

@@ -11,7 +11,9 @@ export const registerEmployeeUpdateChanges = async (
     email: previousData.email,
     position: previousData.position,
     employment_date: previousData.employment_date.toISOString(),
-    termination_date: previousData.termination_date.toISOString(),
+    termination_date: previousData.termination_date
+      ? previousData.termination_date.toISOString()
+      : null,
     no_file: previousData.no_file,
     working_hours: previousData.working_hours,
   };

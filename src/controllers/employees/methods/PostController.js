@@ -47,34 +47,90 @@ export class PostController {
 
     // Supposing that the body has been validated and sanitized
     try {
-      await prisma.employee.create({
-        data: {
-          email: req.body.email,
-          employment_date: req.body.startDate,
-          position: req.body.position,
-          no_file: +req.body.fileNumber,
-          picture_url: imageUrl,
-          person: {
-            create: {
-              name: req.body.name,
-              surname: req.body.lastname,
-              identification_number: req.body.dni,
-              birth_date: req.body.birthdate,
-              id_gender: req.body.genderId,
-            },
-          },
-          area: {
-            connect: {
-              id_area: req.body.areaId,
-            },
-          },
-          employee_status: {
-            connect: {
-              status: 'active',
-            },
-          },
+      // Check for existing (inactive) person
+      const inactivePerson = await prisma.person.findUnique({
+        where: {
+          identification_number: req.body.dni,
+          person_isactive: false,
         },
       });
+
+      let person = null;
+      if (inactivePerson) {
+        person = await prisma.person.update({
+          where: {
+            id_person: inactivePerson.id_person,
+          },
+          data: {
+            person_isactive: true,
+            name: req.body.name,
+            surname: req.body.lastname,
+            birth_date: req.body.birthdate,
+            id_gender: req.body.genderId,
+            address: {
+              update: {
+                address_isactive: true,
+              },
+            },
+          },
+        });
+      } else {
+        person = await prisma.person.create({
+          data: {
+            name: req.body.name,
+            surname: req.body.lastname,
+            identification_number: req.body.dni,
+            birth_date: req.body.birthdate,
+            id_gender: req.body.genderId,
+          },
+        });
+      }
+
+      const inactiveEmployee = await prisma.employee.findUnique({
+        where: {
+          id_person: person.id_person,
+          employee_isactive: false,
+        },
+      });
+
+      const newData = {
+        email: req.body.email,
+        employment_date: req.body.startDate,
+        position: req.body.position,
+        no_file: +req.body.fileNumber,
+        picture_url: imageUrl,
+        person: {
+          connect: {
+            id_person: person.id_person,
+          },
+        },
+        area: {
+          connect: {
+            id_area: req.body.areaId,
+          },
+        },
+        employee_status: {
+          connect: {
+            status: 'active',
+          },
+        },
+      };
+      let employee = null;
+      if (inactiveEmployee) {
+        employee = await prisma.employee.update({
+          where: {
+            id_employee: inactiveEmployee.id_employee,
+          },
+          data: {
+            employee_isactive: true,
+            ...newData,
+          },
+        });
+      } else {
+        employee = await prisma.employee.create({
+          data: newData,
+        });
+      }
 
       res.json({
         data: null,
@@ -88,6 +144,7 @@ export class PostController {
         previousValue: null,
         newValue: new Date().toISOString(),
         modifyingUser: req.user.id,
+        employeeId: employee.id_employee,
       });
     } catch (e) {
       if (e.code === 'P2002') {
@@ -615,9 +672,39 @@ export class PostController {
         phone,
         locality,
         state,
+        force = false,
       },
       user: { id: loggedUserId },
     } = req;
+
+    let doesPersonExist = false;
+    let person = null;
+
+    try {
+      person = await prisma.person.findUnique({
+        where: {
+          identification_number: dni,
+        },
+      });
+
+      if (person) {
+        doesPersonExist = true;
+        if (!force) {
+          res.status(HttpStatus.CONFLICT).json({
+            data: null,
+            message: 'El DNI ingresado ya existe',
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el familiar. Intente de nuevo más tarde.',
+      });
+    }
 
     try {
       let streetId = null;
@@ -688,6 +775,71 @@ export class PostController {
 
       streetId = newStreet.id_street;
 
+      if (doesPersonExist) {
+        const shouldUpdatePhone = !person.id_phone;
+        const shouldUpdateAddress = !person.id_address;
+        const shouldUpdateGender = !person.id_gender;
+
+        person = await prisma.person.update({
+          where: {
+            id_person: person.id_person,
+          },
+          data: {
+            ...(shouldUpdatePhone
+              ? { phone: { create: { phone_no: phone } } }
+              : {}),
+            ...(shouldUpdateGender
+              ? { gender: { connect: { id_gender: genderId } } }
+              : {}),
+            ...(shouldUpdateAddress
+              ? {
+                  address: {
+                    create: {
+                      street: {
+                        connect: {
+                          id_street: streetId,
+                        },
+                      },
+                      street_number: streetNumber,
+                      door: apt,
+                    },
+                  },
+                }
+              : {}),
+          },
+        });
+      } else {
+        person = await prisma.person.create({
+          data: {
+            name,
+            surname: lastname,
+            identification_number: dni,
+            birth_date: birthdate,
+            gender: {
+              connect: {
+                id_gender: genderId,
+              },
+            },
+            phone: {
+              create: {
+                phone_no: phone,
+              },
+            },
+            address: {
+              create: {
+                street: {
+                  connect: {
+                    id_street: streetId,
+                  },
+                },
+                street_number: streetNumber,
+                door: apt,
+              },
+            },
+          },
+        });
+      }
+
       const creationPromise = prisma.family_member.create({
         data: {
           family_relationship_type: {
@@ -701,32 +853,8 @@ export class PostController {
             },
           },
           person: {
-            create: {
-              name,
-              surname: lastname,
-              identification_number: dni,
-              birth_date: birthdate,
-              gender: {
-                connect: {
-                  id_gender: genderId,
-                },
-              },
-              phone: {
-                create: {
-                  phone_no: phone,
-                },
-              },
-              address: {
-                create: {
-                  street: {
-                    connect: {
-                      id_street: streetId,
-                    },
-                  },
-                  street_number: streetNumber,
-                  door: apt,
-                },
-              },
+            connect: {
+              id_person: person.id_person,
             },
           },
         },

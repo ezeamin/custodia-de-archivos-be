@@ -118,7 +118,7 @@ CREATE TABLE public.third_party (
 
 CREATE TABLE public.employee (
     id_employee          UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_person            UUID NOT NULL,
+    id_person            UUID NOT NULL UNIQUE,
     id_status            UUID NOT NULL,
     id_area              UUID NOT NULL,
     no_file              integer NOT NULL UNIQUE,
