@@ -51,10 +51,11 @@ CREATE TABLE public.street (
 );
 
 CREATE TABLE public."address" (
-    id_address           UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_street            UUID NOT NULL,
-    street_number        integer NOT NULL,
-    door                 varchar(4),
+    id_address              UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_street               UUID NOT NULL,
+    street_number           integer NOT NULL,
+    door                    varchar(4),
+    address_isactive        boolean DEFAULT true NOT NULL,
     address_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     address_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_address PRIMARY KEY (id_address),
@@ -64,35 +65,25 @@ CREATE TABLE public."address" (
 CREATE TABLE public.phone (
     id_phone          UUID DEFAULT uuid_generate_v7() NOT NULL,
     phone_no          varchar(13) NOT NULL UNIQUE,
+    phone_isactive    boolean DEFAULT true NOT NULL,
     phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_phone PRIMARY KEY (id_phone)
 );
 
-CREATE TABLE public.family_relationship_type (
-    id_family_relationship_type    UUID DEFAULT uuid_generate_v7() NOT NULL,
-    relationship_type              varchar(20) NOT NULL,
-    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
-);
-
-CREATE TABLE public.family (
-    id_family               UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_employee             UUID NOT NULL,
-    id_family_member        UUID NOT NULL,
-    id_relationship_type    UUID DEFAULT uuid_generate_v7() NOT NULL,
-    family_isactive         boolean DEFAULT true NOT NULL,
-    family_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    family_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_family PRIMARY KEY (id_family),
-    CONSTRAINT fk_family_relationship_type FOREIGN KEY (id_relationship_type) REFERENCES public.family_relationship_type(id_family_relationship_type)
+CREATE TABLE public.civil_status_type (
+    id_civil_status_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    civil_status_type           varchar(20) NOT NULL UNIQUE,
+    civil_status_type_isactive  boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_civil_status_type PRIMARY KEY (id_civil_status_type)
 );
 
 CREATE TABLE public.person (
     id_person            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_gender            UUID ,
-    id_family            UUID ,
     id_address           UUID ,
     id_phone             UUID ,
+    id_civil_status      UUID ,
     name                 varchar(50) NOT NULL,
     surname              varchar(50) NOT NULL,
     birth_date           timestamp NOT NULL,
@@ -102,9 +93,9 @@ CREATE TABLE public.person (
     person_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_person PRIMARY KEY (id_person),
     CONSTRAINT fk_person_gender FOREIGN KEY (id_gender) REFERENCES public.gender(id_gender),
-    CONSTRAINT fk_person_family FOREIGN KEY (id_family) REFERENCES public.family(id_family),
     CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public."address"(id_address),
-    CONSTRAINT fk_person_phone FOREIGN KEY (id_phone) REFERENCES public.phone(id_phone)
+    CONSTRAINT fk_person_phone FOREIGN KEY (id_phone) REFERENCES public.phone(id_phone),
+    CONSTRAINT fk_person_civil_status FOREIGN KEY (id_civil_status) REFERENCES public.civil_status_type(id_civil_status_type)
 );
 
 CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
@@ -148,8 +139,26 @@ CREATE TABLE public.employee (
 
 CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
 
-ALTER TABLE public.family ADD CONSTRAINT fk_family_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee);
-ALTER TABLE public.family ADD CONSTRAINT fk_family_family_member FOREIGN KEY (id_family_member) REFERENCES public.person(id_person);
+CREATE TABLE public.family_relationship_type (
+    id_family_relationship_type             UUID DEFAULT uuid_generate_v7() NOT NULL,
+    family_relationship_type                varchar(20) NOT NULL,
+    family_relationship_type_isactive       boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
+);
+
+CREATE TABLE public.family_member (
+    id_family_member                UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_person                       UUID NOT NULL,
+    id_employee                     UUID NOT NULL,
+    id_relationship_type            UUID DEFAULT uuid_generate_v7() NOT NULL,
+    family_member_isactive          boolean DEFAULT true NOT NULL,
+    family_member_created_at        timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    family_member_updated_at        timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_family_member PRIMARY KEY (id_family_member),
+    CONSTRAINT fk_family_member_relationship_type FOREIGN KEY (id_relationship_type) REFERENCES public.family_relationship_type(id_family_relationship_type),
+    CONSTRAINT fk_family_member_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
+    CONSTRAINT fk_family_member_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
+);
 
 CREATE TABLE public."user" (
     id_user              UUID DEFAULT uuid_generate_v7() NOT NULL,
@@ -445,18 +454,18 @@ FOR EACH ROW
 EXECUTE PROCEDURE update_address_updated_at();
 
 -- family updated_at trigger
-CREATE OR REPLACE FUNCTION update_family_updated_at()
+CREATE OR REPLACE FUNCTION update_family_member_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.family_updated_at = now();
+    NEW.family_member_updated_at = now();
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_family_updated_at
-BEFORE UPDATE ON public.family
+CREATE TRIGGER update_family_member_updated_at
+BEFORE UPDATE ON public.family_member
 FOR EACH ROW
-EXECUTE PROCEDURE update_family_updated_at();
+EXECUTE PROCEDURE update_family_member_updated_at();
 
 -- employee updated_at trigger
 CREATE OR REPLACE FUNCTION update_employee_updated_at()
@@ -646,18 +655,24 @@ INSERT INTO public.user_type (id_user_type, user_type) VALUES
   ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee'),
   ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
 
-INSERT INTO public.family_relationship_type (id_family_relationship_type, relationship_type) VALUES
+INSERT INTO public.family_relationship_type (id_family_relationship_type, family_relationship_type) VALUES
   ('018d4131-99a7-7301-95f5-f1851f99af92','Padre'),
   ('018d4131-99a7-7be7-8806-86232190920d','Madre'),
-  ('018d4131-99a7-76a7-b028-90262b1ea22f','Hermano'),
-  ('018d4131-99a7-7d97-b802-e7e60c762b37','Hijo'),
-  ('018d4131-99a7-72c1-ae5e-d021667a7739','Abuelo'),
-  ('018d4131-99a7-7a4d-8daf-e03c84bf6708','Tio'),
-  ('018d4131-99a7-7538-b160-ba114ded2ddc','Primo'),
-  ('018d4131-99a7-7e65-81e5-8bb048d0fc31','Sobrino'),
-  ('018d4131-99a7-747d-8861-ea674c345ea0','Suegro'),
+  ('018d4131-99a7-76a7-b028-90262b1ea22f','Hermano/a'),
+  ('018d4131-99a7-7d97-b802-e7e60c762b37','Hijo/a'),
+  ('018d4131-99a7-72c1-ae5e-d021667a7739','Abuelo/a'),
+  ('018d4131-99a7-7a4d-8daf-e03c84bf6708','Tio/a'),
+  ('018d4131-99a7-7538-b160-ba114ded2ddc','Primo/a'),
+  ('018d4131-99a7-7e65-81e5-8bb048d0fc31','Sobrino/a'),
+  ('018d4131-99a7-747d-8861-ea674c345ea0','Suegro/a'),
   ('018d4131-99a7-7165-af6f-0b6d7de55694','Cónyuge'),
   ('018d4131-99a7-7c4d-9b9f-5b1b8b1b1b1b','Otro');
+
+INSERT INTO public.civil_status_type (id_civil_status_type, civil_status_type) VALUES
+  ('018d55f3-fc73-7ee0-b166-bac9c3c4b81f', 'Soltero/a'),
+  ('018d55f4-5cc5-7afe-a15f-62810780270b','Casado/a'),
+  ('018d55f4-6c3e-7180-9045-da30c7077cd3','Divorciado/a'),
+  ('018d55f4-7aba-72f9-af8e-744af2b9b83f','Viudo/a');
 
 -- Insert example person
 INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)

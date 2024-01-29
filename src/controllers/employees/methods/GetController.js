@@ -127,11 +127,22 @@ export class GetController {
                 },
               },
               phone: true,
-              family: true,
               gender: true,
+              civil_status_type: true,
             },
           },
           employee_status: true,
+        },
+      });
+
+      const family = await prisma.family_member.findMany({
+        where: {
+          id_employee: employeeId,
+          family_member_isactive: true,
+        },
+        include: {
+          person: true,
+          family_relationship_type: true,
         },
       });
 
@@ -149,6 +160,12 @@ export class GetController {
         firstname: employee.person.name,
         birthdate: employee.person.birth_date,
         workingHours: employee.working_hours,
+        civilStatus: employee.person.civil_status_type
+          ? {
+              id: employee.person.id_civil_status,
+              description: employee.person.civil_status_type.civil_status_type,
+            }
+          : null,
         address: employee.person.address
           ? {
               street: {
@@ -185,6 +202,12 @@ export class GetController {
         age: calculateDateDiffInAges(employee.person.birth_date),
         antiquity: calculateDateDiffInAges(employee.employment_date),
         position: employee.position,
+        familyMembers: family.map((member) => ({
+          id: member.id_family_member,
+          name: member.person.name,
+          relationship:
+            member.family_relationship_type.family_relationship_type,
+        })),
         area: {
           id: employee.area.id_area,
           description: employee.area.area,
@@ -681,6 +704,99 @@ export class GetController {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener el tipo de capacitación',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - familyMemberId
+  static async employeeFamilyMember(req, res) {
+    const {
+      params: { employeeId, familyMemberId },
+    } = req;
+
+    try {
+      const familyMember = await prisma.family_member.findUnique({
+        where: {
+          id_family_member: familyMemberId,
+          id_employee: employeeId,
+          family_member_isactive: true,
+        },
+        include: {
+          person: {
+            include: {
+              gender: true,
+              phone: true,
+              address: {
+                include: {
+                  street: {
+                    include: {
+                      locality: {
+                        include: {
+                          province: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          family_relationship_type: true,
+        },
+      });
+
+      if (!familyMember) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El familiar no existe',
+        });
+        return;
+      }
+
+      const formattedData = {
+        id: familyMember.id_family_member,
+        name: familyMember.person.name,
+        lastname: familyMember.person.surname,
+        dni: familyMember.person.identification_number,
+        gender: {
+          id: familyMember.person.gender.id_gender,
+          description: familyMember.person.gender.gender,
+        },
+        phone: familyMember.person.phone.phone_no,
+        relationship: {
+          id: familyMember.family_relationship_type.id_family_relationship_type,
+          description:
+            familyMember.family_relationship_type.family_relationship_type,
+        },
+        address: {
+          street: {
+            id: familyMember.person.address.street.street_api_id,
+            description: familyMember.person.address.street.street,
+          },
+          streetNumber: familyMember.person.address.street_number,
+          apt: familyMember.person.address.door,
+          locality: {
+            id: familyMember.person.address.street.locality.locality_api_id,
+            description: familyMember.person.address.street.locality.locality,
+          },
+          state: {
+            id: familyMember.person.address.street.locality.province
+              .province_api_id,
+            description:
+              familyMember.person.address.street.locality.province.province,
+          },
+        },
+      };
+
+      res.json({
+        data: formattedData,
+        message: 'Employee family member retrieved successfully',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Error al intentar obtener el familiar del empleado',
       });
     }
   }

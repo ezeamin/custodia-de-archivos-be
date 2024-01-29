@@ -5,6 +5,7 @@ import { registerChange } from '../../../helpers/registerChange.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { formatEmployeeData } from '../../../helpers/formatEmployeeData.js';
 import { registerEmployeeUpdateChanges } from '../../../helpers/registerEmployeeUpdateChanges.js';
+import { formatFamilyMemberData } from '../../../helpers/formatFamilyMemberData.js';
 
 export class PutController {
   // @param - employeeId
@@ -35,7 +36,6 @@ export class PutController {
                 },
               },
               gender: true,
-              family: true,
               phone: true,
             },
           },
@@ -173,16 +173,12 @@ export class PutController {
       // -------------------------
 
       if (formattedData.phone) {
-        // 1. Check if phone exists
-
-        let phone = await prisma.phone.findUnique({
-          where: {
-            phone_no: formattedData.phone.phone_no,
-          },
-        });
+        // 1. Check if it has phone
+        const hasPhone = !!employeeOriginalData.person.id_phone;
+        let phone = null;
 
         // 2. If it doesn't, create it
-        if (!phone) {
+        if (!hasPhone) {
           phone = await prisma.phone.create({
             data: {
               phone_no: formattedData.phone.phone_no,
@@ -199,8 +195,8 @@ export class PutController {
             },
           });
         } else {
-          // Phone already exists
-          await prisma.phone.update({
+          // Has phone
+          phone = await prisma.phone.update({
             where: {
               id_phone: employeeOriginalData.person.id_phone,
             },
@@ -527,6 +523,204 @@ export class PutController {
         data: null,
         message:
           'Ocurrió un error al actualizar el tipo de capacitación. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - familyMemberId
+  static async updateEmployeeFamilyMember(req, res) {
+    const {
+      params: { familyMemberId },
+      user: { id: loggedInUser },
+    } = req;
+
+    try {
+      const familyMemberOriginalData = await prisma.family_member.findUnique({
+        where: {
+          id_family_member: familyMemberId,
+        },
+        include: {
+          person: {
+            include: {
+              address: {
+                include: {
+                  street: {
+                    include: {
+                      locality: {
+                        include: {
+                          province: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              gender: true,
+              phone: true,
+            },
+          },
+          family_relationship_type: true,
+        },
+      });
+
+      if (!familyMemberOriginalData) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El familiar no existe',
+        });
+        return;
+      }
+
+      const formattedData = formatFamilyMemberData(req.body);
+
+      // -------------------------
+      // A - Address changes
+      // -------------------------
+
+      let provinceId = null;
+      let localityId = null;
+      let streetId = null;
+
+      if (formattedData.province && formattedData.locality) {
+        // 1. Check if province exists
+        // 2. If it doesn't, create it
+        let province = await prisma.province.findUnique({
+          where: {
+            province_api_id: formattedData.province.province_api_id,
+          },
+        });
+
+        if (!province) {
+          province = await prisma.province.create({
+            data: {
+              province: formattedData.province.province,
+              province_api_id: formattedData.province.province_api_id,
+            },
+          });
+        }
+
+        provinceId = province.id_province;
+
+        // 3. Check if locality exists
+        // 4. If it doesn't, create it
+        let locality = await prisma.locality.findUnique({
+          where: {
+            locality_api_id: formattedData.locality.locality_api_id,
+          },
+        });
+
+        if (!locality) {
+          locality = await prisma.locality.create({
+            data: {
+              locality: formattedData.locality.locality,
+              locality_api_id: formattedData.locality.locality_api_id,
+              id_province: provinceId,
+            },
+          });
+        }
+
+        localityId = locality.id_locality;
+
+        // 5. Check if street exists
+        // 6. If it doesn't, create it
+        let street = await prisma.street.findUnique({
+          where: {
+            street_api_id: formattedData.street.street_api_id,
+          },
+        });
+
+        if (!street) {
+          street = await prisma.street.create({
+            data: {
+              street: formattedData.street.street,
+              street_api_id: formattedData.street.street_api_id,
+              id_locality: localityId,
+            },
+          });
+        }
+
+        streetId = street.id_street;
+      }
+
+      // Update address
+      const addressPromise = prisma.address.update({
+        where: {
+          id_address: familyMemberOriginalData.person.id_address,
+          address_isactive: true,
+        },
+        data: {
+          ...formattedData.address,
+          id_street: streetId ?? undefined,
+        },
+      });
+
+      // -------------------------
+      // B - Phone changes
+      // -------------------------
+
+      const phonePromise = prisma.phone.update({
+        where: {
+          id_phone: familyMemberOriginalData.person.id_phone,
+        },
+        data: {
+          phone_no: formattedData.phone.phone_no,
+        },
+      });
+
+      // -------------------------
+      // C - Person changes
+      // -------------------------
+
+      const personPromise = prisma.person.update({
+        where: {
+          id_person: familyMemberOriginalData.id_person,
+        },
+        data: {
+          ...formattedData.person,
+        },
+      });
+
+      // -------------------------
+      // D - Relationship changes
+      // -------------------------
+
+      const familyMemberPromise = prisma.family_member.update({
+        where: {
+          id_family_member: familyMemberOriginalData.id_family_member,
+        },
+        data: {
+          id_relationship_type: formattedData.id_relationship_type,
+        },
+      });
+
+      await Promise.all([
+        addressPromise,
+        phonePromise,
+        personPromise,
+        familyMemberPromise,
+      ]);
+
+      res.json({
+        data: null,
+        message: 'Familiar actualizado exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'family_member',
+        changedField: 'family_member',
+        changedFieldLabel: 'Actualización de Familiar - JSON',
+        previousValue: JSON.stringify(familyMemberOriginalData),
+        newValue: JSON.stringify(formattedData),
+        modifyingUser: loggedInUser,
+        employeeId: familyMemberOriginalData.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al actualizar el familiar. Intente de nuevo más tarde.',
       });
     }
   }

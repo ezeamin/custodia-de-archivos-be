@@ -12,6 +12,7 @@ export const formatEmployeeData = (originalData) => {
     },
     person: {
       id_gender: originalData.genderId,
+      id_civil_status: originalData.civilStatusId,
       name: originalData.name,
       surname: originalData.lastname,
       birth_date: originalData.birthdate,
@@ -71,6 +72,8 @@ export const formatEmployeeData = (originalData) => {
       }
     }
   });
+
+  console.log(newData);
 
   return newData;
 };

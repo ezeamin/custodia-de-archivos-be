@@ -597,4 +597,173 @@ export class PostController {
       });
     }
   }
+
+  // @param - employeeId
+  static async createFamilyMember(req, res) {
+    const {
+      params: { employeeId },
+      body: {
+        name,
+        lastname,
+        dni,
+        birthdate,
+        relationshipId,
+        genderId,
+        street,
+        streetNumber,
+        apt,
+        phone,
+        locality,
+        state,
+      },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      let streetId = null;
+      let localityId = null;
+      let provinceId = null;
+
+      // 1. Find or create province
+      let newProvince = await prisma.province.findFirst({
+        where: {
+          province_api_id: state.id,
+        },
+      });
+
+      if (!newProvince) {
+        newProvince = await prisma.province.create({
+          data: {
+            province_api_id: state.id,
+            province: state.description,
+          },
+        });
+      }
+
+      provinceId = newProvince.id_province;
+
+      // 2. Find or create locality
+      let newLocality = await prisma.locality.findFirst({
+        where: {
+          locality_api_id: locality.id,
+        },
+      });
+
+      if (!newLocality) {
+        newLocality = await prisma.locality.create({
+          data: {
+            locality_api_id: locality.id,
+            locality: locality.description,
+            province: {
+              connect: {
+                id_province: provinceId,
+              },
+            },
+          },
+        });
+      }
+
+      localityId = newLocality.id_locality;
+
+      // 3. Find or create street
+      let newStreet = await prisma.street.findFirst({
+        where: {
+          street_api_id: street.id,
+        },
+      });
+
+      if (!newStreet) {
+        newStreet = await prisma.street.create({
+          data: {
+            street_api_id: street.id,
+            street: street.description,
+            locality: {
+              connect: {
+                id_locality: localityId,
+              },
+            },
+          },
+        });
+      }
+
+      streetId = newStreet.id_street;
+
+      const creationPromise = prisma.family_member.create({
+        data: {
+          family_relationship_type: {
+            connect: {
+              id_family_relationship_type: relationshipId,
+            },
+          },
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+          person: {
+            create: {
+              name,
+              surname: lastname,
+              identification_number: dni,
+              birth_date: birthdate,
+              gender: {
+                connect: {
+                  id_gender: genderId,
+                },
+              },
+              phone: {
+                create: {
+                  phone_no: phone,
+                },
+              },
+              address: {
+                create: {
+                  street: {
+                    connect: {
+                      id_street: streetId,
+                    },
+                  },
+                  street_number: streetNumber,
+                  door: apt,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const relationshipPromise = prisma.family_relationship_type.findFirst({
+        where: {
+          id_family_relationship_type: relationshipId,
+        },
+      });
+
+      const [, relationshipType] = await Promise.all([
+        creationPromise,
+        relationshipPromise,
+      ]);
+
+      res.json({
+        data: null,
+        message: 'Familiar creado exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'family_member',
+        changedField: 'family_member',
+        changedFieldLabel: 'Creación de Familiar',
+        previousValue: null,
+        newValue: `${name} ${lastname} (${relationshipType.family_relationship_type})`,
+        modifyingUser: loggedUserId,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el familiar. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

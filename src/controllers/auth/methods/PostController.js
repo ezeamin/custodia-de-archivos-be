@@ -9,6 +9,7 @@ import { prisma } from '../../../helpers/prisma.js';
 
 import { recoverMailOptions } from '../../../helpers/recoverMail.js';
 import { registerLogin } from '../../../helpers/registerLogin.js';
+import { generateToken } from '../../../helpers/token.js';
 
 const { JWT_SECRET_KEY } = envs;
 
@@ -61,31 +62,13 @@ export class PostController {
         return;
       }
 
-      // 3- Generate JWT
-      const userInfo = {
-        user: {
-          id: userInDB.id_user,
-          name: userInDB.id_employee
-            ? userInDB.employee.person.name
-            : userInDB.third_party.person.name,
-          hasChangedPass: userInDB.has_changed_def_pass,
-          role: userInDB.user_type.user_type.toUpperCase(),
-        },
-      };
-
-      // (payload, secretKey, options)
-      const accessToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
-        expiresIn: '1h',
-      });
-      const refreshToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
-        expiresIn: '2h',
-      });
+      const { accessToken, refreshToken } = generateToken(userInDB);
 
       // 4- Send JWT to FE
       res.cookie('refresh_token', refreshToken, {
         expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: true,
       });
       res.json({
@@ -115,34 +98,40 @@ export class PostController {
       if (!refreshToken) throw new Error('No refresh token found');
 
       // 1- Validate JWT
-      // (payload, secretKey, options)
-      const { user } = jwt.verify(refreshToken, JWT_SECRET_KEY);
+      const {
+        user: { id },
+      } = jwt.verify(refreshToken, JWT_SECRET_KEY);
 
-      if (!user.hasChangedPass) throw new Error('Usuario no activado');
-
-      // 2- Generate new JWT
-      const userInfo = {
-        user: {
-          id: user.id,
-          name: user.name,
-          hasChangedPass: user.hasChangedPass,
-          role: user.role,
+      // 2- Renew data
+      const userInDB = await prisma.user.findUnique({
+        where: {
+          id_user: id,
         },
-      };
-
-      // (payload, secretKey, options)
-      const accessToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
-        expiresIn: '1h',
+        include: {
+          employee: {
+            include: {
+              person: true,
+            },
+          },
+          third_party: {
+            include: { person: true },
+          },
+          user_type: true,
+        },
       });
-      const newRefreshToken = jwt.sign(userInfo, JWT_SECRET_KEY, {
-        expiresIn: '2h',
-      });
 
-      // 3- Send JWT to FE
+      if (!userInDB.has_changed_def_pass)
+        throw new Error('Usuario no activado');
+
+      // 3- Generate tokens
+      const { accessToken, refreshToken: newRefreshToken } =
+        generateToken(userInDB);
+
+      // 4- Send JWT to FE
       res.cookie('refresh_token', newRefreshToken, {
         expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: true,
       });
       res.json({
@@ -152,7 +141,11 @@ export class PostController {
     } catch (err) {
       console.error('🟥', err);
       // delete refreshToken cookie
-      res.clearCookie('refresh_token');
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: true,
+      });
       res.status(HttpStatus.UNAUTHORIZED).json({
         data: null,
         message: null,
@@ -275,7 +268,8 @@ export class PostController {
     try {
       // delete refreshToken cookie
       res.clearCookie('refresh_token', {
-        sameSite: 'none',
+        httpOnly: true,
+        sameSite: 'lax',
         secure: true,
       });
       res.json({

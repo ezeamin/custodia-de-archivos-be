@@ -274,4 +274,92 @@ export class DeleteController {
       });
     }
   }
+
+  // @param - employeeId
+  // @param - familyMemberId
+  static async deleteEmployeeFamilyMember(req, res) {
+    const {
+      params: { familyMemberId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const familyMember = await prisma.family_member.findUnique({
+        where: {
+          id_family_member: familyMemberId,
+          family_member_isactive: true,
+        },
+        include: {
+          person: true,
+        },
+      });
+
+      if (!familyMember) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El familiar no existe',
+        });
+        return;
+      }
+
+      // Find if this family member's person id is used in an employee
+      // This can happen when the family member also works at the company
+
+      const employeeWithFamilyMember = await prisma.employee.findFirst({
+        where: {
+          id_person: familyMember.id_person,
+          employee_isactive: true,
+        },
+      });
+
+      // If the person is not used in another employee, set it to inactive
+      if (!employeeWithFamilyMember) {
+        prisma.person.update({
+          where: {
+            id_person: familyMember.id_person,
+          },
+          data: {
+            person_isactive: false,
+            address: {
+              update: {
+                address_isactive: false,
+              },
+            },
+          },
+        });
+      }
+
+      await prisma.family_member.update({
+        where: {
+          id_family_member: familyMemberId,
+          family_member_isactive: true,
+        },
+        data: {
+          family_member_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Familiar eliminado exitosamente',
+      });
+
+      registerChange({
+        changedField: 'family_member',
+        changedFieldLabel: 'Eliminación de Familiar',
+        changedTable: 'family_member',
+        previousValue: `${familyMember.person.lastname}, ${familyMember.person.name}`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: familyMember.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar el familiar. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

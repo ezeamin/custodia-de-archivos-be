@@ -80,6 +80,12 @@ employeeRouter.get(
   Employees.GetController.employeeExtraHours,
 );
 employeeRouter.get(
+  '/:employeeId/family/:familyMemberId',
+  isAuthenticated,
+  isAdmin,
+  Employees.GetController.employeeFamilyMember,
+);
+employeeRouter.get(
   '/licenses/types',
   isAuthenticated,
   isAdminOrReadOnly,
@@ -162,6 +168,12 @@ employeeRouter.post(
   Employees.PostController.createEmployeeExtraHour,
 );
 employeeRouter.post(
+  '/:employeeId/family',
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createFamilyMember,
+);
+employeeRouter.post(
   '/licenses/types',
   isAuthenticated,
   isAdmin,
@@ -193,6 +205,12 @@ employeeRouter.put(
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateEmployeeDoc,
+);
+employeeRouter.put(
+  '/:employeeId/family/:familyMemberId',
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateEmployeeFamilyMember,
 );
 employeeRouter.put(
   '/licenses/types/:licenseTypeId',
@@ -231,6 +249,12 @@ employeeRouter.delete(
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeVacation,
+);
+employeeRouter.delete(
+  '/:employeeId/family/:familyMemberId',
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeFamilyMember,
 );
 employeeRouter.delete(
   '/licenses/types/:licenseTypeId',

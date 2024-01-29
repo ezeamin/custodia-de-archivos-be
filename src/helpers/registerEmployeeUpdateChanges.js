@@ -10,8 +10,8 @@ export const registerEmployeeUpdateChanges = async (
     id_area: previousData.id_area,
     email: previousData.email,
     position: previousData.position,
-    employment_date: previousData.employment_date,
-    termination_date: previousData.termination_date,
+    employment_date: previousData.employment_date.toISOString(),
+    termination_date: previousData.termination_date.toISOString(),
     no_file: previousData.no_file,
     working_hours: previousData.working_hours,
   };
@@ -20,9 +20,10 @@ export const registerEmployeeUpdateChanges = async (
     id_family: previousData.person.id_family,
     id_address: previousData.person.id_address,
     id_phone: previousData.person.id_phone,
+    id_civil_status: previousData.person.id_civil_status,
     name: previousData.person.name,
     surname: previousData.person.surname,
-    birth_date: previousData.person.birth_date,
+    birth_date: previousData.person.birth_date.toISOString(),
     identification_number: previousData.person.identification_number,
   };
   const phonePreviousData = previousData.person.phone || null;
@@ -375,6 +376,22 @@ export const registerEmployeeUpdateChanges = async (
       changedFieldLabel: 'Género',
       previousValue: personPreviousData.id_gender,
       newValue: personNewData.id_gender,
+    });
+  }
+
+  if (
+    personNewData &&
+    personNewData.id_civil_status &&
+    personPreviousData.id_civil_status !== personNewData.id_civil_status
+  ) {
+    registerChange({
+      modifyingUser: userId,
+      employeeId: previousData.id_employee,
+      changedTable: 'civil_status_type',
+      changedField: 'id_civil_status',
+      changedFieldLabel: 'Estado Civil',
+      previousValue: personPreviousData.id_civil_status,
+      newValue: personNewData.id_civil_status,
     });
   }
 
