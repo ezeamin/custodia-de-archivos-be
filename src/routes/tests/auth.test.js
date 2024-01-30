@@ -8,7 +8,11 @@ import { ENDPOINTS, getEndpoint } from '../endpoints.js';
 import { envs } from '../../helpers/envs.js';
 
 const {
-  TESTING: { ACCESS_TOKEN, REFRESH_TOKEN },
+  TESTING: {
+    ACCESS_TOKEN,
+    REFRESH_TOKEN,
+    USER: { USERNAME, PASSWORD },
+  },
 } = envs;
 
 describe('1. AUTH Testing', () => {
@@ -17,8 +21,8 @@ describe('1. AUTH Testing', () => {
       await request(app)
         .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGIN))
         .send({
-          username: '43706393',
-          password: '1234Abcd',
+          username: USERNAME,
+          password: PASSWORD,
         })
         .expect(HttpStatus.OK);
     });
@@ -27,8 +31,8 @@ describe('1. AUTH Testing', () => {
       await request(app)
         .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGIN))
         .send({
-          username: '43706392',
-          password: '1234Abcd',
+          username: `${USERNAME.slice(0, -1)}2`,
+          password: PASSWORD,
         })
         .expect(HttpStatus.UNAUTHORIZED);
     });
@@ -37,8 +41,8 @@ describe('1. AUTH Testing', () => {
       await request(app)
         .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGIN))
         .send({
-          username: '43706393',
-          password: '1234Abc',
+          username: USERNAME,
+          password: PASSWORD.slice(0, -1),
         })
         .expect(HttpStatus.UNAUTHORIZED);
     });
@@ -47,7 +51,7 @@ describe('1. AUTH Testing', () => {
       await request(app)
         .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGIN))
         .send({
-          username: '43706393',
+          username: USERNAME,
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -99,7 +103,7 @@ describe('1. AUTH Testing', () => {
       const response = await request(app)
         .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_RECOVER_PASSWORD))
         .send({
-          username: '43706393',
+          username: USERNAME,
         })
         .expect(HttpStatus.OK);
 
@@ -107,11 +111,11 @@ describe('1. AUTH Testing', () => {
       expect(response.body?.data?.email).toBeDefined();
     });
 
-    it('Incorrect data - 400', async () => {
+    it('Incorrect data (wrong username) - 400', async () => {
       await request(app)
         .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_RECOVER_PASSWORD))
         .send({
-          username: '43706392',
+          username: `${USERNAME.slice(0, -1)}2`,
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -129,7 +133,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: 'Abcd1234',
+          password: '9876Wxyz',
         })
         .expect(HttpStatus.OK);
     });
@@ -139,7 +143,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: 'Abcd1234',
+          password: '9876Wxyz',
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -149,7 +153,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: '12Abc',
+          password: '98Wxy',
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -159,7 +163,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: '1234abcd',
+          password: '9876wxyz',
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -169,7 +173,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: 'Abcdefghi',
+          password: 'Pqrstuvwxyz',
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -179,7 +183,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: '12345678',
+          password: '987654321',
         })
         .expect(HttpStatus.BAD_REQUEST);
     });
@@ -195,7 +199,7 @@ describe('1. AUTH Testing', () => {
       await request(app)
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .send({
-          password: '1234Abcd',
+          password: PASSWORD,
         })
         .expect(HttpStatus.UNAUTHORIZED);
     });
@@ -205,7 +209,7 @@ describe('1. AUTH Testing', () => {
         .put(getEndpoint('AUTH', ENDPOINTS.AUTH.PUT_RESET_PASSWORD))
         .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
         .send({
-          password: '1234Abcd',
+          password: PASSWORD,
         });
       console.log('Reset password OK');
     });

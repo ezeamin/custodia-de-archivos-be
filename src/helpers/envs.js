@@ -22,7 +22,11 @@ export const envs = {
     PORT: get('MAIL_PORT').required().asPortNumber(),
   },
   TESTING: {
-    ACCESS_TOKEN: get('TEST_ACCESS_TOKEN').asString(),
-    REFRESH_TOKEN: get('TEST_REFRESH_TOKEN').asString(),
+    ACCESS_TOKEN: get('TEST_ACCESS_TOKEN').default('').asString(),
+    REFRESH_TOKEN: get('TEST_REFRESH_TOKEN').default('').asString(),
+    USER: {
+      USERNAME: get('TEST_USER_NAME').default('').asString(),
+      PASSWORD: get('TEST_USER_PASS').default('').asString(),
+    },
   },
 };
