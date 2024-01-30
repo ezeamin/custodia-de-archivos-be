@@ -1,5 +1,6 @@
 export const ENDPOINTS = {
   AUTH: {
+    ROOT: '/auth',
     POST_LOGIN: '/login',
     POST_REFRESH_TOKEN: '/refresh-token',
     POST_LOGOUT: '/logout',
@@ -7,6 +8,7 @@ export const ENDPOINTS = {
     PUT_RESET_PASSWORD: '/reset-password',
   },
   EMPLOYEES: {
+    ROOT: '/employees',
     GET_EMPLOYEES: '/',
     GET_EMPLOYEE: '/:employeeId',
     GET_EMPLOYEE_DOCS: '/:employeeId/docs',
@@ -50,6 +52,7 @@ export const ENDPOINTS = {
     DELETE_TRAINING_TYPE: '/trainings/types/:trainingTypeId',
   },
   NOTIFICATIONS: {
+    ROOT: '/notifications',
     GET_NOTIFICATIONS: '/',
     GET_NOTIFICATION: '/:notificationId',
     GET_RECEIVERS: '/receivers',
@@ -62,6 +65,7 @@ export const ENDPOINTS = {
     DELETE_TYPE: '/types/:typeId',
   },
   PARAMS: {
+    ROOT: '/params',
     GET_RELATIONSHIPS: '/relationships',
     GET_STATUS: '/status',
     GET_ROLES: '/roles',
@@ -70,6 +74,7 @@ export const ENDPOINTS = {
     GET_CIVIL_STATUS: '/civil-status',
   },
   USERS: {
+    ROOT: '/users',
     GET_USERS: '/',
     GET_LOGIN_LOGS: '/login-logs',
     POST_USER: '/',
@@ -78,4 +83,11 @@ export const ENDPOINTS = {
     DELETE_ADMIN_USER: '/delete-admin/:userId',
     DELETE_READ_ONLY_USER: '/delete-read-only/:userId',
   },
+};
+
+export const getEndpoint = (category, endpoint) => {
+  const endpoints = ENDPOINTS[category];
+  const rootEndpoint = endpoints.ROOT;
+
+  return `/api/v1/${rootEndpoint}${endpoint}`;
 };

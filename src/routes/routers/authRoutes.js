@@ -25,7 +25,11 @@ authRouter.post(
   ENDPOINTS.AUTH.POST_REFRESH_TOKEN,
   Auth.PostController.refreshToken,
 );
-authRouter.post(ENDPOINTS.AUTH.POST_LOGOUT, Auth.PostController.logout);
+authRouter.post(
+  ENDPOINTS.AUTH.POST_LOGOUT,
+  isAuthenticated,
+  Auth.PostController.logout,
+);
 authRouter.post(
   ENDPOINTS.AUTH.POST_RECOVER_PASSWORD,
   (req, res, next) => validateBody(req, res, next, post_recoverPasswordSchema),

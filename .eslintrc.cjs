@@ -4,6 +4,7 @@ module.exports = {
     es2021: true,
     browser: true,
     node: true,
+    jest: true,
   },
   parser: '@babel/eslint-parser',
   parserOptions: {

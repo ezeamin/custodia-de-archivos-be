@@ -94,7 +94,13 @@ export class PostController {
     } = req;
 
     try {
-      if (!refreshToken) throw new Error('No refresh token found');
+      if (!refreshToken) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message: 'No se encontró una sesión activa',
+        });
+        return;
+      }
 
       // 1- Validate JWT
       const {
@@ -174,7 +180,7 @@ export class PostController {
         },
       });
 
-      if (!userInDB.user_isactive) {
+      if (userInDB && !userInDB.user_isactive) {
         res.status(HttpStatus.BAD_REQUEST).json({
           data: null,
           message:
@@ -187,7 +193,7 @@ export class PostController {
       // Cases:
       // a. incorrect username (no user found)
       if (!userInDB) {
-        res.status(HttpStatus.UNAUTHORIZED).json({
+        res.status(HttpStatus.BAD_REQUEST).json({
           data: null,
           message: 'Usuario no encontrado',
         });
@@ -214,6 +220,15 @@ export class PostController {
       const token = jwt.sign(userInfo, JWT_SECRET_KEY, {
         expiresIn: '30m',
       });
+
+      // Avoid sending mails in test environment
+      if (process.env.NODE_ENV === 'test') {
+        res.json({
+          data: { email: hiddenEmail },
+          message: 'Usuario encontrado',
+        });
+        return;
+      }
 
       // 4- Send email to user
       const mailOptions = recoverMailOptions({ user: userInDB, token });
@@ -263,8 +278,16 @@ export class PostController {
     }
   }
 
-  static logout(_, res) {
+  static logout(req, res) {
     try {
+      if (!req.cookies.refresh_token) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message: 'No se encontró una sesión activa',
+        });
+        return;
+      }
+
       // delete refreshToken cookie
       res.clearCookie('refresh_token', {
         httpOnly: true,

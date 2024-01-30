@@ -4,6 +4,7 @@ const { get } = envvar;
 
 export const envs = {
   PORT: get('PORT').default('3000').asPortNumber(),
+  NODE_ENV: get('NODE_ENV').default('development').asString(),
   DATABASE_URL: get('DATABASE_URL').required().asString(),
   DIRECT_URL: get('DIRECT_URL').required().asString(),
   JWT_SECRET_KEY: get('JWT_SECRET_KEY').required().asString(),
@@ -19,5 +20,9 @@ export const envs = {
     PASS: get('MAIL_PASS').required().asString(),
     HOST: get('MAIL_HOST').default('587').asString(),
     PORT: get('MAIL_PORT').required().asPortNumber(),
+  },
+  TESTING: {
+    ACCESS_TOKEN: get('TEST_ACCESS_TOKEN').asString(),
+    REFRESH_TOKEN: get('TEST_REFRESH_TOKEN').asString(),
   },
 };

@@ -6,13 +6,14 @@
   "type": "module",
   "scripts": {
     "build": "prisma db pull && prisma generate && esbuild src/index.js --bundle --platform=node --outfile=dist/index.cjs --minify",
-    "start": "node --env-file=.env dist/index.cjs",
+    "start": "node --env-file=.env.production dist/index.cjs",
     "dev": "node --watch --env-file=.env src/index.js",
     "lint": "node config/pre-build.js --ignore-build --fix",
     "prettier:check": "prettier -c .",
     "prettier:write": "prettier -w .",
     "prisma:reset": "prisma db pull && prisma generate",
-    "cloudinary:reset": "node --env-file=.env prisma/deleteCloudinary.js"
+    "cloudinary:reset": "node --env-file=.env prisma/deleteCloudinary.js",
+    "test": "node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [
     "rolling",
