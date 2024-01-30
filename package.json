@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "prisma db pull && prisma generate && esbuild src/index.js --bundle --platform=node --outfile=dist/index.cjs --minify",
-    "start": "node --env-file=.env.production dist/index.cjs",
+    "start": "node --env-file=.env dist/index.cjs",
     "dev": "node --watch --env-file=.env src/index.js",
     "lint": "node config/pre-build.js --ignore-build --fix",
     "prettier:check": "prettier -c .",
