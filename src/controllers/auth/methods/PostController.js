@@ -3,12 +3,11 @@ import bcrypt from 'bcryptjs';
 import HttpStatus from 'http-status-codes';
 import nodemailer from 'nodemailer';
 
-// import UsersModel from '../models/UserSchema.js';
 import { envs } from '../../../helpers/envs.js';
 import { prisma } from '../../../helpers/prisma.js';
 
-import { recoverMailOptions } from '../../../helpers/recoverMail.js';
-import { registerLogin } from '../../../helpers/registerLogin.js';
+import { recoverMailOptions } from '../../../helpers/mailing/recoverMail.js';
+import { registerLogin } from '../../../helpers/registering/registerLogin.js';
 import { generateToken } from '../../../helpers/token.js';
 
 const { JWT_SECRET_KEY } = envs;

@@ -1,7 +1,7 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { registerChange } from '../../../helpers/registerChange.js';
+import { registerChange } from '../../../helpers/registering/registerChange.js';
 
 export class PutController {
   // @param userId

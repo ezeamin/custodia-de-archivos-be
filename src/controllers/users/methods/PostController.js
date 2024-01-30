@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { generateFirstPassword } from '../../../helpers/helpers.js';
-import { sendNewUserMail } from '../../../helpers/newUserMail.js';
+import { sendNewUserMail } from '../../../helpers/mailing/newUserMail.js';
 
 export class PostController {
   static async createUser(req, res) {

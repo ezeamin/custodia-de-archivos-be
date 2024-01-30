@@ -1,3 +1,3 @@
-import { deleteAllFiles } from '../../src/helpers/cloudinary';
+import { deleteAllFiles } from '../../src/helpers/cloudinary.js';
 
 deleteAllFiles();

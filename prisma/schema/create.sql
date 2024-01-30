@@ -112,6 +112,7 @@ CREATE TABLE public.third_party (
     id_person            UUID NOT NULL,
     "description"        varchar(100),
     email                varchar(75) NOT NULL UNIQUE,
+    third_party_isactive boolean DEFAULT true NOT NULL,
     CONSTRAINT pk PRIMARY KEY (id_third_party),
     CONSTRAINT fk_third_party_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
 );

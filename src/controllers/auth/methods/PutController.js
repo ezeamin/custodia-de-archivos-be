@@ -2,7 +2,7 @@ import HttpStatus from 'http-status-codes';
 import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { registerChange } from '../../../helpers/registerChange.js';
+import { registerChange } from '../../../helpers/registering/registerChange.js';
 
 export class PutController {
   static async resetPassword(req, res) {

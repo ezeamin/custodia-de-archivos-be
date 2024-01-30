@@ -1,7 +1,7 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { registerChange } from '../../../helpers/registerChange.js';
+import { registerChange } from '../../../helpers/registering/registerChange.js';
 
 export class DeleteController {
   // @param userId
@@ -92,6 +92,16 @@ export class DeleteController {
         },
         data: {
           user_isactive: false,
+          third_party: {
+            update: {
+              third_party_isactive: false,
+              person: {
+                update: {
+                  person_isactive: false,
+                },
+              },
+            },
+          },
         },
       });
 

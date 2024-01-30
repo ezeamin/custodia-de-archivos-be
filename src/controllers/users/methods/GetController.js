@@ -170,7 +170,15 @@ export class GetController {
         },
       });
 
-      const totalPromise = prisma.login.count();
+      const totalPromise = prisma.login.count({
+        where: {
+          user: {
+            username: {
+              contains: query,
+            },
+          },
+        },
+      });
 
       const [logs, total] = await Promise.all([logsPromise, totalPromise]);
 

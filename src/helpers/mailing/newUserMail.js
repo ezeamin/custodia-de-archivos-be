@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-import { envs } from './envs.js';
+import { envs } from '../envs.js';
 
 const frontendUrl = envs.CLIENT_URL;
 

@@ -1,11 +1,11 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { registerChange } from '../../../helpers/registerChange.js';
+import { registerChange } from '../../../helpers/registering/registerChange.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
-import { formatEmployeeData } from '../../../helpers/formatEmployeeData.js';
-import { registerEmployeeUpdateChanges } from '../../../helpers/registerEmployeeUpdateChanges.js';
-import { formatFamilyMemberData } from '../../../helpers/formatFamilyMemberData.js';
+import { formatEmployeeData } from '../../../helpers/formatters/formatEmployeeData.js';
+import { registerEmployeeUpdateChanges } from '../../../helpers/registering/registerEmployeeUpdateChanges.js';
+import { formatFamilyMemberData } from '../../../helpers/formatters/formatFamilyMemberData.js';
 
 export class PutController {
   // @param - employeeId

@@ -3,8 +3,8 @@ import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
-import { registerChange } from '../../../helpers/registerChange.js';
-import { formatAddress } from '../../../helpers/formatAddress.js';
+import { registerChange } from '../../../helpers/registering/registerChange.js';
+import { formatAddress } from '../../../helpers/formatters/formatAddress.js';
 
 export class PostController {
   static async createEmployee(req, res) {
@@ -143,7 +143,7 @@ export class PostController {
         changedFieldLabel: 'Creación de Empleado',
         changedTable: 'employee',
         previousValue: null,
-        newValue: new Date().toISOString(),
+        newValue: new Date().toISOString(), // TODO: Check timezone
         modifyingUser: req.user.id,
         employeeId: employee.id_employee,
       });

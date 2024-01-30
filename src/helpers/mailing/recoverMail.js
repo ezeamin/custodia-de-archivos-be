@@ -1,4 +1,4 @@
-import { envs } from './envs.js';
+import { envs } from '../envs.js';
 
 export const recoverMailOptions = ({ user, token }) => {
   const isEmployee = !!user.id_employee;

@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js';
+import { prisma } from '../prisma.js';
 
 export const registerLogin = async (req, id_user) => {
   const {

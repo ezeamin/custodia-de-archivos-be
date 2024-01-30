@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { ISODateRegex, uuidRegex } from './regex.js';
-import { prisma } from './prisma.js';
+import { ISODateRegex, uuidRegex } from '../regex.js';
+import { prisma } from '../prisma.js';
 
 const optionsMap = {
   phone: {
