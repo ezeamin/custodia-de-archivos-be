@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { registerChange } from '../../../helpers/registerChange.js';
+import { formatAddress } from '../../../helpers/formatAddress.js';
 
 export class PostController {
   static async createEmployee(req, res) {
@@ -685,14 +686,36 @@ export class PostController {
         where: {
           identification_number: dni,
         },
+        include: {
+          phone: true,
+          address: {
+            include: {
+              street: {
+                include: {
+                  locality: {
+                    include: {
+                      province: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       if (person) {
         doesPersonExist = true;
         if (!force) {
-          res.status(HttpStatus.CONFLICT).json({
-            data: null,
-            message: 'El DNI ingresado ya existe',
+          res.json({
+            data: {
+              name: person.name,
+              lastname: person.surname,
+              dni: person.identification_number,
+              phone: person.phone.phone_no,
+              address: person.address ? formatAddress(person.address) : null,
+            },
+            message: 'Duplicate',
           });
           return;
         }
