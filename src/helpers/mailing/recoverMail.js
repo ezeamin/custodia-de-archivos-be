@@ -1,6 +1,9 @@
+import nodemailer from 'nodemailer';
+import HttpStatus from 'http-status-codes';
+
 import { envs } from '../envs.js';
 
-export const recoverMailOptions = ({ user, token }) => {
+const recoverMailOptions = ({ user, token }) => {
   const isEmployee = !!user.id_employee;
   const name = isEmployee
     ? `${user.employee.person.name} ${user.employee.person.surname}`
@@ -27,4 +30,60 @@ export const recoverMailOptions = ({ user, token }) => {
       </main>
       `,
   };
+};
+
+export const sendNewUserMail = async ({
+  user,
+  email,
+  hiddenEmail,
+  token,
+  res,
+}) => {
+  try {
+    // 4- Send email to user
+    const mailOptions = recoverMailOptions({ user, token });
+
+    const transporter = nodemailer.createTransport({
+      host: envs.MAIL.HOST,
+      port: envs.MAIL.PORT,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      auth: {
+        user: envs.MAIL.USER,
+        pass: envs.MAIL.PASS,
+      },
+    });
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        console.error(
+          `🟥 RECOVER MAIL FAILED FOR ${email} - ${user.username}:`,
+          err,
+        );
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          errors: {
+            data: null,
+            message: `Error generando mail`,
+          },
+        });
+        return;
+      }
+
+      // 5- Send email to FE
+      res.json({
+        data: { email: hiddenEmail },
+        message: 'Usuario encontrado',
+      });
+      console.log(`🟩 RECOVER MAIL SENT TO ${email} - ${user.username}`);
+    });
+  } catch (err) {
+    console.error('🟥', err);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      errors: {
+        data: null,
+        message: `Ocurrió un error al intentar recuperar la contraseña`,
+      },
+    });
+  }
 };

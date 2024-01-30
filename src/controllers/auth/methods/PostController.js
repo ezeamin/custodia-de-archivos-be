@@ -1,12 +1,11 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import HttpStatus from 'http-status-codes';
-import nodemailer from 'nodemailer';
 
 import { envs } from '../../../helpers/envs.js';
 import { prisma } from '../../../helpers/prisma.js';
 
-import { recoverMailOptions } from '../../../helpers/mailing/recoverMail.js';
+import { sendNewUserMail } from '../../../helpers/mailing/recoverMail.js';
 import { registerLogin } from '../../../helpers/registering/registerLogin.js';
 import { generateToken } from '../../../helpers/token.js';
 
@@ -230,44 +229,12 @@ export class PostController {
         return;
       }
 
-      // 4- Send email to user
-      const mailOptions = recoverMailOptions({ user: userInDB, token });
-
-      const transporter = nodemailer.createTransport({
-        host: envs.MAIL.HOST,
-        port: envs.MAIL.PORT,
-        tls: {
-          rejectUnauthorized: false,
-        },
-        auth: {
-          user: envs.MAIL.USER,
-          pass: envs.MAIL.PASS,
-        },
-      });
-
-      transporter.sendMail(mailOptions, (err) => {
-        if (err) {
-          console.error(
-            `🟥 RECOVER MAIL FAILED FOR ${userEmail} - ${userInDB.username}:`,
-            err,
-          );
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            errors: {
-              data: null,
-              message: `Error generando mail`,
-            },
-          });
-          return;
-        }
-
-        // 5- Send email to FE
-        res.json({
-          data: { email: hiddenEmail },
-          message: 'Usuario encontrado',
-        });
-        console.log(
-          `🟩 RECOVER MAIL SENT TO ${userEmail} - ${userInDB.username}`,
-        );
+      sendNewUserMail({
+        user: userInDB,
+        email: userEmail,
+        hiddenEmail,
+        token,
+        res,
       });
     } catch (err) {
       console.error('🟥', err);
