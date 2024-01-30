@@ -5,27 +5,33 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 import { isAdminOrReadOnly } from '../../middlewares/isAdminOrReadOnly.js';
 
 import { Users } from '../../controllers/users/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const userRouter = express.Router();
 
 // GET ---------------------------
 userRouter.get(
-  '/',
+  ENDPOINTS.USERS.GET_USERS,
   isAuthenticated,
   isAdminOrReadOnly,
   Users.GetController.users,
 );
 userRouter.get(
-  '/login-logs',
+  ENDPOINTS.USERS.GET_LOGIN_LOGS,
   isAuthenticated,
   isAdminOrReadOnly,
   Users.GetController.loginLogs,
 );
 
 // POST ---------------------------
-userRouter.post('/', isAuthenticated, isAdmin, Users.PostController.createUser);
 userRouter.post(
-  '/create-read-only',
+  ENDPOINTS.USERS.POST_USER,
+  isAuthenticated,
+  isAdmin,
+  Users.PostController.createUser,
+);
+userRouter.post(
+  ENDPOINTS.USERS.POST_READ_ONLY_USER,
   isAuthenticated,
   isAdmin,
   Users.PostController.createReadOnlyUser,
@@ -33,7 +39,7 @@ userRouter.post(
 
 // PUT ----------------------------
 userRouter.put(
-  '/create-admin/:userId',
+  ENDPOINTS.USERS.PUT_CREATE_ADMIN,
   isAuthenticated,
   isAdmin,
   Users.PutController.createAdmin,
@@ -41,13 +47,13 @@ userRouter.put(
 
 // DELETE -------------------------
 userRouter.delete(
-  '/delete-admin/:userId',
+  ENDPOINTS.USERS.DELETE_ADMIN_USER,
   isAuthenticated,
   isAdmin,
   Users.DeleteController.deleteAdminUser,
 );
 userRouter.delete(
-  '/delete-read-only/:userId',
+  ENDPOINTS.USERS.DELETE_READ_ONLY_USER,
   isAuthenticated,
   isAdmin,
   Users.DeleteController.deleteReadOnlyUser,

@@ -5,106 +5,105 @@ import { isAdmin } from '../../middlewares/isAdmin.js';
 import { isAdminOrReadOnly } from '../../middlewares/isAdminOrReadOnly.js';
 
 import { Employees } from '../../controllers/employees/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 import { upload } from '../../helpers/multer.js';
 
 export const employeeRouter = express.Router();
 
-// Faltan: licensesTypes, trainingTypes,
-
 // GET ---------------------------
 employeeRouter.get(
-  '/',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEES,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employees,
 );
 employeeRouter.get(
-  '/:employeeId',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeById,
 );
 employeeRouter.get(
-  '/:employeeId/docs',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_DOCS,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeDocs,
 );
 employeeRouter.get(
-  '/:employeeId/history',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_HISTORY,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeHistory,
 );
 employeeRouter.get(
-  '/:employeeId/absences',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_ABSENCES,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeAbsences,
 );
 employeeRouter.get(
-  '/:employeeId/licenses',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LICENSES,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeLicenses,
 );
 employeeRouter.get(
-  '/:employeeId/vacations',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_VACATIONS,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeVacations,
 );
 employeeRouter.get(
-  '/:employeeId/trainings',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_TRAININGS,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeTrainings,
 );
 employeeRouter.get(
-  '/:employeeId/formal-warnings',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FORMAL_WARNINGS,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeFormalWarnings,
 );
 employeeRouter.get(
-  '/:employeeId/late-arrivals',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_EXTRA_HOURS,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeLateArrivals,
 );
 employeeRouter.get(
-  '/:employeeId/extra-hours',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LATE_ARRIVALS,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.employeeExtraHours,
 );
 employeeRouter.get(
-  '/:employeeId/family/:familyMemberId',
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   isAdmin,
   Employees.GetController.employeeFamilyMember,
 );
 employeeRouter.get(
-  '/licenses/types',
+  ENDPOINTS.EMPLOYEES.GET_LICENSES_TYPES,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.licensesTypes,
 );
 employeeRouter.get(
-  '/licenses/types/:licenseTypeId',
+  ENDPOINTS.EMPLOYEES.GET_LICENSE_TYPE,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.licensesTypesById,
 );
 employeeRouter.get(
-  '/trainings/types',
+  ENDPOINTS.EMPLOYEES.GET_TRAINING_TYPES,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.trainingsTypes,
 );
 employeeRouter.get(
-  '/trainings/types/:trainingTypeId',
+  ENDPOINTS.EMPLOYEES.GET_TRAINING_TYPE,
   isAuthenticated,
   isAdminOrReadOnly,
   Employees.GetController.trainingsTypesById,
@@ -112,75 +111,75 @@ employeeRouter.get(
 
 // POST ---------------------------
 employeeRouter.post(
-  '/',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE,
   isAuthenticated,
   isAdmin,
   upload.single('imgFile'),
   Employees.PostController.createEmployee,
 );
 employeeRouter.post(
-  '/:employeeId/docs',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_DOC,
   isAuthenticated,
   isAdmin,
   upload.single('file'),
   Employees.PostController.createEmployeeDoc,
 );
 employeeRouter.post(
-  '/:employeeId/absences',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_ABSENCE,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeAbsence,
 );
 employeeRouter.post(
-  '/:employeeId/licenses',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LICENSE,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeLicense,
 );
 employeeRouter.post(
-  '/:employeeId/vacations',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_VACATION,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeVacation,
 );
 employeeRouter.post(
-  '/:employeeId/trainings',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_TRAINING,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeTraining,
 );
 employeeRouter.post(
-  '/:employeeId/formal-warnings',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FORMAL_WARNING,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeFormalWarning,
 );
 employeeRouter.post(
-  '/:employeeId/late-arrivals',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_EXTRA_HOUR,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeLateArrival,
 );
 employeeRouter.post(
-  '/:employeeId/extra-hours',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LATE_ARRIVAL,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeExtraHour,
 );
 employeeRouter.post(
-  '/:employeeId/family',
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createFamilyMember,
 );
 employeeRouter.post(
-  '/licenses/types',
+  ENDPOINTS.EMPLOYEES.POST_LICENSE_TYPE,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createLicenseType,
 );
 employeeRouter.post(
-  '/trainings/types',
+  ENDPOINTS.EMPLOYEES.POST_TRAINING_TYPE,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createTrainingType,
@@ -188,38 +187,38 @@ employeeRouter.post(
 
 // PUT ----------------------------
 employeeRouter.put(
-  '/:employeeId',
+  ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE,
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateEmployee,
 );
 employeeRouter.put(
-  '/:employeeId/image',
+  ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_IMAGE,
   isAuthenticated,
   isAdmin,
   upload.single('imgFile'),
   Employees.PutController.updateEmployeeImage,
 );
 employeeRouter.put(
-  '/:employeeId/docs/:docId',
+  ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_DOC,
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateEmployeeDoc,
 );
 employeeRouter.put(
-  '/:employeeId/family/:familyMemberId',
+  ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateEmployeeFamilyMember,
 );
 employeeRouter.put(
-  '/licenses/types/:licenseTypeId',
+  ENDPOINTS.EMPLOYEES.PUT_LICENSE_TYPE,
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateLicenseType,
 );
 employeeRouter.put(
-  '/trainings/types/:trainingTypeId',
+  ENDPOINTS.EMPLOYEES.PUT_TRAINING_TYPE,
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateTrainingType,
@@ -227,43 +226,43 @@ employeeRouter.put(
 
 // DELETE -------------------------
 employeeRouter.delete(
-  '/:employeeId',
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployee,
 );
 employeeRouter.delete(
-  '/:employeeId/docs/:docId',
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_DOC,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeDoc,
 );
 employeeRouter.delete(
-  '/:employeeId/licenses/:licenseId',
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LICENSE,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeLicense,
 );
 employeeRouter.delete(
-  '/:employeeId/vacations/:vacationId',
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_VACATION,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeVacation,
 );
 employeeRouter.delete(
-  '/:employeeId/family/:familyMemberId',
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeFamilyMember,
 );
 employeeRouter.delete(
-  '/licenses/types/:licenseTypeId',
+  ENDPOINTS.EMPLOYEES.DELETE_LICENSE_TYPE,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteLicenseType,
 );
 employeeRouter.delete(
-  '/trainings/types/:trainingTypeId',
+  ENDPOINTS.EMPLOYEES.DELETE_TRAINING_TYPE,
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteTrainingType,

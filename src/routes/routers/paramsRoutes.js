@@ -1,23 +1,40 @@
 import express from 'express';
 
-import { Params } from '../../controllers/params/index.js';
-
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
+
+import { Params } from '../../controllers/params/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const paramsRouter = express.Router();
 
 // GET ---------------------------
 paramsRouter.get(
-  '/relationships',
+  ENDPOINTS.PARAMS.GET_RELATIONSHIPS,
   isAuthenticated,
   Params.GetController.relationships,
 );
-paramsRouter.get('/status', isAuthenticated, Params.GetController.status);
-paramsRouter.get('/roles', isAuthenticated, Params.GetController.roles);
-paramsRouter.get('/genders', isAuthenticated, Params.GetController.genders);
-paramsRouter.get('/areas', isAuthenticated, Params.GetController.areas);
 paramsRouter.get(
-  '/civil-status',
+  ENDPOINTS.PARAMS.GET_STATUS,
+  isAuthenticated,
+  Params.GetController.status,
+);
+paramsRouter.get(
+  ENDPOINTS.PARAMS.GET_ROLES,
+  isAuthenticated,
+  Params.GetController.roles,
+);
+paramsRouter.get(
+  ENDPOINTS.PARAMS.GET_GENDERS,
+  isAuthenticated,
+  Params.GetController.genders,
+);
+paramsRouter.get(
+  ENDPOINTS.PARAMS.GET_AREAS,
+  isAuthenticated,
+  Params.GetController.areas,
+);
+paramsRouter.get(
+  ENDPOINTS.PARAMS.GET_CIVIL_STATUS,
   isAuthenticated,
   Params.GetController.civilStatus,
 );

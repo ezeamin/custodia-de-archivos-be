@@ -8,28 +8,33 @@ import {
   post_resetPasswordSchema,
 } from '../../helpers/validationSchemas/authSchemas.js';
 
-import { Auth } from '../../controllers/auth/index.js';
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
+
+import { Auth } from '../../controllers/auth/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const authRouter = express.Router();
 
 // POST ---------------------------
 authRouter.post(
-  '/login',
+  ENDPOINTS.AUTH.POST_LOGIN,
   (req, res, next) => validateBody(req, res, next, post_loginSchema),
   Auth.PostController.login,
 );
-authRouter.post('/refresh-token', Auth.PostController.refreshToken);
-authRouter.post('/logout', Auth.PostController.logout);
 authRouter.post(
-  '/recover-password',
+  ENDPOINTS.AUTH.POST_REFRESH_TOKEN,
+  Auth.PostController.refreshToken,
+);
+authRouter.post(ENDPOINTS.AUTH.POST_LOGOUT, Auth.PostController.logout);
+authRouter.post(
+  ENDPOINTS.AUTH.POST_RECOVER_PASSWORD,
   (req, res, next) => validateBody(req, res, next, post_recoverPasswordSchema),
   Auth.PostController.recoverPassword,
 );
 
 // PUT ----------------------------
 authRouter.put(
-  '/reset-password',
+  ENDPOINTS.AUTH.PUT_RESET_PASSWORD,
   isAuthenticated,
   (req, res, next) => validateBody(req, res, next, post_resetPasswordSchema),
   Auth.PutController.resetPassword,

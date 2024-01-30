@@ -4,44 +4,45 @@ import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { isAdmin } from '../../middlewares/isAdmin.js';
 
 import { Notifications } from '../../controllers/notifications/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const notificationRouter = express.Router();
 
 // GET ---------------------------
 notificationRouter.get(
-  '/',
+  ENDPOINTS.NOTIFICATIONS.GET_NOTIFICATIONS,
   isAuthenticated,
   Notifications.GetController.notifications,
 );
 notificationRouter.get(
-  '/:notificationId',
+  ENDPOINTS.NOTIFICATIONS.GET_NOTIFICATION,
   isAuthenticated,
   Notifications.GetController.notificationById,
 );
 notificationRouter.get(
-  '/receivers',
+  ENDPOINTS.NOTIFICATIONS.GET_RECEIVERS,
   isAuthenticated,
   Notifications.GetController.notificationReceivers,
 );
 notificationRouter.get(
-  '/types',
+  ENDPOINTS.NOTIFICATIONS.GET_TYPES,
   isAuthenticated,
   Notifications.GetController.notificationTypes,
 );
 notificationRouter.get(
-  '/types/:typeId',
+  ENDPOINTS.NOTIFICATIONS.GET_TYPE,
   isAuthenticated,
   Notifications.GetController.notificationTypesById,
 );
 
 // POST ---------------------------
 notificationRouter.post(
-  '/',
+  ENDPOINTS.NOTIFICATIONS.POST_NOTIFICATION,
   isAuthenticated,
   Notifications.PostController.createNotification,
 );
 notificationRouter.post(
-  '/types',
+  ENDPOINTS.NOTIFICATIONS.POST_TYPE,
   isAuthenticated,
   isAdmin,
   Notifications.PostController.createNotificationType,
@@ -49,12 +50,12 @@ notificationRouter.post(
 
 // PUT ----------------------------
 notificationRouter.put(
-  '/:notificationId/read',
+  ENDPOINTS.NOTIFICATIONS.PUT_READ_NOTIFICATION,
   isAuthenticated,
   Notifications.PutController.readNotification,
 );
 notificationRouter.put(
-  '/types/:typeId',
+  ENDPOINTS.NOTIFICATIONS.PUT_TYPE,
   isAuthenticated,
   isAdmin,
   Notifications.PutController.updateNotificationType,
@@ -62,7 +63,7 @@ notificationRouter.put(
 
 // DELETE -------------------------
 notificationRouter.delete(
-  '/types/:typeId',
+  ENDPOINTS.NOTIFICATIONS.DELETE_TYPE,
   isAuthenticated,
   isAdmin,
   Notifications.DeleteController.deleteNotificationType,
