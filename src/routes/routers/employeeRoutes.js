@@ -9,6 +9,25 @@ import { ENDPOINTS } from '../endpoints.js';
 
 import { upload } from '../../helpers/multer.js';
 
+import { validateParams } from '../../middlewares/validateParams.js';
+import {
+  get_params_employeeAbsencesSchema,
+  get_params_employeeByIdSchema,
+  get_params_employeeDocsSchema,
+  get_params_employeeExtraHoursSchema,
+  get_params_employeeFamilyMemberSchema,
+  get_params_employeeFormalWarningsSchema,
+  get_params_employeeHistorySchema,
+  get_params_employeeLateArrivalsSchema,
+  get_params_employeeLicensesSchema,
+  get_params_employeeTrainingsSchema,
+  get_params_employeeVacationsSchema,
+  get_params_licensesTypesByIdSchema,
+  get_params_trainingsTypesByIdSchema,
+  post_employeeSchema,
+} from '../../helpers/validationSchemas/employeeSchemas.js';
+import { validateBody } from '../../middlewares/validateBody.js';
+
 export const employeeRouter = express.Router();
 
 // GET ---------------------------
@@ -22,66 +41,96 @@ employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeByIdSchema),
   Employees.GetController.employeeById,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_DOCS,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeDocsSchema),
   Employees.GetController.employeeDocs,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_HISTORY,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeHistorySchema),
+
   Employees.GetController.employeeHistory,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_ABSENCES,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeAbsencesSchema),
+
   Employees.GetController.employeeAbsences,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LICENSES,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeLicensesSchema),
+
   Employees.GetController.employeeLicenses,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_VACATIONS,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeVacationsSchema),
+
   Employees.GetController.employeeVacations,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_TRAININGS,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeTrainingsSchema),
+
   Employees.GetController.employeeTrainings,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FORMAL_WARNINGS,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeFormalWarningsSchema),
+
   Employees.GetController.employeeFormalWarnings,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_EXTRA_HOURS,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeExtraHoursSchema),
+
   Employees.GetController.employeeLateArrivals,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LATE_ARRIVALS,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeLateArrivalsSchema),
+
   Employees.GetController.employeeExtraHours,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   isAdmin,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_employeeFamilyMemberSchema),
   Employees.GetController.employeeFamilyMember,
 );
 employeeRouter.get(
@@ -94,6 +143,8 @@ employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_LICENSE_TYPE,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_licensesTypesByIdSchema),
   Employees.GetController.licensesTypesById,
 );
 employeeRouter.get(
@@ -106,6 +157,8 @@ employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_TRAINING_TYPE,
   isAuthenticated,
   isAdminOrReadOnly,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_trainingsTypesByIdSchema),
   Employees.GetController.trainingsTypesById,
 );
 
@@ -114,6 +167,7 @@ employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE,
   isAuthenticated,
   isAdmin,
+  (req, res, next) => validateBody(req, res, next, post_employeeSchema),
   upload.single('imgFile'),
   Employees.PostController.createEmployee,
 );

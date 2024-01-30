@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS public.login CASCADE;
 DROP TABLE IF EXISTS public.training CASCADE;
 DROP TABLE IF EXISTS public.license CASCADE;
 DROP TABLE IF EXISTS public.absence CASCADE;
-DROP TABLE IF EXISTS public.vacations CASCADE;
+DROP TABLE IF EXISTS public.vacation CASCADE;
 DROP TABLE IF EXISTS public.training_type CASCADE;
 DROP TABLE IF EXISTS public.notification_type CASCADE;
 DROP TABLE IF EXISTS public.license_type CASCADE;
@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS public.province CASCADE;
 DROP TABLE IF EXISTS public.phone CASCADE;
 DROP TABLE IF EXISTS public.locality CASCADE;
 DROP TABLE IF EXISTS public.gender CASCADE;
-DROP TABLE IF EXISTS public.family CASCADE;
+DROP TABLE IF EXISTS public.family_member CASCADE;
 DROP TABLE IF EXISTS public.family_relationship_type CASCADE;
 DROP TABLE IF EXISTS public.area CASCADE;
 

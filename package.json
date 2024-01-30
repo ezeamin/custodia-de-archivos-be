@@ -7,13 +7,14 @@
   "scripts": {
     "build": "prisma db pull && prisma generate && esbuild src/index.js --bundle --platform=node --outfile=dist/index.cjs --minify",
     "start": "node --env-file=.env dist/index.cjs",
-    "dev": "node --watch --env-file=.env src/index.js",
+    "dev": "node --watch --env-file=.env.development src/index.js",
     "lint": "node config/pre-build.js --ignore-build --fix",
     "prettier:check": "prettier -c .",
     "prettier:write": "prettier -w .",
     "prisma:reset": "prisma db pull && prisma generate",
     "cloudinary:reset": "node --env-file=.env prisma/deleteCloudinary.js",
-    "test": "node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
+    "test:reset": "node --env-file=.env.test ./src/testing/resetDatabase.js && node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles"
   },
   "keywords": [
     "rolling",

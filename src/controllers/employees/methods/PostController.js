@@ -46,6 +46,8 @@ export class PostController {
       return;
     }
 
+    let person = null;
+
     // Supposing that the body has been validated and sanitized
     try {
       // Check for existing (inactive) person
@@ -56,7 +58,6 @@ export class PostController {
         },
       });
 
-      let person = null;
       if (inactivePerson) {
         person = await prisma.person.update({
           where: {
@@ -133,7 +134,7 @@ export class PostController {
         });
       }
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Empleado creado exitosamente',
       });
@@ -162,6 +163,11 @@ export class PostController {
             data: null,
             message: 'El email ingresado ya existe',
           });
+          await prisma.person.delete({
+            where: {
+              id_person: person.id_person,
+            },
+          });
           return;
         }
 
@@ -169,6 +175,11 @@ export class PostController {
           res.status(HttpStatus.BAD_REQUEST).json({
             data: null,
             message: 'El número de legajo ingresado ya existe',
+          });
+          await prisma.person.delete({
+            where: {
+              id_person: person.id_person,
+            },
           });
           return;
         }

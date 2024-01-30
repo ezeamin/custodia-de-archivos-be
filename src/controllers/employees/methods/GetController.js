@@ -136,6 +136,14 @@ export class GetController {
         },
       });
 
+      if (!employee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const family = await prisma.family_member.findMany({
         where: {
           id_employee: employeeId,
@@ -180,6 +188,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const docs = await prisma.employee_doc.findMany({
         where: {
           id_employee: employeeId,
@@ -215,6 +237,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const countPromise = prisma.employee_history.count({
         where: {
           id_employee: employeeId,
@@ -264,6 +300,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const absences = await prisma.absence.findMany({
         where: {
           id_employee: employeeId,
@@ -298,6 +348,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const licenses = await prisma.license.findMany({
         where: {
           id_employee: employeeId,
@@ -340,6 +404,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const vacations = await prisma.vacation.findMany({
         where: {
           id_employee: employeeId,
@@ -374,6 +452,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const trainings = await prisma.training.findMany({
         where: {
           id_employee: employeeId,
@@ -415,6 +507,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const formalWarnings = await prisma.formal_warning.findMany({
         where: {
           id_employee: employeeId,
@@ -449,6 +555,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const lateArrivals = await prisma.late_arrival.findMany({
         where: {
           id_employee: employeeId,
@@ -484,6 +604,20 @@ export class GetController {
     } = req;
 
     try {
+      const existingEmployee = await prisma.employee.count({
+        where: {
+          id_employee: employeeId,
+        },
+      });
+
+      if (!existingEmployee) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El empleado no existe',
+        });
+        return;
+      }
+
       const extraHours = await prisma.extra_hours.findMany({
         where: {
           id_employee: employeeId,
@@ -711,24 +845,27 @@ export class GetController {
           description:
             familyMember.family_relationship_type.family_relationship_type,
         },
-        address: {
-          street: {
-            id: familyMember.person.address.street.street_api_id,
-            description: familyMember.person.address.street.street,
-          },
-          streetNumber: familyMember.person.address.street_number,
-          apt: familyMember.person.address.door,
-          locality: {
-            id: familyMember.person.address.street.locality.locality_api_id,
-            description: familyMember.person.address.street.locality.locality,
-          },
-          state: {
-            id: familyMember.person.address.street.locality.province
-              .province_api_id,
-            description:
-              familyMember.person.address.street.locality.province.province,
-          },
-        },
+        address: familyMember.address
+          ? {
+              street: {
+                id: familyMember.person.address.street.street_api_id,
+                description: familyMember.person.address.street.street,
+              },
+              streetNumber: familyMember.person.address.street_number,
+              apt: familyMember.person.address.door,
+              locality: {
+                id: familyMember.person.address.street.locality.locality_api_id,
+                description:
+                  familyMember.person.address.street.locality.locality,
+              },
+              state: {
+                id: familyMember.person.address.street.locality.province
+                  .province_api_id,
+                description:
+                  familyMember.person.address.street.locality.province.province,
+              },
+            }
+          : null,
       };
 
       res.json({

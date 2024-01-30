@@ -18,6 +18,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'no-console': 'off',
     'no-unused-vars': 'warn',
+    'import/no-extraneous-dependencies': 'off',
   },
   ignorePatterns: ['node_modules', 'dist', 'config'],
 };

@@ -85,9 +85,17 @@ export const ENDPOINTS = {
   },
 };
 
-export const getEndpoint = (category, endpoint) => {
+export const getEndpoint = (category, endpoint, ...replaceValues) => {
   const endpoints = ENDPOINTS[category];
   const rootEndpoint = endpoints.ROOT;
 
-  return `/api/v1/${rootEndpoint}${endpoint}`;
+  let finalEndpoint = endpoint;
+  if (replaceValues) {
+    // find the first parameter in the link and replace it with the value
+    replaceValues.forEach((replaceValue) => {
+      finalEndpoint = finalEndpoint.replace(/:\w+/, replaceValue);
+    });
+  }
+
+  return `/api/v1${rootEndpoint}${finalEndpoint}`;
 };
