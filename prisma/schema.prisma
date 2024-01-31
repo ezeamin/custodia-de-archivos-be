@@ -84,7 +84,7 @@ model employee_doc {
   id_employee             String    @db.Uuid
   id_submitted_by         String    @db.Uuid
   employee_doc_url        String    @db.VarChar(250)
-  employee_doc_name       String    @db.VarChar(50)
+  employee_doc_name       String    @db.VarChar(250)
   employee_doc_isactive   Boolean   @default(true)
   employee_doc_created_at DateTime  @default(now()) @db.Timestamp(6)
   employee_doc_updated_at DateTime? @default(now()) @db.Timestamp(6)
@@ -265,6 +265,7 @@ model notification_type {
   end_hour                   String                      @db.Char(5)
   description_notification   String                      @db.VarChar(200)
   notification_type_isactive Boolean                     @default(true)
+  can_modify                 Boolean                     @default(true)
   notification               notification[]
   notification_allowed_role  notification_allowed_role[]
 }
