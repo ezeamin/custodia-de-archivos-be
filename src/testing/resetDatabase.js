@@ -29,6 +29,7 @@ async function truncateTables() {
   await prisma.family_relationship_type.deleteMany();
   await prisma.area.deleteMany();
   await prisma.civil_status_type.deleteMany();
+  await prisma.notification_allowed_role.deleteMany();
   await prisma.notification_receiver.deleteMany();
   await prisma.notification_doc.deleteMany();
   await prisma.notification.deleteMany();
@@ -127,14 +128,17 @@ async function insertData() {
       {
         id_user_type: '32deb906-6292-4908-9cfc-02394fd4ab28',
         user_type: 'admin',
+        user_type_label: 'Administrador',
       },
       {
         id_user_type: '62ffb154-64a6-4b87-9486-3bb7b14a77f3',
         user_type: 'employee',
+        user_type_label: 'Empleado',
       },
       {
         id_user_type: '5fc9c68b-34f3-45aa-ba54-9305515b8bcb',
         user_type: 'third_party',
+        user_type_label: 'Solo Lectura',
       },
     ],
   });

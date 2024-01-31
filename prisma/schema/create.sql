@@ -103,7 +103,8 @@ CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
 
 CREATE TABLE public.user_type (
     id_user_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
-    user_type           varchar(15) NOT NULL UNIQUE,
+    user_type           varchar(20) NOT NULL UNIQUE,
+    user_type_label     varchar(30) NOT NULL,
     user_type_isactive  boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_user_type PRIMARY KEY (id_user_type)
 );
@@ -338,10 +339,19 @@ CREATE TABLE public.notification_type (
     title_notification          varchar(100) NOT NULL,
     start_hour                  char(5) NOT NULL,
     end_hour                    char(5) NOT NULL,
-    -- TODO: Check if this is the correct way to store the roles
-    allowed_roles               varchar(200) NOT NULL,
+    description_notification    varchar(200) NOT NULL,
     notification_type_isactive  boolean DEFAULT true NOT NULL ,
     CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
+);
+
+CREATE TABLE public.notification_allowed_role (
+    id_notification_allowed_role        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_notification_type                UUID NOT NULL,
+    id_user_type                        UUID NOT NULL,
+    notification_allowed_role_isactive   boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_notification_allowed_role PRIMARY KEY (id_notification_allowed_role),
+    CONSTRAINT fk_notification_type FOREIGN KEY (id_notification_type) REFERENCES public.notification_type(id_notification_type),
+    CONSTRAINT fk_user_type FOREIGN KEY (id_user_type) REFERENCES public.user_type(id_user_type)
 );
 
 CREATE TABLE public.receiver_type (
@@ -356,13 +366,12 @@ CREATE TABLE public.notification (
     id_notification_type       UUID NOT NULL,
     id_sender                  UUID NOT NULL,
     message                    varchar(500) NOT NULL,
-    read_status                boolean NOT NULL,
     notification_isactive      boolean DEFAULT true NOT NULL,
     notification_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     notification_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_notification PRIMARY KEY (id_notification),
     CONSTRAINT fk_notification_type FOREIGN KEY (id_notification_type) REFERENCES public.notification_type(id_notification_type),
-    CONSTRAINT fk_notification_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user)
+    CONSTRAINT fk_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user)
 );
 
 CREATE TABLE public.notification_receiver (
@@ -370,6 +379,7 @@ CREATE TABLE public.notification_receiver (
     id_notification                     UUID NOT NULL,
     id_receiver_type                    UUID NOT NULL,
     id_receiver                         UUID NOT NULL,
+    has_read_notification               boolean DEFAULT false NOT NULL,
     notification_receiver_isactive      boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_notification_receiver PRIMARY KEY (id_notification_receiver),
     CONSTRAINT fk_notification_receiver_notification FOREIGN KEY (id_notification) REFERENCES public.notification(id_notification),
@@ -669,10 +679,10 @@ INSERT INTO public.employee_status (id_status, "status") VALUES
   ('018d3b85-ad41-705d-b6ac-eff17a2cbb63','inactive'),
   ('018d3b85-ad41-74b8-9bd4-9f7b27b02176','deleted');
 
-INSERT INTO public.user_type (id_user_type, user_type) VALUES
-  ('32deb906-6292-4908-9cfc-02394fd4ab28','admin'),
-  ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee'),
-  ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
+INSERT INTO public.user_type (id_user_type, user_type, user_type_label) VALUES
+  ('32deb906-6292-4908-9cfc-02394fd4ab28','admin', 'Administrador'),
+  ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee', 'Empleado'),
+  ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party', 'Solo Lectura');
 
 INSERT INTO public.family_relationship_type (id_family_relationship_type, family_relationship_type) VALUES
   ('018d4131-99a7-7301-95f5-f1851f99af92','Padre'),

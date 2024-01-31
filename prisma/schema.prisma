@@ -41,6 +41,13 @@ model area {
   employee      employee[]
 }
 
+model civil_status_type {
+  id_civil_status_type       String   @id(map: "pk_civil_status_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  civil_status_type          String   @unique @db.VarChar(20)
+  civil_status_type_isactive Boolean  @default(true)
+  person                     person[]
+}
+
 model employee {
   id_employee         String             @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_person           String             @unique @db.Uuid
@@ -118,6 +125,19 @@ model extra_hours {
   extra_hours_updated_at  DateTime? @default(now()) @db.Timestamp(6)
   employee                employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_extra_hours_employee")
   user                    user      @relation(fields: [id_submitted_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_extra_hours_submitted_by")
+}
+
+model family_member {
+  id_family_member         String                   @id(map: "pk_family_member") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_person                String                   @db.Uuid
+  id_employee              String                   @db.Uuid
+  id_relationship_type     String                   @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  family_member_isactive   Boolean                  @default(true)
+  family_member_created_at DateTime                 @default(now()) @db.Timestamp(6)
+  family_member_updated_at DateTime?                @default(now()) @db.Timestamp(6)
+  employee                 employee                 @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_member_employee")
+  person                   person                   @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_member_person")
+  family_relationship_type family_relationship_type @relation(fields: [id_relationship_type], references: [id_family_relationship_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_member_relationship_type")
 }
 
 model family_relationship_type {
@@ -204,18 +224,17 @@ model login {
 }
 
 model notification {
-  id_notification                   String                  @id(map: "pk_notification") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_notification_type              String                  @db.Uuid
-  id_sender                         String                  @db.Uuid
-  message                           String                  @db.VarChar(500)
-  read_status                       Boolean
-  notification_isactive             Boolean                 @default(true)
-  notification_created_at           DateTime                @default(now()) @db.Timestamp(6)
-  notification_updated_at           DateTime?               @default(now()) @db.Timestamp(6)
-  user_notification_id_senderTouser user                    @relation("notification_id_senderTouser", fields: [id_sender], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_sender")
-  notification_type                 notification_type       @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
-  notification_doc                  notification_doc[]
-  notification_receiver             notification_receiver[]
+  id_notification         String                  @id(map: "pk_notification") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_notification_type    String                  @db.Uuid
+  id_sender               String                  @db.Uuid
+  message                 String                  @db.VarChar(500)
+  notification_isactive   Boolean                 @default(true)
+  notification_created_at DateTime                @default(now()) @db.Timestamp(6)
+  notification_updated_at DateTime?               @default(now()) @db.Timestamp(6)
+  notification_type       notification_type       @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
+  user                    user                    @relation(fields: [id_sender], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_sender")
+  notification_doc        notification_doc[]
+  notification_receiver   notification_receiver[]
 }
 
 model notification_doc {
@@ -228,14 +247,26 @@ model notification_doc {
   notification                notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_doc_notification")
 }
 
+model notification_receiver {
+  id_notification_receiver       String        @id(map: "pk_notification_receiver") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_notification                String        @db.Uuid
+  id_receiver_type               String        @db.Uuid
+  id_receiver                    String        @db.Uuid
+  has_read_notification          Boolean       @default(false)
+  notification_receiver_isactive Boolean       @default(true)
+  notification                   notification  @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receiver_notification")
+  receiver_type                  receiver_type @relation(fields: [id_receiver_type], references: [id_receiver_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receiver_receiver_type")
+}
+
 model notification_type {
-  id_notification_type       String         @id(map: "pk_notification_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  title_notification         String         @db.VarChar(100)
-  start_hour                 String         @db.Char(5)
-  end_hour                   String         @db.Char(5)
-  allowed_roles              String         @db.VarChar(200)
-  notification_type_isactive Boolean        @default(true)
+  id_notification_type       String                      @id(map: "pk_notification_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  title_notification         String                      @db.VarChar(100)
+  start_hour                 String                      @db.Char(5)
+  end_hour                   String                      @db.Char(5)
+  description_notification   String                      @db.VarChar(200)
+  notification_type_isactive Boolean                     @default(true)
   notification               notification[]
+  notification_allowed_role  notification_allowed_role[]
 }
 
 model person {
@@ -274,6 +305,13 @@ model province {
   province_api_id String     @unique @db.VarChar(20)
   province        String     @unique @db.VarChar(50)
   locality        locality[]
+}
+
+model receiver_type {
+  id_receiver_type       String                  @id(map: "pk_receiver_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  receiver_type          String                  @unique @db.VarChar(20)
+  receiver_type_isactive Boolean                 @default(true)
+  notification_receiver  notification_receiver[]
 }
 
 model street {
@@ -320,37 +358,39 @@ model training_type {
 }
 
 model user {
-  id_user                                   String             @id(map: "pk_user") @unique(map: "unq_id_user") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_user_type                              String             @db.Uuid
-  id_employee                               String?            @db.Uuid
-  id_third_party                            String?            @db.Uuid
-  username                                  String             @unique @db.VarChar(8)
-  password                                  String             @db.VarChar(100)
-  has_changed_def_pass                      Boolean            @default(false)
-  user_isactive                             Boolean            @default(true)
-  user_created_at                           DateTime           @default(now()) @db.Timestamp(6)
-  user_updated_at                           DateTime?          @default(now()) @db.Timestamp(6)
-  absence                                   absence[]
-  employee_doc                              employee_doc[]
-  employee_history                          employee_history[]
-  extra_hours                               extra_hours[]
-  formal_warning                            formal_warning[]
-  late_arrival                              late_arrival[]
-  license                                   license[]
-  login                                     login[]
-  notification_notification_id_senderTouser notification[]     @relation("notification_id_senderTouser")
-  training                                  training[]
-  employee                                  employee?          @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_employee")
-  third_party                               third_party?       @relation(fields: [id_third_party], references: [id_third_party], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_third_party")
-  user_type                                 user_type          @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
-  vacation                                  vacation[]
+  id_user              String             @id(map: "pk_user") @unique(map: "unq_id_user") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_user_type         String             @db.Uuid
+  id_employee          String?            @db.Uuid
+  id_third_party       String?            @db.Uuid
+  username             String             @unique @db.VarChar(8)
+  password             String             @db.VarChar(100)
+  has_changed_def_pass Boolean            @default(false)
+  user_isactive        Boolean            @default(true)
+  user_created_at      DateTime           @default(now()) @db.Timestamp(6)
+  user_updated_at      DateTime?          @default(now()) @db.Timestamp(6)
+  absence              absence[]
+  employee_doc         employee_doc[]
+  employee_history     employee_history[]
+  extra_hours          extra_hours[]
+  formal_warning       formal_warning[]
+  late_arrival         late_arrival[]
+  license              license[]
+  login                login[]
+  notification         notification[]
+  training             training[]
+  employee             employee?          @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_employee")
+  third_party          third_party?       @relation(fields: [id_third_party], references: [id_third_party], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_third_party")
+  user_type            user_type          @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
+  vacation             vacation[]
 }
 
 model user_type {
-  id_user_type       String  @id(map: "pk_user_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  user_type          String  @unique @db.VarChar(15)
-  user_type_isactive Boolean @default(true)
-  user               user[]
+  id_user_type              String                      @id(map: "pk_user_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  user_type                 String                      @unique @db.VarChar(20)
+  user_type_label           String                      @db.VarChar(30)
+  user_type_isactive        Boolean                     @default(true)
+  notification_allowed_role notification_allowed_role[]
+  user                      user[]
 }
 
 model vacation {
@@ -367,39 +407,11 @@ model vacation {
   user                 user      @relation(fields: [id_submitted_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_vacations_submitted_by")
 }
 
-model civil_status_type {
-  id_civil_status_type       String   @id(map: "pk_civil_status_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  civil_status_type          String   @unique @db.VarChar(20)
-  civil_status_type_isactive Boolean  @default(true)
-  person                     person[]
-}
-
-model family_member {
-  id_family_member         String                   @id(map: "pk_family_member") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_person                String                   @db.Uuid
-  id_employee              String                   @db.Uuid
-  id_relationship_type     String                   @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  family_member_isactive   Boolean                  @default(true)
-  family_member_created_at DateTime                 @default(now()) @db.Timestamp(6)
-  family_member_updated_at DateTime?                @default(now()) @db.Timestamp(6)
-  employee                 employee                 @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_member_employee")
-  person                   person                   @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_member_person")
-  family_relationship_type family_relationship_type @relation(fields: [id_relationship_type], references: [id_family_relationship_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_family_member_relationship_type")
-}
-
-model notification_receiver {
-  id_notification_receiver       String        @id(map: "pk_notification_receiver") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_notification                String        @db.Uuid
-  id_receiver_type               String        @db.Uuid
-  id_receiver                    String        @db.Uuid
-  notification_receiver_isactive Boolean       @default(true)
-  notification                   notification  @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receiver_notification")
-  receiver_type                  receiver_type @relation(fields: [id_receiver_type], references: [id_receiver_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receiver_receiver_type")
-}
-
-model receiver_type {
-  id_receiver_type       String                  @id(map: "pk_receiver_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  receiver_type          String                  @unique @db.VarChar(20)
-  receiver_type_isactive Boolean                 @default(true)
-  notification_receiver  notification_receiver[]
+model notification_allowed_role {
+  id_notification_allowed_role       String            @id(map: "pk_notification_allowed_role") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_notification_type               String            @db.Uuid
+  id_user_type                       String            @db.Uuid
+  notification_allowed_role_isactive Boolean           @default(true)
+  notification_type                  notification_type @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
+  user_type                          user_type         @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")
 }

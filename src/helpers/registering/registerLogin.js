@@ -9,7 +9,7 @@ export const registerLogin = async (req, id_user) => {
   try {
     await prisma.login.create({
       data: {
-        ip_address: ip === '::1' ? trueClientIp : 'Desconocido',
+        ip_address: ip === '::1' && trueClientIp ? trueClientIp : 'Desconocido',
         user_agent: userAgent || '',
         id_user,
       },

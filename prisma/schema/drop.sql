@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS public.gender CASCADE;
 DROP TABLE IF EXISTS public.family CASCADE;
 DROP TABLE IF EXISTS public.family_relationship_type CASCADE;
 DROP TABLE IF EXISTS public.area CASCADE;
+DROP TABLE IF EXISTS public.notification_allowed_role CASCADE;
 DROP TABLE IF EXISTS public.notification_receiver CASCADE;
 DROP TABLE IF EXISTS public.notification_doc CASCADE;
 DROP TABLE IF EXISTS public.notification CASCADE;

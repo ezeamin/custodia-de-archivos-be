@@ -60,7 +60,6 @@ export const ENDPOINTS = {
     GET_TYPE: '/types/:typeId',
     POST_NOTIFICATION: '/',
     POST_TYPE: '/types',
-    PUT_READ_NOTIFICATION: '/:notificationId/read',
     PUT_TYPE: '/types/:typeId',
     DELETE_TYPE: '/types/:typeId',
   },

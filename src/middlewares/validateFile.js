@@ -1,5 +1,5 @@
-export const validateFile = (req, res, next, fileName) => {
-  if (!req.file || (Array.isArray(req.file) && !req.file[fileName])) {
+export const validateFile = (req, res, next) => {
+  if (!req.file && !req.files) {
     res.status(400).json({
       data: null,
       message: 'No se subió el archivo requerido',

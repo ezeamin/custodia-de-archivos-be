@@ -56,17 +56,26 @@ export class GetController {
     }
   }
 
-  static async roles(_, res) {
+  static async roles(req, res) {
+    const {
+      query: { notifications = false },
+    } = req;
+
     try {
-      const data = await prisma.user_type.findMany({
+      let data = await prisma.user_type.findMany({
         where: {
           user_type_isactive: true,
         },
       });
 
+      // Filter out "third_party" user type for allowed roles in notifications form
+      if (notifications) {
+        data = data.filter((item) => item.user_type !== 'third_party');
+      }
+
       const formattedData = data.map((item) => ({
         id: item.id_user_type,
-        description: item.user_type,
+        description: item.user_type_label,
       }));
 
       res.json({
