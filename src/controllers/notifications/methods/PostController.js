@@ -7,11 +7,42 @@ export class PostController {
   static async createNotification(req, res) {
     const {
       body: { typeId, receivers, message },
-      user: { id: userId },
+      user: { id: userId, role: userRole },
       files,
     } = req;
 
     let docs = [];
+
+    // Check if user can create this type of notification
+    try {
+      const allowedRoles = await prisma.notification_allowed_role.findMany({
+        where: {
+          id_notification_type: typeId,
+        },
+        include: {
+          user_type: true,
+        },
+      });
+
+      const allowedRolesNames = allowedRoles.map((role) =>
+        role.user_type.user_type.toUpperCase(),
+      );
+
+      if (!allowedRolesNames.includes(userRole.toUpperCase())) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          data: null,
+          message: 'No tiene permisos para crear este tipo de notificación',
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('🟥', error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al crear la notificacion',
+      });
+      return;
+    }
 
     if (files) {
       // Check file size
@@ -26,13 +57,21 @@ export class PostController {
           });
           return;
         }
+        if (file.originalname.length > 250) {
+          res.status(HttpStatus.BAD_REQUEST).json({
+            data: null,
+            message: `El nombre del archivo "${file.originalname}" es demasiado largo. El máximo permitido es de 250 caracteres`,
+          });
+          return;
+        }
       }
 
       // Upload files to cloudinary
       const uploadPromises = [];
       for (let i = 0; i < files.length; i += 1) {
         try {
-          const uploadPromise = handleUpload(req, true);
+          const file = files[i];
+          const uploadPromise = handleUpload(file, true);
           uploadPromises.push(uploadPromise);
         } catch (e) {
           console.error('🟥', e);

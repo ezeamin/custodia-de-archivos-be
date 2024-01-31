@@ -340,6 +340,7 @@ CREATE TABLE public.notification_type (
     start_hour                  char(5) NOT NULL,
     end_hour                    char(5) NOT NULL,
     description_notification    varchar(200) NOT NULL,
+    can_modify                  boolean DEFAULT true NOT NULL,
     notification_type_isactive  boolean DEFAULT true NOT NULL ,
     CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
 );
@@ -404,7 +405,7 @@ CREATE TABLE public.notification_doc (
     id_notification_doc               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_notification                   UUID NOT NULL,
     notification_doc_url              varchar(250) NOT NULL,
-    notification_doc_name             varchar(50) NOT NULL,
+    notification_doc_name             varchar(250) NOT NULL,
     notification_doc_created_at       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     notification_doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_notification_doc PRIMARY KEY (id_notification_doc),
@@ -727,6 +728,21 @@ VALUES (
     '1967-02-07',
     '17860733'
 );
+
+INSERT INTO public.notification_type (id_notification_type,title_notification,start_hour,end_hour,description_notification,can_modify)
+VALUES (
+    '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
+    'Respuesta',
+    '00:00',
+    '23:59',
+    'Tipo de notificación que permite responder a otra notificación enviada. Utilizarlo solo como respuesta, y no al crear una notificación desde cero.',
+    FALSE
+);
+
+INSERT INTO public.notification_allowed_role (id_notification_allowed_role,id_notification_type,id_user_type)
+VALUES 
+    ('018d61a4-9f1e-7188-8d62-35a1d3399e22','018d6192-a7fd-725a-b5a3-8f667a9a53eb','32deb906-6292-4908-9cfc-02394fd4ab28'),
+    ('018d61a4-9f1e-7188-8d62-35a1d3399e23','018d6192-a7fd-725a-b5a3-8f667a9a53eb','62ffb154-64a6-4b87-9486-3bb7b14a77f3');
 
 -- Insert example employee
 INSERT INTO public.employee (id_employee,id_person,id_status,id_area,no_file,email,employment_date,position,working_hours,picture_url)

@@ -18,11 +18,11 @@ const parser = new DatauriParser();
 
 const imageFormats = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-export const handleUpload = async (req, privateDoc = false) => {
-  const extName = path.extname(req.file.originalname).toString();
-  const file64 = parser.format(extName, req.file.buffer);
+export const handleUpload = async (file, privateDoc = false) => {
+  const extName = path.extname(file.originalname).toString();
+  const file64 = parser.format(extName, file.buffer);
 
-  const sanitizedFileName = req.file.originalname
+  const sanitizedFileName = file.originalname
     .toLowerCase()
     .replace(/[\s/\\:*?"<>|ñáéíóú]/g, '_')
     .replace(/ñ/g, 'n')

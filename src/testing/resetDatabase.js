@@ -229,6 +229,33 @@ async function insertData() {
     ],
   });
 
+  await prisma.notification_type.create({
+    data: {
+      id_notification_type: '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
+      title_notification: 'Respuesta',
+      start_hour: '00:00',
+      end_hour: '23:59',
+      description_notification:
+        'Tipo de notificación que permite responder a otra notificación enviada. Utilizarlo solo como respuesta, y no al crear una notificación desde cero.',
+      can_modify: false,
+    },
+  });
+
+  await prisma.notification_allowed_role.createMany({
+    data: [
+      {
+        id_notification_allowed_role: '018d61a4-9f1e-7188-8d62-35a1d3399e22',
+        id_notification_type: '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
+        id_user_type: '32deb906-6292-4908-9cfc-02394fd4ab28',
+      },
+      {
+        id_notification_allowed_role: '018d61a4-9f1e-7188-8d62-35a1d3399e23',
+        id_notification_type: '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
+        id_user_type: '62ffb154-64a6-4b87-9486-3bb7b14a77f3',
+      },
+    ],
+  });
+
   // Example person
   await prisma.person.create({
     data: {

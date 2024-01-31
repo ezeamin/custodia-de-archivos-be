@@ -307,7 +307,7 @@ export class PutController {
 
     // Upload image to cloudinary
     try {
-      const { url } = await handleUpload(req);
+      const { url } = await handleUpload(req.file);
 
       const splitUrl = url.split('/upload/');
       imageUrl = `${splitUrl[0]}/upload/w_300,h_300,c_fill,g_face/${splitUrl[1]}`;

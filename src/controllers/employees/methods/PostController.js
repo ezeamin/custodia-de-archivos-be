@@ -32,7 +32,7 @@ export class PostController {
 
     // Upload image to cloudinary
     try {
-      const { url } = await handleUpload(req);
+      const { url } = await handleUpload(req.file);
 
       const splitUrl = url.split('/upload/');
       imageUrl = `${splitUrl[0]}/upload/w_300,h_300,c_fill,g_face/${splitUrl[1]}`;
@@ -230,7 +230,7 @@ export class PostController {
 
     // Upload file to cloudinary
     try {
-      const { url } = await handleUpload(req, true);
+      const { url } = await handleUpload(req.file, true);
       docUrl = url;
     } catch (e) {
       console.error('🟥', e);

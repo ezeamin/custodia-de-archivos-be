@@ -3,6 +3,8 @@ import HttpStatus from 'http-status-codes';
 import { prisma } from '../../../helpers/prisma.js';
 import { formatNotifications } from '../../../helpers/formatters/formatNotifications.js';
 
+const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
+
 export class GetController {
   static async notifications(req, res) {
     const {
@@ -159,13 +161,20 @@ export class GetController {
     }
   }
 
-  static async notificationReceivers(_, res) {
+  static async notificationReceivers(req, res) {
+    const {
+      user: { id: userId },
+    } = req;
+
     try {
       const usersPromise = prisma.user.findMany({
         where: {
           user_isactive: true,
           user_type: {
             user_type: 'employee',
+          },
+          NOT: {
+            id_user: userId,
           },
         },
         include: {
@@ -175,19 +184,65 @@ export class GetController {
             },
           },
         },
+        orderBy: {
+          employee: {
+            person: {
+              surname: 'asc',
+            },
+          },
+        },
+      });
+
+      const adminUsersPromise = prisma.user.findMany({
+        where: {
+          user_isactive: true,
+          user_type: {
+            user_type: 'admin',
+          },
+          NOT: {
+            id_user: userId,
+          },
+        },
+        include: {
+          employee: {
+            include: {
+              person: true,
+            },
+          },
+        },
+        orderBy: {
+          employee: {
+            person: {
+              surname: 'asc',
+            },
+          },
+        },
       });
 
       const areasPromise = prisma.area.findMany({
         where: {
           area_isactive: true,
         },
+        orderBy: {
+          area: 'asc',
+        },
       });
 
-      const [users, areas] = await Promise.all([usersPromise, areasPromise]);
+      const [users, admins, areas] = await Promise.all([
+        usersPromise,
+        adminUsersPromise,
+        areasPromise,
+      ]);
 
       const formattedUsers = users.map((user) => ({
         id: user.id_user,
         description: `Empleado - ${user.employee.person.surname}, ${user.employee.person.name}`,
+        type: 'user',
+      }));
+
+      const formattedAdmins = admins.map((admin) => ({
+        id: admin.id_user,
+        description: `Administrador - ${admin.employee.person.surname}, ${admin.employee.person.name}`,
         type: 'user',
       }));
 
@@ -197,7 +252,23 @@ export class GetController {
         type: 'area',
       }));
 
-      const receivers = [...formattedUsers, ...formattedAreas];
+      // Take "Area - Todos los empleados" to top - ALL_EMPLOYEES_ID = 018d3b85-ad41-789e-b615-cd610c5c12ef
+      const allEmployeesArea = formattedAreas.find(
+        (a) => a.id === ALL_EMPLOYEES_ID,
+      );
+      if (allEmployeesArea) {
+        formattedAreas.splice(formattedAreas.indexOf(allEmployeesArea), 1);
+        formattedAreas.unshift({
+          ...allEmployeesArea,
+          description: 'Todos los empleados',
+        });
+      }
+
+      const receivers = [
+        ...formattedAreas,
+        ...formattedAdmins,
+        ...formattedUsers,
+      ];
 
       res.json({
         data: receivers,
@@ -214,10 +285,13 @@ export class GetController {
 
   static async notificationTypes(_, res) {
     try {
-      const notificationTypes = await prisma.notification_type.findMany();
-      const allowedRoles = await prisma.notification_allowed_role.findMany({
+      const notificationTypes = await prisma.notification_type.findMany({
         include: {
-          user_type: true,
+          notification_allowed_role: {
+            include: {
+              user_type: true,
+            },
+          },
         },
       });
 
@@ -227,7 +301,8 @@ export class GetController {
         description: type.description_notification,
         startHour: type.start_hour,
         endHour: type.end_hour,
-        allowedRoles: allowedRoles
+        canModify: type.can_modify,
+        allowedRoles: type.notification_allowed_role
           .filter(
             (role) => role.id_notification_type === type.id_notification_type,
           )
