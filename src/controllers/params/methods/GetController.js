@@ -108,11 +108,16 @@ export class GetController {
     }
   }
 
-  static async areas(_, res) {
+  static async areas(req, res) {
+    const {
+      query: { filterAssignable = false },
+    } = req;
+
     try {
       const data = await prisma.area.findMany({
         where: {
           area_isactive: true,
+          ...(filterAssignable ? { is_assignable: true } : {}),
         },
       });
 

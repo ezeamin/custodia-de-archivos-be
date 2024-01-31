@@ -13,6 +13,8 @@ export class GetController {
   }
 
   static async notificationReceivers(req, res) {
+    // Should show all users and all areas
+    // Send info with receiver_type id included
     res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
   }
 

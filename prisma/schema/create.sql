@@ -6,6 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_uuidv7";
 CREATE TABLE public.area (
     id_area         UUID DEFAULT uuid_generate_v7() NOT NULL,
     area            varchar(20) NOT NULL UNIQUE,
+    is_assignable    boolean DEFAULT true NOT NULL,
     area_isactive   boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_area PRIMARY KEY (id_area)
 );
@@ -247,17 +248,6 @@ CREATE TABLE public.license_type (
     CONSTRAINT pk_license_type PRIMARY KEY (id_license_type)
 );
 
-CREATE TABLE public.notification_type (
-    id_notification_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
-    title_notification          varchar(100) NOT NULL,
-    start_hour                  char(5) NOT NULL,
-    end_hour                    char(5) NOT NULL,
-    -- TODO: Check if this is the correct way to store the roles
-    allowed_roles               varchar(200) NOT NULL,
-    notification_type_isactive  boolean DEFAULT true NOT NULL ,
-    CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
-);
-
 CREATE TABLE public.training_type (
     id_training_type                UUID DEFAULT uuid_generate_v7() NOT NULL,
     title_training_type             varchar(30) NOT NULL UNIQUE,
@@ -343,11 +333,28 @@ CREATE TABLE public.login (
     CONSTRAINT fk_login_user FOREIGN KEY (id_user) REFERENCES public."user"(id_user)
 );
 
+CREATE TABLE public.notification_type (
+    id_notification_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    title_notification          varchar(100) NOT NULL,
+    start_hour                  char(5) NOT NULL,
+    end_hour                    char(5) NOT NULL,
+    -- TODO: Check if this is the correct way to store the roles
+    allowed_roles               varchar(200) NOT NULL,
+    notification_type_isactive  boolean DEFAULT true NOT NULL ,
+    CONSTRAINT pk_notification_type PRIMARY KEY (id_notification_type)
+);
+
+CREATE TABLE public.receiver_type (
+    id_receiver_type        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    receiver_type           varchar(20) NOT NULL UNIQUE,
+    receiver_type_isactive  boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_receiver_type PRIMARY KEY (id_receiver_type)
+);
+
 CREATE TABLE public.notification (
     id_notification            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_notification_type       UUID NOT NULL,
     id_sender                  UUID NOT NULL,
-    id_receptor                UUID NOT NULL,
     message                    varchar(500) NOT NULL,
     read_status                boolean NOT NULL,
     notification_isactive      boolean DEFAULT true NOT NULL,
@@ -355,8 +362,18 @@ CREATE TABLE public.notification (
     notification_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_notification PRIMARY KEY (id_notification),
     CONSTRAINT fk_notification_type FOREIGN KEY (id_notification_type) REFERENCES public.notification_type(id_notification_type),
-    CONSTRAINT fk_notification_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user),
-    CONSTRAINT fk_notification_receptor FOREIGN KEY (id_receptor) REFERENCES public."user"(id_user)
+    CONSTRAINT fk_notification_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user)
+);
+
+CREATE TABLE public.notification_receiver (
+    id_notification_receiver            UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_notification                     UUID NOT NULL,
+    id_receiver_type                    UUID NOT NULL,
+    id_receiver                         UUID NOT NULL,
+    notification_receiver_isactive      boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_notification_receiver PRIMARY KEY (id_notification_receiver),
+    CONSTRAINT fk_notification_receiver_notification FOREIGN KEY (id_notification) REFERENCES public.notification(id_notification),
+    CONSTRAINT fk_notification_receiver_receiver_type FOREIGN KEY (id_receiver_type) REFERENCES public.receiver_type(id_receiver_type)
 );
 
 CREATE TABLE public.employee_doc (
@@ -632,18 +649,19 @@ VALUES
     ('018d3b85-ad41-7211-91f3-c9c1a59d7d75','Femenino'),
     ('018d3b85-ad41-7604-be77-b3668698a7da','Otro');
 
-INSERT INTO public.area (id_area,area)
+INSERT INTO public.area (id_area,area,is_assignable)
 VALUES
-    ('018d3b85-ad41-77e2-aaa7-4fcc12ba0132','Mantenimiento'),
-    ('018d3b85-ad41-7ebf-b39d-2f042aeef39b','Administración'),
-    ('018d3b85-ad41-7b89-a115-53129e20a558','Almacenamiento'),
-    ('018d3b85-ad41-752d-96dc-550186aafccd','Ventas'),
-    ('018d3b85-ad41-7ce6-a177-930a835ca677','Compras'),
-    ('018d3b85-ad41-752f-972c-30102846b42c','Producción'),
-    ('018d3b85-ad41-7d49-b328-b71e34a42396','Recursos Humanos'),
-    ('018d3b85-ad41-74d4-a5b5-8c08718dbce8','Contabilidad'),
-    ('018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a','Sistemas'),
-    ('018d3b85-ad41-789e-b615-cd610c5c131f','Gerencia');
+    ('018d3b85-ad41-77e2-aaa7-4fcc12ba0132','Mantenimiento',TRUE),
+    ('018d3b85-ad41-7ebf-b39d-2f042aeef39b','Administración',TRUE),
+    ('018d3b85-ad41-7b89-a115-53129e20a558','Almacenamiento',TRUE),
+    ('018d3b85-ad41-752d-96dc-550186aafccd','Ventas',TRUE),
+    ('018d3b85-ad41-7ce6-a177-930a835ca677','Compras',TRUE),
+    ('018d3b85-ad41-752f-972c-30102846b42c','Producción',TRUE),
+    ('018d3b85-ad41-7d49-b328-b71e34a42396','Recursos Humanos',TRUE),
+    ('018d3b85-ad41-74d4-a5b5-8c08718dbce8','Contabilidad',TRUE),
+    ('018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a','Sistemas',TRUE),
+    ('018d3b85-ad41-789e-b615-cd610c5c131f','Gerencia',TRUE),
+    ('018d3b85-ad41-789e-b615-cd610c5c12ef','Todos los empleados',FALSE);
 
 INSERT INTO public.employee_status (id_status, "status") VALUES
   ('018d3b85-ad41-70bf-a4b3-b248a73b7bf8','active'),
@@ -674,6 +692,10 @@ INSERT INTO public.civil_status_type (id_civil_status_type, civil_status_type) V
   ('018d55f4-5cc5-7afe-a15f-62810780270b','Casado/a'),
   ('018d55f4-6c3e-7180-9045-da30c7077cd3','Divorciado/a'),
   ('018d55f4-7aba-72f9-af8e-744af2b9b83f','Viudo/a');
+
+INSERT INTO public.receiver_type (id_receiver_type, receiver_type) VALUES
+  ('018d3b85-ad41-7c4d-9b9f-5b1b8a1b1b1b','user'),
+  ('018d3b85-ad41-7c4d-9b9f-5b1b8b1b1b1d','area');
 
 -- Insert example person
 INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)

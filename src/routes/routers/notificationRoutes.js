@@ -1,10 +1,14 @@
 import express from 'express';
 
+import { upload } from '../../helpers/multer.js';
+
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { isAdmin } from '../../middlewares/isAdmin.js';
 
 import { Notifications } from '../../controllers/notifications/index.js';
 import { ENDPOINTS } from '../endpoints.js';
+
+import { validateFile } from '../../middlewares/validateFile.js';
 
 export const notificationRouter = express.Router();
 
@@ -39,6 +43,8 @@ notificationRouter.get(
 notificationRouter.post(
   ENDPOINTS.NOTIFICATIONS.POST_NOTIFICATION,
   isAuthenticated,
+  upload.array('files', 5),
+  (req, res, next) => validateFile(req, res, next),
   Notifications.PostController.createNotification,
 );
 notificationRouter.post(

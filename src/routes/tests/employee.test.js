@@ -6,16 +6,17 @@ import { app } from '../../app.js';
 
 import { ENDPOINTS, getEndpoint } from '../endpoints.js';
 import { envs } from '../../helpers/envs.js';
+import { prisma } from '../../helpers/prisma.js';
 
 const __dirname = path.resolve();
 const IMAGE_FILE_PATH = path.join(__dirname, '/src/testing/sample_img.png');
 
 const {
-  TESTING: { ACCESS_TOKEN },
+  TESTING: { ACCESS_TOKEN_ADMIN, ACCESS_TOKEN_EMPLOYEE },
 } = envs;
 const EMPLOYEE_ID = '018d3b85-ad41-7cca-94c9-0cf50325d9a4';
 const FAMILY_MEMBER_ID = '018d5a99-9686-7b77-b151-eb3cfaefd72c';
-const FAMILY_MEMBER_DNI = '17860733';
+const FAMILY_MEMBER_DNI = '20000000';
 
 const getEndpoints = [
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_DOCS,
@@ -30,12 +31,12 @@ const getEndpoints = [
 ];
 
 describe('2. EMPLOYEE Testing', () => {
-  describe.skip('-- GET ENDPOINTS -- ', () => {
+  describe('-- GET ENDPOINTS -- ', () => {
     describe(`a. GET ${ENDPOINTS.EMPLOYEES.GET_EMPLOYEES}`, () => {
       it('Get correct data - 200', async () => {
         const response = await request(app)
           .get(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.GET_EMPLOYEES))
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.OK);
 
         expect(response.body.data).toBeDefined();
@@ -59,7 +60,7 @@ describe('2. EMPLOYEE Testing', () => {
               EMPLOYEE_ID,
             ),
           )
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.OK);
 
         const { data } = response.body;
@@ -78,7 +79,7 @@ describe('2. EMPLOYEE Testing', () => {
       it('No id - 400', async () => {
         await request(app)
           .get(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.GET_EMPLOYEE))
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.BAD_REQUEST);
       });
 
@@ -91,7 +92,7 @@ describe('2. EMPLOYEE Testing', () => {
               '018d3b85-ad41-7cca-94c9-0cf50325d9a5',
             ),
           )
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.NOT_FOUND);
       });
     });
@@ -102,7 +103,7 @@ describe('2. EMPLOYEE Testing', () => {
         it('Get correct data - 200', async () => {
           const response = await request(app)
             .get(getEndpoint('EMPLOYEES', endpoint, EMPLOYEE_ID))
-            .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+            .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
             .expect(HttpStatus.OK);
 
           expect(response.body.data).toBeDefined();
@@ -118,7 +119,7 @@ describe('2. EMPLOYEE Testing', () => {
         it('No id - 400', async () => {
           await request(app)
             .get(getEndpoint('EMPLOYEES', endpoint))
-            .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+            .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
             .expect(HttpStatus.BAD_REQUEST);
         });
 
@@ -131,7 +132,7 @@ describe('2. EMPLOYEE Testing', () => {
                 '018d3b85-ad41-7cca-94c9-0cf50325d9a5',
               ),
             )
-            .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+            .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
             .expect(HttpStatus.NOT_FOUND);
         });
       });
@@ -148,7 +149,7 @@ describe('2. EMPLOYEE Testing', () => {
               FAMILY_MEMBER_ID,
             ),
           )
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.OK);
 
         expect(response.body.data).toBeDefined();
@@ -179,7 +180,7 @@ describe('2. EMPLOYEE Testing', () => {
               FAMILY_MEMBER_ID,
             ),
           )
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.BAD_REQUEST);
       });
 
@@ -193,7 +194,7 @@ describe('2. EMPLOYEE Testing', () => {
               '_',
             ),
           )
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.BAD_REQUEST);
       });
 
@@ -207,7 +208,7 @@ describe('2. EMPLOYEE Testing', () => {
               '018d3b85-ad41-7cca-94c9-0cf50325d9a5',
             ),
           )
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.NOT_FOUND);
       });
     });
@@ -216,7 +217,7 @@ describe('2. EMPLOYEE Testing', () => {
       it('Get correct data - 200', async () => {
         const response = await request(app)
           .get(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.GET_LICENSES_TYPES))
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.OK);
 
         expect(response.body.data).toBeDefined();
@@ -239,7 +240,7 @@ describe('2. EMPLOYEE Testing', () => {
       it('Get correct data - 200', async () => {
         const response = await request(app)
           .get(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.GET_TRAINING_TYPES))
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .expect(HttpStatus.OK);
 
         expect(response.body.data).toBeDefined();
@@ -261,12 +262,66 @@ describe('2. EMPLOYEE Testing', () => {
 
   describe('-- POST ENDPOINTS -- ', () => {
     describe(`a. POST ${ENDPOINTS.EMPLOYEES.POST_EMPLOYEE}`, () => {
+      let server;
+      beforeAll((done) => {
+        server = app.listen(0, '127.0.0.1', done);
+      });
+
+      afterAll(() => {
+        server.close();
+      });
+
       it('Correct post - 201', async () => {
-        await request(app)
+        const res = await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
-          .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
-          .set('Content-Type', 'multipart/form-data')
-          .attach('imgFile', IMAGE_FILE_PATH)
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
+          .field('name', 'John')
+          .field('lastname', 'Doe')
+          .field('birthdate', '1980-01-01T00:00:00.000Z')
+          .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
+          .field('dni', '12345678')
+          .field('email', 'johndoe123@mail.com')
+          .field('startDate', '1990-01-01T00:00:00.000Z')
+          .field('position', 'Prueba')
+          .field('fileNumber', '1002')
+          .field('areaId', '018d3b85-ad41-77e2-aaa7-4fcc12ba0132')
+          .attach('imgFile', IMAGE_FILE_PATH);
+
+        expect(res.status).toBe(HttpStatus.CREATED);
+        expect(res.body.data).toBeDefined();
+        expect(res.body.data).toEqual(expect.any(Object));
+        expect(res.body.data).toHaveProperty('employeeId');
+
+        // Clean up
+        const { employeeId } = res.body.data;
+        await prisma.employee.delete({
+          where: {
+            id_employee: employeeId,
+          },
+        });
+      });
+
+      it('Missing field - 400', async () => {
+        await request(server)
+          .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
+          .field('name', 'John') // missing imgFile
+          .field('lastname', 'Doe')
+          .field('birthdate', '1980-01-01T00:00:00.000Z')
+          .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
+          .field('dni', '12345678')
+          .field('email', 'johndoe@mail.com')
+          .field('startDate', '1990-01-01T00:00:00.000Z')
+          .field('position', 'Prueba')
+          .field('fileNumber', '1002')
+          .field('areaId', '018d3b85-ad41-77e2-aaa7-4fcc12ba0132')
+          .expect(HttpStatus.BAD_REQUEST);
+      });
+
+      it('Extra field - 400', async () => {
+        await request(server)
+          .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .field('name', 'John')
           .field('lastname', 'Doe')
           .field('birthdate', '1980-01-01T00:00:00.000Z')
@@ -277,12 +332,45 @@ describe('2. EMPLOYEE Testing', () => {
           .field('position', 'Prueba')
           .field('fileNumber', '1002')
           .field('areaId', '018d3b85-ad41-77e2-aaa7-4fcc12ba0132')
-          .expect(HttpStatus.CREATED);
+          .field('extra', 'extra') // extra field
+          .attach('imgFile', IMAGE_FILE_PATH)
+          .expect(HttpStatus.BAD_REQUEST);
+      });
+
+      it('Incorrect data on a field - 400', async () => {
+        await request(server)
+          .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
+          .field('name', 'John')
+          .field('lastname', 'Doe')
+          .field('birthdate', 'hola') // incorrect data
+          .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
+          .field('dni', '12345678')
+          .field('email', 'johndoe@mail.com')
+          .field('startDate', '1990-01-01T00:00:00.000Z')
+          .field('position', 'Prueba')
+          .field('fileNumber', '1002')
+          .field('areaId', '018d3b85-ad41-77e2-aaa7-4fcc12ba0132')
+          .attach('imgFile', IMAGE_FILE_PATH)
+          .expect(HttpStatus.BAD_REQUEST);
+      });
+
+      it('No token - 401', async () => {
+        await request(server)
+          .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
+          .expect(HttpStatus.UNAUTHORIZED);
+      });
+
+      it('No admin token - 403', async () => {
+        await request(server)
+          .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
+          .set('Authorization', `Bearer ${ACCESS_TOKEN_EMPLOYEE}`)
+          .expect(HttpStatus.FORBIDDEN);
       });
     });
   });
 
-  describe('-- PUT ENDPOINTS -- ', () => {});
+  describe.skip('-- PUT ENDPOINTS -- ', () => {});
 
-  describe('-- DELETE ENDPOINTS -- ', () => {});
+  describe.skip('-- DELETE ENDPOINTS -- ', () => {});
 });

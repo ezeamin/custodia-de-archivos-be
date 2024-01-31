@@ -8,13 +8,13 @@ import { envs } from '../../helpers/envs.js';
 
 const {
   TESTING: {
-    ACCESS_TOKEN,
-    REFRESH_TOKEN,
+    REAL_USER_ACCESS_TOKEN: ACCESS_TOKEN,
+    REFRESH_TOKEN_ADMIN,
     USER: { USERNAME, PASSWORD },
   },
 } = envs;
 
-describe.skip('1. AUTH Testing', () => {
+describe('1. AUTH Testing', () => {
   describe('-- POST ENDPOINTS -- ', () => {
     describe(`a. POST ${ENDPOINTS.AUTH.POST_LOGIN}`, () => {
       it('Login OK - 200', async () => {
@@ -62,14 +62,14 @@ describe.skip('1. AUTH Testing', () => {
         await request(app)
           .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGOUT))
           .set('Authorization', `Bearer ${ACCESS_TOKEN}`)
-          .set('Cookie', [`refresh_token=${REFRESH_TOKEN}`])
+          .set('Cookie', [`refresh_token=${REFRESH_TOKEN_ADMIN}`])
           .expect(HttpStatus.OK);
       });
 
       it('Missing auth token - 401', async () => {
         await request(app)
           .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGOUT))
-          .set('Cookie', [`refresh_token=${REFRESH_TOKEN}`])
+          .set('Cookie', [`refresh_token=${REFRESH_TOKEN_ADMIN}`])
           .expect(HttpStatus.UNAUTHORIZED);
       });
 
@@ -85,7 +85,7 @@ describe.skip('1. AUTH Testing', () => {
       it('Refresh token OK - 200', async () => {
         const response = await request(app)
           .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_REFRESH_TOKEN))
-          .set('Cookie', [`refresh_token=${REFRESH_TOKEN}`])
+          .set('Cookie', [`refresh_token=${REFRESH_TOKEN_ADMIN}`])
           .expect(HttpStatus.OK);
 
         expect(response.body?.data?.token).toBeDefined();

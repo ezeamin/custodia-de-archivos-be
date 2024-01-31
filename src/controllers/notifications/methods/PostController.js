@@ -4,7 +4,10 @@ import { prisma } from '../../../helpers/prisma.js';
 
 export class PostController {
   static async createNotification(req, res) {
-    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+    const {
+      body: { type, receivers, message, files },
+      user: { id: userId },
+    } = req;
   }
 
   static async createNotificationType(req, res) {

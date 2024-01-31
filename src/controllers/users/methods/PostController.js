@@ -66,7 +66,10 @@ export class PostController {
         },
       });
 
-      res.status(HttpStatus.CREATED).json({ username, password });
+      res.status(HttpStatus.CREATED).json({
+        data: { username, password },
+        message: 'Usuario creado exitosamente',
+      });
     } catch (error) {
       console.log(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -75,6 +78,9 @@ export class PostController {
       });
       return;
     }
+
+    // Avoid sending mails in test environment
+    if (process.env.NODE_ENV === 'test') return;
 
     const name = `${userInDB.employee.person.name} ${userInDB.employee.person.surname}`;
     const { email } = userInDB.employee;
@@ -117,7 +123,10 @@ export class PostController {
         },
       });
 
-      res.status(HttpStatus.CREATED).json({ username, password });
+      res.status(HttpStatus.CREATED).json({
+        data: { username, password },
+        message: 'Usuario creado exitosamente',
+      });
     } catch (error) {
       console.log('🟥', error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -126,6 +135,9 @@ export class PostController {
       });
       return;
     }
+
+    // Avoid sending mails in test environment
+    if (process.env.NODE_ENV === 'test') return;
 
     const fullname = `${name} ${lastname}`;
     sendNewUserMail({ name: fullname, email, username, password });

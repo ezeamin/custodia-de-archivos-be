@@ -65,9 +65,11 @@ export const dniRules = (name = 'dni') => {
       .trim()
       .required()
       .length(8)
+      .regex(/^[0-9]+$/)
       .messages({
         'string.empty': `El campo "${name}" no puede estar vacio`,
         'string.length': `El campo "${name}" debe tener 8 caracteres`,
+        'string.pattern.base': `El campo "${name}" debe ser un dni válido`,
         'any.required': `El campo "${name}" es obligatorio`,
         '*': `Revisa el campo "${name}"`,
       });

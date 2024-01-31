@@ -27,6 +27,7 @@ import {
   post_employeeSchema,
 } from '../../helpers/validationSchemas/employeeSchemas.js';
 import { validateBody } from '../../middlewares/validateBody.js';
+import { validateFile } from '../../middlewares/validateFile.js';
 
 export const employeeRouter = express.Router();
 
@@ -167,8 +168,9 @@ employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE,
   isAuthenticated,
   isAdmin,
-  (req, res, next) => validateBody(req, res, next, post_employeeSchema),
   upload.single('imgFile'),
+  (req, res, next) => validateFile(req, res, next),
+  (req, res, next) => validateBody(req, res, next, post_employeeSchema),
   Employees.PostController.createEmployee,
 );
 employeeRouter.post(
@@ -176,6 +178,7 @@ employeeRouter.post(
   isAuthenticated,
   isAdmin,
   upload.single('file'),
+  (req, res, next) => validateFile(req, res, next),
   Employees.PostController.createEmployeeDoc,
 );
 employeeRouter.post(
@@ -251,6 +254,7 @@ employeeRouter.put(
   isAuthenticated,
   isAdmin,
   upload.single('imgFile'),
+  (req, res, next) => validateFile(req, res, next),
   Employees.PutController.updateEmployeeImage,
 );
 employeeRouter.put(

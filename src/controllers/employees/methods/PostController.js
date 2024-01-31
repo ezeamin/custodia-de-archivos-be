@@ -135,9 +135,14 @@ export class PostController {
       }
 
       res.status(HttpStatus.CREATED).json({
-        data: null,
+        data: {
+          employeeId: employee.id_employee,
+        },
         message: 'Empleado creado exitosamente',
       });
+
+      // Avoid registering change in test environment
+      if (process.env.NODE_ENV === 'test') return;
 
       registerChange({
         changedField: 'employee',

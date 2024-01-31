@@ -1,11 +1,9 @@
 import Joi from 'joi';
 
-import { uuidRegex } from '../regex.js';
 import {
   dateBeforeTodayRules,
   dniRules,
   emailRules,
-  fileRules,
   numberRules,
   textRules,
   uuidRule,
@@ -16,17 +14,16 @@ import {
 // ----------------------------
 
 export const post_employeeSchema = Joi.object({
-  name: textRules('name', 3, 50),
-  imgFile: fileRules('imgFile'),
-  lastname: textRules('lastname', 3, 50),
-  birthdate: dateBeforeTodayRules('birthdate'),
-  startDate: dateBeforeTodayRules('startDate'),
-  email: emailRules('email'),
-  dni: dniRules('dni'),
-  genderId: uuidRule('genderId'),
-  areaId: uuidRule('areaId'),
-  position: textRules('position', 3, 100),
-  fileNumber: numberRules('fileNumber', 1, 1000000),
+  name: textRules('name', 3, 50)(),
+  lastname: textRules('lastname', 3, 50)(),
+  birthdate: dateBeforeTodayRules('birthdate')(),
+  startDate: dateBeforeTodayRules('startDate')(),
+  email: emailRules('email')(),
+  dni: dniRules('dni')(),
+  genderId: uuidRule('genderId')(),
+  areaId: uuidRule('areaId')(),
+  position: textRules('position', 3, 100)(),
+  fileNumber: numberRules('fileNumber', 1, 1000000)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
@@ -37,13 +34,7 @@ export const post_employeeSchema = Joi.object({
 // ----------------------------
 
 export const get_params_employeeByIdSchema = Joi.object({
-  employeeId: Joi.string().required().length(36).regex(uuidRegex).messages({
-    'string.empty': 'El parámetro "employeeId" no puede estar vacio',
-    'string.length': 'El parámetro "employeeId" debe ser un uuid válido',
-    'string.pattern.base': 'El parámetro "employeeId" debe ser un uuid válido',
-    'any.required': 'El parámetro "employeeId" es obligatorio',
-    '*': 'Revisa el parámetro "employeeId"',
-  }),
+  employeeId: uuidRule('employeeId')(),
 });
 export const get_params_employeeDocsSchema = get_params_employeeByIdSchema;
 export const get_params_employeeHistorySchema = get_params_employeeByIdSchema;
@@ -59,39 +50,12 @@ export const get_params_employeeLateArrivalsSchema =
   get_params_employeeByIdSchema;
 export const get_params_employeeFamilySchema = get_params_employeeByIdSchema;
 export const get_params_employeeFamilyMemberSchema = Joi.object({
-  employeeId: Joi.string().required().length(36).regex(uuidRegex).messages({
-    'string.empty': 'El parámetro "employeeId" no puede estar vacio',
-    'string.length': 'El parámetro "employeeId" debe ser un uuid válido',
-    'string.pattern.base': 'El parámetro "employeeId" debe ser un uuid válido',
-    'any.required': 'El parámetro "employeeId" es obligatorio',
-    '*': 'Revisa el parámetro "employeeId"',
-  }),
-  familyMemberId: Joi.string().required().length(36).regex(uuidRegex).messages({
-    'string.empty': 'El parámetro "familyMemberId" no puede estar vacio',
-    'string.length': 'El parámetro "familyMemberId" debe ser un uuid válido',
-    'string.pattern.base':
-      'El parámetro "familyMemberId" debe ser un uuid válido',
-    'any.required': 'El parámetro "familyMemberId" es obligatorio',
-    '*': 'Revisa el parámetro "familyMemberId"',
-  }),
+  employeeId: uuidRule('employeeId')(),
+  familyMemberId: uuidRule('familyMemberId')(),
 });
 export const get_params_licensesTypesByIdSchema = Joi.object({
-  licenseTypeId: Joi.string().required().length(36).regex(uuidRegex).messages({
-    'string.empty': 'El parámetro "licenseTypeId" no puede estar vacio',
-    'string.length': 'El parámetro "licenseTypeId" debe ser un uuid válido',
-    'string.pattern.base':
-      'El parámetro "licenseTypeId" debe ser un uuid válido',
-    'any.required': 'El parámetro "licenseTypeId" es obligatorio',
-    '*': 'Revisa el parámetro "licenseTypeId"',
-  }),
+  licenseTypeId: uuidRule('licenseTypeId')(),
 });
 export const get_params_trainingsTypesByIdSchema = Joi.object({
-  trainingTypeId: Joi.string().required().length(36).regex(uuidRegex).messages({
-    'string.empty': 'El parámetro "trainingTypeId" no puede estar vacio',
-    'string.length': 'El parámetro "trainingTypeId" debe ser un uuid válido',
-    'string.pattern.base':
-      'El parámetro "trainingTypeId" debe ser un uuid válido',
-    'any.required': 'El parámetro "trainingTypeId" es obligatorio',
-    '*': 'Revisa el parámetro "trainingTypeId"',
-  }),
+  trainingTypeId: uuidRule('trainingTypeId')(),
 });

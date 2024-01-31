@@ -1,13 +1,10 @@
-TRUNCATE TABLE public.notification_doc;
 TRUNCATE TABLE public.employee_doc;
-TRUNCATE TABLE public.notification;
 TRUNCATE TABLE public.login;
 TRUNCATE TABLE public.training;
 TRUNCATE TABLE public.license;
 TRUNCATE TABLE public.absence;
-TRUNCATE TABLE public.vacations;
+TRUNCATE TABLE public.vacation;
 TRUNCATE TABLE public.training_type;
-TRUNCATE TABLE public.notification_type;
 TRUNCATE TABLE public.license_type;
 TRUNCATE TABLE public.late_arrival;
 TRUNCATE TABLE public.formal_warning;
@@ -27,6 +24,11 @@ TRUNCATE TABLE public.gender;
 TRUNCATE TABLE public.family;
 TRUNCATE TABLE public.family_relationship_type;
 TRUNCATE TABLE public.area;
+TRUNCATE TABLE public.notification_receiver;
+TRUNCATE TABLE public.notification_doc;
+TRUNCATE TABLE public.notification;
+TRUNCATE TABLE public.notification_type;
+TRUNCATE TABLE public.receiver_type;
 
 INSERT INTO public.gender (id_gender,gender)
 VALUES
@@ -34,18 +36,19 @@ VALUES
     ('018d3b85-ad41-7211-91f3-c9c1a59d7d75','Femenino'),
     ('018d3b85-ad41-7604-be77-b3668698a7da','Otro');
 
-INSERT INTO public.area (id_area,area)
+INSERT INTO public.area (id_area,area,is_assignable)
 VALUES
-    ('018d3b85-ad41-77e2-aaa7-4fcc12ba0132','Mantenimiento'),
-    ('018d3b85-ad41-7ebf-b39d-2f042aeef39b','Administración'),
-    ('018d3b85-ad41-7b89-a115-53129e20a558','Almacenamiento'),
-    ('018d3b85-ad41-752d-96dc-550186aafccd','Ventas'),
-    ('018d3b85-ad41-7ce6-a177-930a835ca677','Compras'),
-    ('018d3b85-ad41-752f-972c-30102846b42c','Producción'),
-    ('018d3b85-ad41-7d49-b328-b71e34a42396','Recursos Humanos'),
-    ('018d3b85-ad41-74d4-a5b5-8c08718dbce8','Contabilidad'),
-    ('018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a','Sistemas'),
-    ('018d3b85-ad41-789e-b615-cd610c5c131f','Gerencia');
+    ('018d3b85-ad41-77e2-aaa7-4fcc12ba0132','Mantenimiento',TRUE),
+    ('018d3b85-ad41-7ebf-b39d-2f042aeef39b','Administración',TRUE),
+    ('018d3b85-ad41-7b89-a115-53129e20a558','Almacenamiento',TRUE),
+    ('018d3b85-ad41-752d-96dc-550186aafccd','Ventas',TRUE),
+    ('018d3b85-ad41-7ce6-a177-930a835ca677','Compras',TRUE),
+    ('018d3b85-ad41-752f-972c-30102846b42c','Producción',TRUE),
+    ('018d3b85-ad41-7d49-b328-b71e34a42396','Recursos Humanos',TRUE),
+    ('018d3b85-ad41-74d4-a5b5-8c08718dbce8','Contabilidad',TRUE),
+    ('018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a','Sistemas',TRUE),
+    ('018d3b85-ad41-789e-b615-cd610c5c131f','Gerencia',TRUE),
+    ('018d3b85-ad41-789e-b615-cd610c5c12ef','Todos los empleados',FALSE);
 
 INSERT INTO public.employee_status (id_status, "status") VALUES
   ('018d3b85-ad41-70bf-a4b3-b248a73b7bf8','active'),
@@ -76,6 +79,10 @@ INSERT INTO public.civil_status_type (id_civil_status_type, civil_status_type) V
   ('018d55f4-5cc5-7afe-a15f-62810780270b','Casado/a'),
   ('018d55f4-6c3e-7180-9045-da30c7077cd3','Divorciado/a'),
   ('018d55f4-7aba-72f9-af8e-744af2b9b83f','Viudo/a');
+
+INSERT INTO public.receiver_type (id_receiver_type, receiver_type) VALUES
+  ('018d3b85-ad41-7c4d-9b9f-5b1b8a1b1b1b','user'),
+  ('018d3b85-ad41-7c4d-9b9f-5b1b8b1b1b1d','area');
 
 -- Insert example person
 INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)

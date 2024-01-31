@@ -1,16 +1,13 @@
 import { prisma } from '../helpers/prisma.js';
 
 async function truncateTables() {
-  await prisma.notification_doc.deleteMany();
   await prisma.employee_doc.deleteMany();
-  await prisma.notification.deleteMany();
   await prisma.login.deleteMany();
   await prisma.training.deleteMany();
   await prisma.license.deleteMany();
   await prisma.absence.deleteMany();
   await prisma.vacation.deleteMany();
   await prisma.training_type.deleteMany();
-  await prisma.notification_type.deleteMany();
   await prisma.license_type.deleteMany();
   await prisma.late_arrival.deleteMany();
   await prisma.formal_warning.deleteMany();
@@ -32,6 +29,11 @@ async function truncateTables() {
   await prisma.family_relationship_type.deleteMany();
   await prisma.area.deleteMany();
   await prisma.civil_status_type.deleteMany();
+  await prisma.notification_receiver.deleteMany();
+  await prisma.notification_doc.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.notification_type.deleteMany();
+  await prisma.receiver_type.deleteMany();
 }
 
 async function insertData() {
@@ -51,25 +53,58 @@ async function insertData() {
       {
         id_area: '018d3b85-ad41-77e2-aaa7-4fcc12ba0132',
         area: 'Mantenimiento',
+        is_assignable: true,
       },
       {
         id_area: '018d3b85-ad41-7ebf-b39d-2f042aeef39b',
         area: 'Administración',
+        is_assignable: true,
       },
       {
         id_area: '018d3b85-ad41-7b89-a115-53129e20a558',
         area: 'Almacenamiento',
+        is_assignable: true,
       },
-      { id_area: '018d3b85-ad41-752d-96dc-550186aafccd', area: 'Ventas' },
-      { id_area: '018d3b85-ad41-7ce6-a177-930a835ca677', area: 'Compras' },
-      { id_area: '018d3b85-ad41-752f-972c-30102846b42c', area: 'Producción' },
+      {
+        id_area: '018d3b85-ad41-752d-96dc-550186aafccd',
+        area: 'Ventas',
+        is_assignable: true,
+      },
+      {
+        id_area: '018d3b85-ad41-7ce6-a177-930a835ca677',
+        area: 'Compras',
+        is_assignable: true,
+      },
+      {
+        id_area: '018d3b85-ad41-752f-972c-30102846b42c',
+        area: 'Producción',
+        is_assignable: true,
+      },
       {
         id_area: '018d3b85-ad41-7d49-b328-b71e34a42396',
         area: 'Recursos Humanos',
+        is_assignable: true,
       },
-      { id_area: '018d3b85-ad41-74d4-a5b5-8c08718dbce8', area: 'Contabilidad' },
-      { id_area: '018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a', area: 'Sistemas' },
-      { id_area: '018d3b85-ad41-789e-b615-cd610c5c131f', area: 'Gerencia' },
+      {
+        id_area: '018d3b85-ad41-74d4-a5b5-8c08718dbce8',
+        area: 'Contabilidad',
+        is_assignable: true,
+      },
+      {
+        id_area: '018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a',
+        area: 'Sistemas',
+        is_assignable: true,
+      },
+      {
+        id_area: '018d3b85-ad41-789e-b615-cd610c5c131f',
+        area: 'Gerencia',
+        is_assignable: true,
+      },
+      {
+        id_area: '018d3b85-ad41-789e-b615-cd610c5c12ef',
+        area: 'Todos los empleados',
+        is_assignable: false,
+      },
     ],
   });
 
@@ -176,15 +211,29 @@ async function insertData() {
     ],
   });
 
+  // Receiver types
+  await prisma.receiver_type.createMany({
+    data: [
+      {
+        id_receiver_type: '018d3b85-ad41-7c4d-9b9f-5b1b8a1b1b1b',
+        receiver_type: 'user',
+      },
+      {
+        id_receiver_type: '018d3b85-ad41-7c4d-9b9f-5b1b8b1b1b1d',
+        receiver_type: 'area',
+      },
+    ],
+  });
+
   // Example person
   await prisma.person.create({
     data: {
       id_person: '018d3b85-ad41-7129-b181-0f1fc7c70573',
       id_gender: '018d3b85-ad41-71c2-a317-95f3fa1a632d',
-      name: 'Ezequiel',
-      surname: 'Amin',
-      birth_date: new Date('2002-02-17'),
-      identification_number: '43706393',
+      name: 'John',
+      surname: 'Doe',
+      birth_date: new Date('2000-01-01'),
+      identification_number: '40000000',
     },
   });
 
@@ -192,14 +241,25 @@ async function insertData() {
     data: {
       id_person: '018d3b85-ad41-7129-b181-0f1fc7c71234',
       id_gender: '018d3b85-ad41-71c2-a317-95f3fa1a632d',
-      name: 'Carlos',
-      surname: 'Amin',
-      birth_date: new Date('1967-02-07'),
-      identification_number: '17860733',
+      name: 'Mario',
+      surname: 'Perez',
+      birth_date: new Date('1970-02-01'),
+      identification_number: '20000000',
     },
   });
 
-  // Example employee
+  await prisma.person.create({
+    data: {
+      id_person: '018d5f79-eb05-7563-b721-497393e1ee8a',
+      id_gender: '018d3b85-ad41-7211-91f3-c9c1a59d7d75',
+      name: 'Maria',
+      surname: 'Perez',
+      birth_date: new Date('1975-05-27'),
+      identification_number: '30000000',
+    },
+  });
+
+  // Example employees
   await prisma.employee.create({
     data: {
       id_employee: '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
@@ -207,9 +267,25 @@ async function insertData() {
       id_status: '018d3b85-ad41-70bf-a4b3-b248a73b7bf8',
       id_area: '018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a',
       no_file: 1000,
-      email: 'ezequielamin@outlook.com',
+      email: 'john@outlook.com',
       employment_date: new Date('2021-02-17'),
       position: 'Programador',
+      working_hours: 8,
+      picture_url:
+        'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg',
+    },
+  });
+
+  await prisma.employee.create({
+    data: {
+      id_employee: '018d5f7e-0a00-7913-87ef-c43edb396158',
+      id_person: '018d5f79-eb05-7563-b721-497393e1ee8a',
+      id_status: '018d3b85-ad41-70bf-a4b3-b248a73b7bf8',
+      id_area: '018d3b85-ad41-76b0-a0bb-f4ee8a8f0f0a',
+      no_file: 1003,
+      email: 'mariajose@outlook.com',
+      employment_date: new Date('2021-02-17'),
+      position: 'Programadora',
       working_hours: 8,
       picture_url:
         'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg',
@@ -222,7 +298,7 @@ async function insertData() {
       id_user: '1249cbd7-5184-45d4-bd18-04a3f0769e99',
       id_user_type: '32deb906-6292-4908-9cfc-02394fd4ab28',
       id_employee: '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
-      username: '43706393', // Adjust username as needed
+      username: '40000000',
       password: '$2a$10$XYaSlV0oGj8XNiiUawT6iu7JF43a4A9nDzA7dl2SQr6co3a/rh4Hy', // 1234Abcd
       has_changed_def_pass: true,
     },

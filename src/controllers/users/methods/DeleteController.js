@@ -45,6 +45,9 @@ export class DeleteController {
         message: 'Usuario reducido a Empleado exitosamente',
       });
 
+      // Avoid registering change in test environment
+      if (process.env.NODE_ENV === 'test') return;
+
       registerChange({
         modifyingUser: loggedUserId,
         changedTable: 'user_type',
