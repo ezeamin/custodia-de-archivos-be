@@ -5,7 +5,94 @@ import { prisma } from '../../../helpers/prisma.js';
 export class PutController {
   // @param - typeId
   static async updateNotificationType(req, res) {
-    // CHECK IF CAN_MODIFY OF THAT TYPE IS TRUE
-    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+    const {
+      params: { typeId },
+      body: { title, description, startHour, endHour, allowedRoles },
+    } = req;
+
+    try {
+      const type = await prisma.notification_type.findUnique({
+        where: {
+          id_notification_type: typeId,
+          notification_type_isactive: true,
+        },
+        include: {
+          notification_allowed_role: {
+            include: {
+              user_type: true,
+            },
+          },
+        },
+      });
+
+      if (!type.can_modify) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          data: null,
+          message: 'No se puede modificar el tipo de notificación',
+        });
+        return;
+      }
+
+      const userTypeIdAllowedRoles = allowedRoles.map((role) => role.id);
+      const userTypeIdCurrentRoles = type.notification_allowed_role.map(
+        (role) => role.id_user_type,
+      );
+
+      const userTypeIdRolesToDelete = userTypeIdCurrentRoles.filter(
+        (role) => !userTypeIdAllowedRoles.includes(role),
+      );
+      const userTypeIdRolesToAdd = userTypeIdAllowedRoles.filter(
+        (role) => !userTypeIdCurrentRoles.includes(role),
+      );
+
+      // We need id_notification_allowed_role and not id_user_type to search and update
+      const notificationTypeIdToDelete = type.notification_allowed_role
+        .filter((role) => userTypeIdRolesToDelete.includes(role.id_user_type))
+        .map((role) => role.id_notification_allowed_role);
+
+      const rolesToDelete = notificationTypeIdToDelete.map((role) => ({
+        where: {
+          id_notification_allowed_role: role,
+        },
+        data: {
+          notification_allowed_role_isactive: false,
+        },
+      }));
+
+      const createPromise = prisma.notification_allowed_role.createMany({
+        data: userTypeIdRolesToAdd.map((role) => ({
+          id_user_type: role,
+          id_notification_type: typeId,
+        })),
+      });
+
+      const updatePromise = prisma.notification_type.update({
+        where: {
+          id_notification_type: typeId,
+        },
+        data: {
+          title_notification: title,
+          description_notification: description,
+          start_hour: startHour,
+          end_hour: endHour,
+          notification_allowed_role: {
+            updateMany: rolesToDelete,
+          },
+        },
+      });
+
+      await Promise.all([createPromise, updatePromise]);
+
+      res.json({
+        data: null,
+        message: 'Tipo de notificación actualizado exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al actualizar el tipo de notificación',
+      });
+    }
   }
 }

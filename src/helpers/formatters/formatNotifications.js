@@ -98,7 +98,7 @@ export const formatNotifications = async ({ data, sent }) => {
         title: item.notification_type.title_notification,
         description: item.notification_type.description_notification,
       },
-      date: item.notification_date,
+      date: item.notification_created_at,
       files: item.notification_doc.map((doc) => ({
         id: doc.id_notification_doc,
         name: doc.notification_doc_name,

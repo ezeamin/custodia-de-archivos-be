@@ -18,11 +18,20 @@ export class PostController {
       const allowedRoles = await prisma.notification_allowed_role.findMany({
         where: {
           id_notification_type: typeId,
+          notification_allowed_role_isactive: true,
         },
         include: {
           user_type: true,
         },
       });
+
+      if (!allowedRoles.length) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'No se encontró el tipo de notificación',
+        });
+        return;
+      }
 
       const allowedRolesNames = allowedRoles.map((role) =>
         role.user_type.user_type.toUpperCase(),
@@ -156,6 +165,8 @@ export class PostController {
     const {
       body: { title, description, startHour, endHour, allowedRoles },
     } = req;
+
+    // TODO: Add check for allowedRoles: minimum of 1 role
 
     try {
       const newNotificationType = await prisma.notification_type.create({

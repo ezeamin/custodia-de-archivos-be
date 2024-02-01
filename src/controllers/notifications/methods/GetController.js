@@ -8,9 +8,12 @@ const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 export class GetController {
   static async notifications(req, res) {
     const {
-      query: { hasBeenRead, sent },
+      query: { hasBeenRead: paramHasBeenRead, sent },
       user: { id: userId },
     } = req;
+
+    const hasBeenRead =
+      paramHasBeenRead === undefined ? undefined : paramHasBeenRead === 'true';
 
     try {
       const data = await prisma.notification.findMany({
@@ -20,7 +23,7 @@ export class GetController {
           notification_receiver: {
             some: {
               id_receiver: sent ? undefined : userId,
-              has_read_notification: hasBeenRead === 'true',
+              has_read_notification: hasBeenRead,
             },
           },
         },
@@ -41,6 +44,9 @@ export class GetController {
               },
             },
           },
+        },
+        orderBy: {
+          notification_created_at: 'desc',
         },
       });
 
@@ -294,7 +300,13 @@ export class GetController {
             include: {
               user_type: true,
             },
+            where: {
+              notification_allowed_role_isactive: true,
+            },
           },
+        },
+        orderBy: {
+          title_notification: 'asc',
         },
       });
 
