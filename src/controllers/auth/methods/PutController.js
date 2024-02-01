@@ -55,15 +55,17 @@ export class PutController {
         message: 'Contraseña actualizada exitosamente',
       });
 
-      registerChange({
-        modifyingUser: userId,
-        changedTable: 'user',
-        changedField: 'password',
-        changedFieldLabel: 'Contraseña',
-        employeeId: user.id_employee,
-        newValue: '***',
-        previousValue: '***',
-      });
+      if (user.id_employee) {
+        registerChange({
+          modifyingUser: userId,
+          changedTable: 'user',
+          changedField: 'password',
+          changedFieldLabel: 'Contraseña',
+          employeeId: user.id_employee,
+          newValue: '***',
+          previousValue: '***',
+        });
+      }
     } catch (error) {
       console.error('🟥', error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
