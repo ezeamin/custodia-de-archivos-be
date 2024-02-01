@@ -48,6 +48,8 @@ export class DeleteController {
         (role) => role.id_notification_allowed_role,
       );
 
+      // QUEDO MOSTRANDO DESPUES DE ELIMINAR, REVISAR ROLES ELIMINADOS!
+
       await prisma.notification_allowed_role.deleteMany({
         where: {
           id_notification_allowed_role: {

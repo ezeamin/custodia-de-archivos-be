@@ -34,7 +34,7 @@ notificationRouter.get(
 notificationRouter.get(
   ENDPOINTS.NOTIFICATIONS.GET_TYPE,
   isAuthenticated,
-  Notifications.GetController.notificationTypesById,
+  Notifications.GetController.notificationTypeById,
 );
 
 // POST ---------------------------

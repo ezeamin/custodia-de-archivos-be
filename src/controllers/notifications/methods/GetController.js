@@ -286,6 +286,9 @@ export class GetController {
   static async notificationTypes(_, res) {
     try {
       const notificationTypes = await prisma.notification_type.findMany({
+        where: {
+          notification_type_isactive: true,
+        },
         include: {
           notification_allowed_role: {
             include: {
@@ -326,7 +329,53 @@ export class GetController {
   }
 
   // @param - typeId
-  static async notificationTypesById(req, res) {
-    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+  static async notificationTypeById(req, res) {
+    const {
+      params: { typeId },
+    } = req;
+
+    try {
+      const type = await prisma.notification_type.findUnique({
+        where: {
+          notification_type_isactive: true,
+          id_notification_type: typeId,
+        },
+        include: {
+          notification_allowed_role: {
+            include: {
+              user_type: true,
+            },
+          },
+        },
+      });
+
+      const formattedData = {
+        id: type.id_notification_type,
+        title: type.title_notification,
+        description: type.description_notification,
+        startHour: type.start_hour,
+        endHour: type.end_hour,
+        canModify: type.can_modify,
+        allowedRoles: type.notification_allowed_role
+          .filter(
+            (role) => role.id_notification_type === type.id_notification_type,
+          )
+          .map((r) => ({
+            id: r.user_type.id_user_type,
+            description: r.user_type.user_type_label,
+          })),
+      };
+
+      res.json({
+        data: formattedData,
+        message: 'Tipo de notificación obtenido exitosamente',
+      });
+    } catch (error) {
+      console.error('🟥', error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al obtener el tipo de notificación',
+      });
+    }
   }
 }
