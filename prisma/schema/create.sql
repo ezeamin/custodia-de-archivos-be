@@ -65,7 +65,7 @@ CREATE TABLE public."address" (
 
 CREATE TABLE public.phone (
     id_phone          UUID DEFAULT uuid_generate_v7() NOT NULL,
-    phone_no          varchar(13) NOT NULL UNIQUE,
+    phone_no          varchar(13) NOT NULL,
     phone_isactive    boolean DEFAULT true NOT NULL,
     phone_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     phone_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -757,6 +757,14 @@ VALUES (
     'Programador',
     8,
     'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg'
+);
+
+INSERT INTO public.family_member (id_family_member, id_person, id_employee, id_relationship_type)
+VALUES (
+    '018d644d-08e5-746c-81fb-8d317e387126',
+    '018d3b85-ad41-7129-b181-0f1fc7c71234',
+    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
+    '018d4131-99a7-7301-95f5-f1851f99af92'
 );
 
 -- Insert default admin user

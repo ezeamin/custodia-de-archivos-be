@@ -84,7 +84,7 @@ model employee_doc {
   id_employee             String    @db.Uuid
   id_submitted_by         String    @db.Uuid
   employee_doc_url        String    @db.VarChar(250)
-  employee_doc_name       String    @db.VarChar(250)
+  employee_doc_name       String    @db.VarChar(50)
   employee_doc_isactive   Boolean   @default(true)
   employee_doc_created_at DateTime  @default(now()) @db.Timestamp(6)
   employee_doc_updated_at DateTime? @default(now()) @db.Timestamp(6)
@@ -241,7 +241,7 @@ model notification_doc {
   id_notification_doc         String       @id(map: "pk_notification_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_notification             String       @db.Uuid
   notification_doc_url        String       @db.VarChar(250)
-  notification_doc_name       String       @db.VarChar(50)
+  notification_doc_name       String       @db.VarChar(250)
   notification_doc_created_at DateTime     @default(now()) @db.Timestamp(6)
   notification_doc_updated_at DateTime?    @default(now()) @db.Timestamp(6)
   notification                notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_doc_notification")
@@ -264,8 +264,8 @@ model notification_type {
   start_hour                 String                      @db.Char(5)
   end_hour                   String                      @db.Char(5)
   description_notification   String                      @db.VarChar(200)
-  notification_type_isactive Boolean                     @default(true)
   can_modify                 Boolean                     @default(true)
+  notification_type_isactive Boolean                     @default(true)
   notification               notification[]
   notification_allowed_role  notification_allowed_role[]
 }
