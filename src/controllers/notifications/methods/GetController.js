@@ -357,6 +357,9 @@ export class GetController {
             include: {
               user_type: true,
             },
+            where: {
+              notification_allowed_role_isactive: true,
+            },
           },
         },
       });

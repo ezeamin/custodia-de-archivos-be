@@ -33,16 +33,32 @@ export class PutController {
         return;
       }
 
+      const userTypeIdInactiveRoles = type.notification_allowed_role
+        .map(
+          (role) =>
+            !role.notification_allowed_role_isactive && role.id_user_type,
+        )
+        .filter(Boolean);
+
+      console.log(userTypeIdInactiveRoles);
+
       const userTypeIdAllowedRoles = allowedRoles.map((role) => role.id);
-      const userTypeIdCurrentRoles = type.notification_allowed_role.map(
-        (role) => role.id_user_type,
-      );
+      const userTypeIdCurrentRoles = type.notification_allowed_role
+        .map((role) =>
+          role.notification_allowed_role_isactive ? role.id_user_type : null,
+        )
+        .filter(Boolean);
 
       const userTypeIdRolesToDelete = userTypeIdCurrentRoles.filter(
         (role) => !userTypeIdAllowedRoles.includes(role),
       );
       const userTypeIdRolesToAdd = userTypeIdAllowedRoles.filter(
-        (role) => !userTypeIdCurrentRoles.includes(role),
+        (role) =>
+          !userTypeIdCurrentRoles.includes(role) &&
+          !userTypeIdInactiveRoles.includes(role),
+      );
+      const userTypeIdRolesToActive = userTypeIdAllowedRoles.filter((role) =>
+        userTypeIdInactiveRoles.includes(role),
       );
 
       // We need id_notification_allowed_role and not id_user_type to search and update
@@ -59,11 +75,27 @@ export class PutController {
         },
       }));
 
+      const notificacionTypeIdToActive = type.notification_allowed_role
+        .filter((role) => userTypeIdRolesToActive.includes(role.id_user_type))
+        .map((role) => role.id_notification_allowed_role);
+
       const createPromise = prisma.notification_allowed_role.createMany({
         data: userTypeIdRolesToAdd.map((role) => ({
           id_user_type: role,
           id_notification_type: typeId,
         })),
+      });
+
+      const activePromise = prisma.notification_allowed_role.updateMany({
+        where: {
+          id_notification_allowed_role: {
+            in: notificacionTypeIdToActive,
+          },
+          notification_allowed_role_isactive: false,
+        },
+        data: {
+          notification_allowed_role_isactive: true,
+        },
       });
 
       const updatePromise = prisma.notification_type.update({
@@ -81,7 +113,7 @@ export class PutController {
         },
       });
 
-      await Promise.all([createPromise, updatePromise]);
+      await Promise.all([createPromise, activePromise, updatePromise]);
 
       res.json({
         data: null,
