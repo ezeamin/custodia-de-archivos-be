@@ -14,3 +14,12 @@ export const generateFirstPassword = () => {
   const password = Math.random().toString(36).slice(-8);
   return password.toString();
 };
+
+export const uppercaseName = (name) => {
+  // make the first letter of every word uppercase, and the rest lowercase
+  return name
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .trim();
+};

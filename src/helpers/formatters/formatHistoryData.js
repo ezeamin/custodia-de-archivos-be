@@ -60,8 +60,6 @@ const getTableInformation = async (data) => {
   for (let i = 0; i < names.length; i += 1) {
     const tableName = names[i];
 
-    console.log(tableName);
-
     const dbDataPromise = prisma[tableName].findMany({
       select: optionsMap[tableName],
     });

@@ -5,13 +5,32 @@ import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
 import { formatAddress } from '../../../helpers/formatters/formatAddress.js';
+import { uppercaseName } from '../../../helpers/helpers.js';
 
 export class PostController {
   static async createEmployee(req, res) {
+    const {
+      body: {
+        name,
+        lastname,
+        dni,
+        birthdate,
+        genderId,
+        email,
+        startDate,
+        position,
+        fileNumber,
+        areaId,
+        force = false,
+      },
+      file,
+      user: { id: userId },
+    } = req;
+
     let imageUrl = '';
 
     // Check if image was sent
-    if (!req.file) {
+    if (!file) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message: 'No se ha enviado una imagen',
@@ -21,7 +40,7 @@ export class PostController {
 
     // Check image size
     const FIVE_MB = 5000000;
-    if (req.file.size > FIVE_MB) {
+    if (file.size > FIVE_MB) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message:
@@ -32,7 +51,7 @@ export class PostController {
 
     // Upload image to cloudinary
     try {
-      const { url } = await handleUpload(req.file);
+      const { url } = await handleUpload(file);
 
       const splitUrl = url.split('/upload/');
       imageUrl = `${splitUrl[0]}/upload/w_300,h_300,c_fill,g_face/${splitUrl[1]}`;
@@ -53,7 +72,7 @@ export class PostController {
       // Check for existing (inactive) person
       const existingPerson = await prisma.person.findUnique({
         where: {
-          identification_number: req.body.dni,
+          identification_number: dni,
         },
         include: {
           phone: true,
@@ -102,12 +121,12 @@ export class PostController {
         return;
       }
 
-      if (existingPerson && activePerson && !isAnEmployee && !req.body.force) {
+      if (existingPerson && activePerson && !isAnEmployee && !force) {
         res.json({
           data: {
             body: req.body,
-            name: existingPerson.name,
-            lastname: existingPerson.surname,
+            name: uppercaseName(existingPerson.name),
+            lastname: uppercaseName(existingPerson.surname),
             dni: existingPerson.identification_number,
             phone: existingPerson?.phone?.phone_no || null,
             address: existingPerson.address
@@ -124,7 +143,7 @@ export class PostController {
         activePerson &&
         !isAnEmployee &&
         !isAThirdParty &&
-        req.body.force;
+        force;
 
       const isInactiveThirdParty =
         existingPerson && activePerson && !isAnEmployee && isAThirdParty;
@@ -152,10 +171,10 @@ export class PostController {
           },
           data: {
             person_isactive: true,
-            name: req.body.name,
-            surname: req.body.lastname,
-            birth_date: req.body.birthdate,
-            id_gender: req.body.genderId,
+            name,
+            surname: lastname,
+            birth_date: birthdate,
+            id_gender: genderId,
             address: {
               update: {
                 address_isactive: true,
@@ -167,11 +186,11 @@ export class PostController {
         // No data -> Create person
         person = await prisma.person.create({
           data: {
-            name: req.body.name,
-            surname: req.body.lastname,
-            identification_number: req.body.dni,
-            birth_date: req.body.birthdate,
-            id_gender: req.body.genderId,
+            name,
+            surname: lastname,
+            identification_number: dni,
+            birth_date: birthdate,
+            id_gender: genderId,
           },
         });
       }
@@ -184,10 +203,10 @@ export class PostController {
       });
 
       const newData = {
-        email: req.body.email,
-        employment_date: req.body.startDate,
-        position: req.body.position,
-        no_file: +req.body.fileNumber,
+        email,
+        employment_date: startDate,
+        position,
+        no_file: +fileNumber,
         picture_url: imageUrl,
         person: {
           connect: {
@@ -196,7 +215,7 @@ export class PostController {
         },
         area: {
           connect: {
-            id_area: req.body.areaId,
+            id_area: areaId,
           },
         },
         employee_status: {
@@ -238,7 +257,7 @@ export class PostController {
         changedTable: 'employee',
         previousValue: null,
         newValue: new Date().toISOString(), // TODO: Check timezone
-        modifyingUser: req.user.id,
+        modifyingUser: userId,
         employeeId: employee.id_employee,
       });
     } catch (e) {

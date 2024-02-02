@@ -1,8 +1,10 @@
+import { uppercaseName } from '../helpers.js';
+
 export const formatFamilyMemberData = (familyMemberData) => ({
   person: {
     identification_number: familyMemberData.dni,
-    name: familyMemberData.name,
-    surname: familyMemberData.lastname,
+    name: uppercaseName(familyMemberData.name),
+    surname: uppercaseName(familyMemberData.lastname),
     birth_date: familyMemberData.birthdate || undefined,
     id_gender: familyMemberData.genderId,
   },

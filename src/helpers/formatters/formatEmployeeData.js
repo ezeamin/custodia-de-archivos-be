@@ -1,3 +1,5 @@
+import { uppercaseName } from '../helpers.js';
+
 export const formatEmployeeData = (originalData) => {
   const newData = {
     employee: {
@@ -13,8 +15,8 @@ export const formatEmployeeData = (originalData) => {
     person: {
       id_gender: originalData.genderId,
       id_civil_status: originalData.civilStatusId,
-      name: originalData.name,
-      surname: originalData.lastname,
+      name: uppercaseName(originalData.name),
+      surname: uppercaseName(originalData.lastname),
       birth_date: originalData.birthdate,
       identification_number: originalData.dni,
     },
