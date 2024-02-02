@@ -294,7 +294,7 @@ model person {
 
 model phone {
   id_phone         String    @id(map: "pk_phone") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  phone_no         String    @unique @db.VarChar(13)
+  phone_no         String    @db.VarChar(13)
   phone_isactive   Boolean   @default(true)
   phone_created_at DateTime  @default(now()) @db.Timestamp(6)
   phone_updated_at DateTime? @default(now()) @db.Timestamp(6)

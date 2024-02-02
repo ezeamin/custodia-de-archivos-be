@@ -18,7 +18,6 @@ async function truncateTables() {
   await prisma.employee.deleteMany();
   await prisma.employee_status.deleteMany();
   await prisma.third_party.deleteMany();
-  await prisma.user_type.deleteMany();
   await prisma.person.deleteMany();
   await prisma.address.deleteMany();
   await prisma.street.deleteMany();
@@ -30,6 +29,7 @@ async function truncateTables() {
   await prisma.area.deleteMany();
   await prisma.civil_status_type.deleteMany();
   await prisma.notification_allowed_role.deleteMany();
+  await prisma.user_type.deleteMany();
   await prisma.notification_receiver.deleteMany();
   await prisma.notification_doc.deleteMany();
   await prisma.notification.deleteMany();
