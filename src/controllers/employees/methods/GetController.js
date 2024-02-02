@@ -232,7 +232,7 @@ export class GetController {
   // @param - employeeId
   static async employeeHistory(req, res) {
     const {
-      query: { page = 0, entries = 10 },
+      query: { page = 0, entries = 10, query = '' },
       params: { employeeId },
     } = req;
 
@@ -262,6 +262,10 @@ export class GetController {
         take: +entries,
         where: {
           id_employee: employeeId,
+          modified_field_label: {
+            contains: query,
+            mode: 'insensitive',
+          },
         },
         orderBy: {
           modification_date: 'desc',
