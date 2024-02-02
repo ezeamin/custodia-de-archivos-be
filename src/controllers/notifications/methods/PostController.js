@@ -6,16 +6,17 @@ import { handleUpload } from '../../../helpers/cloudinary.js';
 export class PostController {
   static async createNotification(req, res) {
     const {
-      body: { typeId, receivers, message },
+      body: { typeId, receivers, message, isResponseBody },
       user: { id: userId, role: userRole },
       files,
     } = req;
 
     let docs = [];
+    const isResponse = isResponseBody === 'true';
 
     // Check if user can create this type of notification
     try {
-      const allowedRoles = await prisma.notification_allowed_role.findMany({
+      const allowedRolesPromise = prisma.notification_allowed_role.findMany({
         where: {
           id_notification_type: typeId,
           notification_allowed_role_isactive: true,
@@ -24,6 +25,17 @@ export class PostController {
           user_type: true,
         },
       });
+
+      const notificationTypesPromise = prisma.notification_type.findMany({
+        where: {
+          notification_type_isactive: true,
+        },
+      });
+
+      const [allowedRoles, notificationTypes] = await Promise.all([
+        allowedRolesPromise,
+        notificationTypesPromise,
+      ]);
 
       if (!allowedRoles.length) {
         res.status(HttpStatus.NOT_FOUND).json({
@@ -41,6 +53,22 @@ export class PostController {
         res.status(HttpStatus.FORBIDDEN).json({
           data: null,
           message: 'No tiene permisos para crear este tipo de notificación',
+        });
+        return;
+      }
+
+      const responseNotificationType = notificationTypes.find(
+        (type) => type.title_notification.toLowerCase() === 'respuesta',
+      );
+
+      if (
+        typeId === responseNotificationType.id_notification_type &&
+        !isResponse
+      ) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          data: null,
+          message:
+            'No se puede crear una notificación de tipo "Respuesta" cuando no lo es',
         });
         return;
       }
@@ -119,17 +147,36 @@ export class PostController {
 
       // Receivers
 
-      const receiver_types = await prisma.receiver_type.findMany();
+      const receiverTypes = await prisma.receiver_type.findMany();
+      const allEmployeesReceiverId = receiverTypes.find((r) =>
+        r.receiver_type.toLowerCase().includes('todos'),
+      )?.id_receiver_type;
 
-      await prisma.notification_receiver.createMany({
-        data: JSON.parse(receivers).map((receiver) => ({
-          id_notification: newNotification.id_notification,
-          id_receiver: receiver.id,
-          id_receiver_type: receiver_types.find(
-            (r) => r.receiver_type === receiver.type,
-          ).id_receiver_type,
-        })),
-      });
+      const receiverHasAllEmployees =
+        JSON.parse(receivers).findIndex((receiver) =>
+          receiver.type.toLowerCase().includes('todos'),
+        ) !== -1;
+
+      if (receiverHasAllEmployees) {
+        // Create a single notification_receiver entry (all employees)
+        await prisma.notification_receiver.create({
+          data: {
+            id_notification: newNotification.id_notification,
+            id_receiver: userId,
+            id_receiver_type: allEmployeesReceiverId,
+          },
+        });
+      } else {
+        await prisma.notification_receiver.createMany({
+          data: JSON.parse(receivers).map((receiver) => ({
+            id_notification: newNotification.id_notification,
+            id_receiver: receiver.id,
+            id_receiver_type: receiverTypes.find(
+              (r) => r.receiver_type === receiver.type,
+            ).id_receiver_type,
+          })),
+        });
+      }
 
       // Create docs entries (if any)
 
