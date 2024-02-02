@@ -97,6 +97,8 @@ export class PostController {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     try {
+      const genders = await prisma.gender.findMany();
+
       await prisma.user.create({
         data: {
           username,
@@ -109,6 +111,7 @@ export class PostController {
                   surname: lastname,
                   identification_number: dni,
                   birth_date: new Date(),
+                  id_gender: genders[0]?.id_gender || null,
                 },
               },
               email,

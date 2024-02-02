@@ -24,6 +24,7 @@ export const post_employeeSchema = Joi.object({
   areaId: uuidRule('areaId')(),
   position: textRules('position', 3, 100)(),
   fileNumber: numberRules('fileNumber', 1, 1000000)(),
+  force: Joi.boolean().default(false),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',

@@ -21,7 +21,7 @@ const newUserMail = ({ name, email, username, password }) => ({
             <li> Usuario: <b>${username}</b>
             <li> Contraseña: <b>${password}</b>
         </ul>
-        <p style="margin-top: 1rem;">Esta contraseña deberá ser cambiada tras el primer inicio. </p>
+        <p style="margin-top: 1rem;">Esta contraseña deberá ser cambiada tras el primer inicio de sesión. </p>
         <p style="margin-top: 1rem;">Si tiene dudas de por qué recibe este mail, contacte con el administrador de la empresa.</p>
         <p style="margin-top: 3rem;">Saludos,</p>
         <p>Equipo de Custodia de Archivos.</p>

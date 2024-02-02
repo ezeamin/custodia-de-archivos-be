@@ -51,17 +51,102 @@ export class PostController {
     // Supposing that the body has been validated and sanitized
     try {
       // Check for existing (inactive) person
-      const inactivePerson = await prisma.person.findUnique({
+      const existingPerson = await prisma.person.findUnique({
         where: {
           identification_number: req.body.dni,
-          person_isactive: false,
+        },
+        include: {
+          phone: true,
+          address: {
+            include: {
+              street: {
+                include: {
+                  locality: {
+                    include: {
+                      province: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          employee: true,
+          third_party: true,
         },
       });
 
-      if (inactivePerson) {
+      let activePerson = true;
+      if (existingPerson && !existingPerson.person_isactive)
+        activePerson = false;
+
+      const isAnEmployee = !!existingPerson.employee > 0;
+      const isAThirdParty = !!existingPerson.third_party.length > 0;
+
+      if (existingPerson && activePerson && isAnEmployee) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message:
+            'Esta persona ya está registrada como empleado activo bajo el mismo DNI.',
+        });
+        return;
+      }
+
+      if (existingPerson && activePerson && isAThirdParty) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message:
+            'Esta persona ya está registrada como usuario de solo lectura. Por favor, primero elimínela desde "Ajustes".',
+        });
+        return;
+      }
+
+      if (existingPerson && activePerson && !isAnEmployee && !req.body.force) {
+        res.json({
+          data: {
+            body: req.body,
+            name: existingPerson.name,
+            lastname: existingPerson.surname,
+            dni: existingPerson.identification_number,
+            phone: existingPerson?.phone?.phone_no || null,
+            address: existingPerson.address
+              ? formatAddress(existingPerson.address)
+              : null,
+          },
+          message: 'Duplicate',
+        });
+        return;
+      }
+
+      const isActiveFamilyMember =
+        existingPerson &&
+        activePerson &&
+        !isAnEmployee &&
+        !isAThirdParty &&
+        req.body.force;
+
+      const isInactiveThirdParty =
+        existingPerson && activePerson && !isAnEmployee && isAThirdParty;
+
+      const isInactivePersonNotThirdParty = existingPerson && !activePerson;
+
+      if (isActiveFamilyMember) {
+        // No updates needed
+        person = existingPerson;
+      } else if (isInactiveThirdParty) {
+        // Enable person
         person = await prisma.person.update({
           where: {
-            id_person: inactivePerson.id_person,
+            id_person: existingPerson.id_person,
+          },
+          data: {
+            person_isactive: true,
+          },
+        });
+      } else if (isInactivePersonNotThirdParty) {
+        // Some deleted (inactive) person -> Update all data with new information
+        person = await prisma.person.update({
+          where: {
+            id_person: existingPerson.id_person,
           },
           data: {
             person_isactive: true,
@@ -77,6 +162,7 @@ export class PostController {
           },
         });
       } else {
+        // No data -> Create person
         person = await prisma.person.create({
           data: {
             name: req.body.name,

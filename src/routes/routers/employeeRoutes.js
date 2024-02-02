@@ -212,13 +212,13 @@ employeeRouter.post(
   Employees.PostController.createEmployeeFormalWarning,
 );
 employeeRouter.post(
-  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_EXTRA_HOUR,
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LATE_ARRIVAL,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeLateArrival,
 );
 employeeRouter.post(
-  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LATE_ARRIVAL,
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_EXTRA_HOUR,
   isAuthenticated,
   isAdmin,
   Employees.PostController.createEmployeeExtraHour,
