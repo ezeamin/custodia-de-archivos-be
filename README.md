@@ -15,10 +15,12 @@ Descripción corta del proyecto.
 
 1. Clonar este repositorio.
 2. Ejecutar `pnpm i` para instalar las dependencias.
+3. Ejecutar `prisma generate` para generar el cliente de prisma.
 
 ## Configuración
 
-- Crear un archivo `.env` en la raíz del proyecto y configurar las variables de entorno necesarias, que están definidas en el archivo `.env_sample`.
+1. Crear un archivo `.env.production` y `.env.production` en la raíz del proyecto y configurar las variables de entorno necesarias, que están definidas en el archivo `.env_sample`.
+2. Si se quisiera regenerar la base de datos, será necesario crear un archivo `.env` en la raíz del proyecto y configurar las variables de entorno de la base de datos (`DATABASE_URL` y `DIRECT_URL`), que están definidas en el archivo `.env_sample`. Esto servirá para prisma que no diferencia entre los distintos `.env`s del proyecto.
 
 ## Uso
 
@@ -51,13 +53,13 @@ La tabla a continuación detalla los endpoints de cada servicio disponible:
 #### Usuarios:
 
 Ruta principal: `/api/v1/users`
-| Método | Endpoint | Protegido | Debe ser Admin | Descripción | Body |
-| ------ | -------- | --------- | -------------- | ----------- | ---- |
-| GET | `/` | ✅ | ✅ | Obtiene todos los usuarios | - |
-| GET | `/:id` | ✅ | ❌ | Obtiene un usuario por su id | - |
-| POST | `/` | ❌ | ❌ | Crea un nuevo usuario | `{ lastname: string, firstname: string, password: string, username: string }` |
-| PUT | `/:id` | ✅ | ❌ | Actualiza un usuario por su id | `{ isAdmin?: boolean, lastname?: string, firstname?: string, password?: string, username?: string }` |
-| DELETE | `/:id` | ✅ | ❌ | Elimina un usuario por su id (borrado lógico) | - |
+| Método | Endpoint | Protegido | Solo Admin | Descripción | Parámetros de búsqueda | Body |
+| ------ | -------- | --------- | -------------- | ----------- | ---- | ---- |
+| GET | `/` | ✅ | ✅ | Obtiene todos los usuarios | `{ page: string, entries: string, query: string }` | - |
+| GET | `/:id` | ✅ | ❌ | Obtiene un usuario por su id | - | - |
+| POST | `/` | ❌ | ❌ | Crea un nuevo usuario | - | `{ lastname: string, firstname: string, password: string, username: string }` |
+| PUT | `/:id` | ✅ | ❌ | Actualiza un usuario por su id | - | `{ isAdmin?: boolean, lastname?: string, firstname?: string, password?: string, username?: string }` |
+| DELETE | `/:id` | ✅ | ❌ | Elimina un usuario por su id (borrado lógico) | - | - |
 
 #### Autenticación:
 
@@ -79,5 +81,5 @@ Ruta principal: `/api/v1/products`
 
 ## Equipo
 
+- [Valentina Ormaechea](***)
 - [Ezequiel Amin](https://github.com/ezeamin)
-- [Valentina Ormaechea](https://github.com/valeormaechea)

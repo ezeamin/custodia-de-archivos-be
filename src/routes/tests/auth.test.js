@@ -55,6 +55,26 @@ describe('1. AUTH Testing', () => {
           })
           .expect(HttpStatus.BAD_REQUEST);
       });
+
+      it('Missing data - 400', async () => {
+        await request(app)
+          .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGIN))
+          .send({
+            password: PASSWORD,
+          })
+          .expect(HttpStatus.BAD_REQUEST);
+      });
+
+      it('Extra data - 400', async () => {
+        await request(app)
+          .post(getEndpoint('AUTH', ENDPOINTS.AUTH.POST_LOGIN))
+          .send({
+            username: USERNAME,
+            password: PASSWORD,
+            extra: 'extra',
+          })
+          .expect(HttpStatus.BAD_REQUEST);
+      });
     });
 
     describe(`b. POST ${ENDPOINTS.AUTH.POST_LOGOUT}`, () => {

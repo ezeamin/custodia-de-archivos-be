@@ -262,15 +262,6 @@ describe('2. EMPLOYEE Testing', () => {
 
   describe('-- POST ENDPOINTS -- ', () => {
     describe(`a. POST ${ENDPOINTS.EMPLOYEES.POST_EMPLOYEE}`, () => {
-      let server;
-      beforeAll((done) => {
-        server = app.listen(0, '127.0.0.1', done);
-      });
-
-      afterAll(() => {
-        server.close();
-      });
-
       it('Correct post - 201', async () => {
         const res = await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
@@ -285,24 +276,34 @@ describe('2. EMPLOYEE Testing', () => {
           .field('position', 'Prueba')
           .field('fileNumber', '1002')
           .field('areaId', '018d3b85-ad41-77e2-aaa7-4fcc12ba0132')
-          .attach('imgFile', IMAGE_FILE_PATH);
+          .attach('imgFile', IMAGE_FILE_PATH)
+          .expect(HttpStatus.CREATED);
 
-        expect(res.status).toBe(HttpStatus.CREATED);
         expect(res.body.data).toBeDefined();
         expect(res.body.data).toEqual(expect.any(Object));
         expect(res.body.data).toHaveProperty('employeeId');
 
         // Clean up
         const { employeeId } = res.body.data;
+        const { id_person } = await prisma.employee.findUnique({
+          where: {
+            id_employee: employeeId,
+          },
+        });
         await prisma.employee.delete({
           where: {
             id_employee: employeeId,
           },
         });
+        await prisma.person.delete({
+          where: {
+            id_person,
+          },
+        });
       });
 
       it('Missing field - 400', async () => {
-        await request(server)
+        await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
           .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .field('name', 'John') // missing imgFile
@@ -319,7 +320,7 @@ describe('2. EMPLOYEE Testing', () => {
       });
 
       it('Extra field - 400', async () => {
-        await request(server)
+        await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
           .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .field('name', 'John')
@@ -338,7 +339,7 @@ describe('2. EMPLOYEE Testing', () => {
       });
 
       it('Incorrect data on a field - 400', async () => {
-        await request(server)
+        await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
           .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .field('name', 'John')
@@ -356,13 +357,13 @@ describe('2. EMPLOYEE Testing', () => {
       });
 
       it('No token - 401', async () => {
-        await request(server)
+        await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
           .expect(HttpStatus.UNAUTHORIZED);
       });
 
       it('No admin token - 403', async () => {
-        await request(server)
+        await request(app)
           .post(getEndpoint('EMPLOYEES', ENDPOINTS.EMPLOYEES.POST_EMPLOYEE))
           .set('Authorization', `Bearer ${ACCESS_TOKEN_EMPLOYEE}`)
           .expect(HttpStatus.FORBIDDEN);
