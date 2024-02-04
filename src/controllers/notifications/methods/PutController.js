@@ -40,8 +40,6 @@ export class PutController {
         )
         .filter(Boolean);
 
-      console.log(userTypeIdInactiveRoles);
-
       const userTypeIdAllowedRoles = allowedRoles.map((role) => role.id);
       const userTypeIdCurrentRoles = type.notification_allowed_role
         .map((role) =>

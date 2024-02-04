@@ -82,6 +82,49 @@ export class PostController {
       return;
     }
 
+    // Check if notification is sent between its type hour restrictions
+    try {
+      const notificationType = await prisma.notification_type.findUnique({
+        where: {
+          id_notification_type: typeId,
+        },
+      });
+
+      if (!notificationType) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'No se encontró el tipo de notificación',
+        });
+        return;
+      }
+
+      const { start_hour: startHour, end_hour: endHour } = notificationType;
+
+      const argentinianTime = new Date().toLocaleString('en-US', {
+        timeZone: 'America/Argentina/Buenos_Aires',
+      });
+      const currentHour = new Date(argentinianTime).getHours();
+      const currentMinutes = new Date(argentinianTime).getMinutes();
+
+      const currentTime = `${currentHour}:${currentMinutes}`;
+
+      if (currentTime < startHour || currentTime > endHour) {
+        res.status(HttpStatus.FORBIDDEN).json({
+          data: null,
+          message: `No se puede crear una notificación fuera del horario permitido (${startHour} - ${endHour})`,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('🟥', error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al crear la notificacion',
+      });
+      return;
+    }
+
+    // Check file sizes restrictions and upload files to cloudinary
     if (files) {
       // Check file size
       const TEN_MB = 10000000;
@@ -210,6 +253,7 @@ export class PostController {
       return;
     }
 
+    // Send email to receivers
     JSON.parse(receivers).forEach(async (receiver) => {
       if (receiver.type === 'user') {
         const receiverInfo = await prisma.user.findUnique({
