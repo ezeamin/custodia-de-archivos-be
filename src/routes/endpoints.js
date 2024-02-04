@@ -56,6 +56,7 @@ export const ENDPOINTS = {
     GET_NOTIFICATIONS: '/',
     GET_NOTIFICATION: '/:notificationId',
     GET_RECEIVERS: '/receivers',
+    GET_RECEIVERS_BY_AREA: '/:notificationId/receivers/:areaId',
     GET_TYPES: '/types',
     GET_TYPE: '/types/:typeId',
     POST_NOTIFICATION: '/',

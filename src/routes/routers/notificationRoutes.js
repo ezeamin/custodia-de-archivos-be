@@ -22,6 +22,11 @@ notificationRouter.get(
   Notifications.GetController.notificationReceivers,
 );
 notificationRouter.get(
+  ENDPOINTS.NOTIFICATIONS.GET_RECEIVERS_BY_AREA,
+  isAuthenticated,
+  Notifications.GetController.notificationAreaReceivers,
+);
+notificationRouter.get(
   ENDPOINTS.NOTIFICATIONS.GET_TYPES,
   isAuthenticated,
   Notifications.GetController.notificationTypes,

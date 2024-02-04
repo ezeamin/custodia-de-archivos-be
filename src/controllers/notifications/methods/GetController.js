@@ -16,7 +16,7 @@ export class GetController {
       paramHasBeenRead === undefined ? undefined : paramHasBeenRead === 'true';
 
     try {
-      let data = await prisma.notification.findMany({
+      const data = await prisma.notification.findMany({
         where: {
           notification_isactive: true,
           id_sender: sent ? userId : undefined,
@@ -308,6 +308,66 @@ export class GetController {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener la notificación',
+      });
+    }
+  }
+
+  // @param - notificationId
+  // @param - areaId
+  static async notificationAreaReceivers(req, res) {
+    const {
+      params: { notificationId, areaId },
+      user: { id: userId },
+    } = req;
+
+    try {
+      const data = await prisma.notification_area_receiver.findMany({
+        where: {
+          id_notification: notificationId,
+          id_area: areaId,
+          NOT: {
+            id_user: userId,
+          },
+        },
+        include: {
+          user: {
+            include: {
+              employee: {
+                include: {
+                  person: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!data) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'No se encontraron receptores de notificación',
+        });
+        return;
+      }
+
+      const formattedData = data.map((receiver) => ({
+        id: receiver.id_user,
+        name: `${receiver.user.employee.person.surname}, ${receiver.user.employee.person.name}`,
+        email: receiver.user.employee.email,
+        hasReadNotification: receiver.has_read_notification,
+        timeReadNotification: receiver.time_read_notification,
+        imgSrc: receiver.user.employee.picture_url,
+      }));
+
+      res.json({
+        data: formattedData,
+        message: 'Receptores obtenidos exitosamente',
+      });
+    } catch (error) {
+      console.error('🟥', error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error al obtener los receptores de la notificación',
       });
     }
   }
