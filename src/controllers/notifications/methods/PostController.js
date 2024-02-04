@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
+import { sendNewNotificationMail } from '../../../helpers/mailing/newNotificationEmail.js';
 
 export class PostController {
   static async createNotification(req, res) {
@@ -128,8 +129,9 @@ export class PostController {
       }));
     }
 
+    let newNotification = null;
     try {
-      const newNotification = await prisma.notification.create({
+      newNotification = await prisma.notification.create({
         data: {
           message,
           notification_type: {
@@ -205,7 +207,36 @@ export class PostController {
         data: null,
         message: 'Error al crear la notificación',
       });
+      return;
     }
+
+    JSON.parse(receivers).forEach(async (receiver) => {
+      if (receiver.type === 'user') {
+        const receiverInfo = await prisma.user.findUnique({
+          where: {
+            id_user: receiver.id,
+          },
+          include: {
+            employee: {
+              include: {
+                person: true,
+              },
+            },
+          },
+        });
+
+        // TODO: What happens if receiver is not an employee: For eg. "Recursos Humanos"?
+        // TODO: What happens when you send to an area the notification? -> Should sent to all employees of that area
+        // TODO: Check performance of this query, it awaits searchs for each user in the list of receivers
+
+        sendNewNotificationMail({
+          name: receiverInfo.employee.person.name,
+          email: receiverInfo.employee.email,
+          username: receiverInfo.username,
+          notificationId: newNotification.id_notification,
+        });
+      }
+    });
   }
 
   static async createNotificationType(req, res) {

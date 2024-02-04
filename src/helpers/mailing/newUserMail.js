@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 
 import { envs } from '../envs.js';
+import { transporter } from './transport.js';
 
 const frontendUrl = envs.CLIENT_URL;
 
@@ -33,18 +34,6 @@ export const sendNewUserMail = async ({ name, email, username, password }) => {
   try {
     // 4- Send email to user
     const mailOptions = newUserMail({ name, email, username, password });
-
-    const transporter = nodemailer.createTransport({
-      host: envs.MAIL.HOST,
-      port: envs.MAIL.PORT,
-      tls: {
-        rejectUnauthorized: false,
-      },
-      auth: {
-        user: envs.MAIL.USER,
-        pass: envs.MAIL.PASS,
-      },
-    });
 
     transporter.sendMail(mailOptions, (err) => {
       if (err) {

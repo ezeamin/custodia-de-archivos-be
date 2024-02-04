@@ -1,7 +1,7 @@
-import nodemailer from 'nodemailer';
 import HttpStatus from 'http-status-codes';
 
 import { envs } from '../envs.js';
+import { transporter } from './transport.js';
 
 const recoverMailOptions = ({ user, token }) => {
   const isEmployee = !!user.id_employee;
@@ -42,18 +42,6 @@ export const sendNewUserMail = async ({
   try {
     // 4- Send email to user
     const mailOptions = recoverMailOptions({ user, token });
-
-    const transporter = nodemailer.createTransport({
-      host: envs.MAIL.HOST,
-      port: envs.MAIL.PORT,
-      tls: {
-        rejectUnauthorized: false,
-      },
-      auth: {
-        user: envs.MAIL.USER,
-        pass: envs.MAIL.PASS,
-      },
-    });
 
     transporter.sendMail(mailOptions, (err) => {
       if (err) {

@@ -66,8 +66,6 @@ export class PostController {
     }
 
     let person = null;
-
-    // Supposing that the body has been validated and sanitized
     try {
       // Check for existing (inactive) person
       const existingPerson = await prisma.person.findUnique({

@@ -33,7 +33,7 @@ export const handleUpload = async (file, privateDoc = false) => {
     .replace(/ú/g, 'u');
 
   const res = await cloudinary.uploader.upload(file64.content, {
-    resource_type: imageFormats.includes(extName) ? 'image' : 'raw',
+    resource_type: imageFormats.includes(extName.slice(1)) ? 'image' : 'raw',
     public_id: sanitizedFileName,
     type: privateDoc ? 'private' : 'upload',
   });
