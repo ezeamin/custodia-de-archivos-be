@@ -96,10 +96,8 @@ export class PostController {
       if (existingPerson && !existingPerson.person_isactive)
         activePerson = false;
 
-      const isAnEmployee = !!(existingPerson && existingPerson.employee > 0);
-      const isAThirdParty = !!(
-        existingPerson && existingPerson.third_party.length > 0
-      );
+      const isAnEmployee = !!(existingPerson && existingPerson.employee);
+      const isAThirdParty = !!(existingPerson && existingPerson.third_party);
 
       if (existingPerson && activePerson && isAnEmployee) {
         res.status(HttpStatus.BAD_REQUEST).json({

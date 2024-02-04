@@ -1,5 +1,3 @@
-import nodemailer from 'nodemailer';
-
 import { envs } from '../envs.js';
 import { transporter } from './transport.js';
 

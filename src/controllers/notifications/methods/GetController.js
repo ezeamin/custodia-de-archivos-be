@@ -126,6 +126,11 @@ export class GetController {
           (r) => r.id_receiver === userId,
         ).id_notification_receiver;
 
+        const argentineanDate = new Date(
+          new Date().toLocaleString('en-US', {
+            timeZone: 'America/Argentina/Buenos_Aires',
+          }),
+        );
         const notification_receiver = await prisma.notification_receiver.update(
           {
             where: {
@@ -135,6 +140,7 @@ export class GetController {
             },
             data: {
               has_read_notification: true,
+              time_read_notification: argentineanDate,
             },
           },
         );

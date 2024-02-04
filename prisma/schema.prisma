@@ -253,6 +253,7 @@ model notification_receiver {
   id_receiver_type               String        @db.Uuid
   id_receiver                    String        @db.Uuid
   has_read_notification          Boolean       @default(false)
+  time_read_notification         DateTime?     @db.Timestamp(6)
   notification_receiver_isactive Boolean       @default(true)
   notification                   notification  @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receiver_notification")
   receiver_type                  receiver_type @relation(fields: [id_receiver_type], references: [id_receiver_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_receiver_receiver_type")
@@ -289,7 +290,7 @@ model person {
   civil_status_type     civil_status_type? @relation(fields: [id_civil_status], references: [id_civil_status_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_civil_status")
   gender                gender?            @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
   phone                 phone?             @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
-  third_party           third_party[]
+  third_party           third_party?
 }
 
 model phone {
@@ -326,7 +327,7 @@ model street {
 
 model third_party {
   id_third_party       String  @id(map: "pk") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_person            String  @db.Uuid
+  id_person            String  @unique @db.Uuid
   description          String? @db.VarChar(100)
   email                String  @unique @db.VarChar(75)
   third_party_isactive Boolean @default(true)

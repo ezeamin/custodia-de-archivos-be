@@ -111,7 +111,7 @@ CREATE TABLE public.user_type (
 
 CREATE TABLE public.third_party (
     id_third_party       UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_person            UUID NOT NULL,
+    id_person            UUID NOT NULL UNIQUE,
     "description"        varchar(100),
     email                varchar(75) NOT NULL UNIQUE,
     third_party_isactive boolean DEFAULT true NOT NULL,
@@ -381,6 +381,7 @@ CREATE TABLE public.notification_receiver (
     id_receiver_type                    UUID NOT NULL,
     id_receiver                         UUID NOT NULL,
     has_read_notification               boolean DEFAULT false NOT NULL,
+    time_read_notification              timestamp,
     notification_receiver_isactive      boolean DEFAULT true NOT NULL,
     CONSTRAINT pk_notification_receiver PRIMARY KEY (id_notification_receiver),
     CONSTRAINT fk_notification_receiver_notification FOREIGN KEY (id_notification) REFERENCES public.notification(id_notification),
