@@ -388,6 +388,20 @@ CREATE TABLE public.notification_receiver (
     CONSTRAINT fk_notification_receiver_receiver_type FOREIGN KEY (id_receiver_type) REFERENCES public.receiver_type(id_receiver_type)
 );
 
+CREATE TABLE public.notification_area_receiver (
+    id_notification_area_receiver        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_notification                      UUID NOT NULL,
+    id_area                              UUID NOT NULL,
+    id_user                              UUID NOT NULL,
+    has_read_notification                boolean DEFAULT false NOT NULL,
+    time_read_notification               timestamp,
+    notification_area_receiver_isactive  boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_notification_area_receiver PRIMARY KEY (id_notification_area_receiver),
+    CONSTRAINT fk_notification_area_receiver_notification FOREIGN KEY (id_notification) REFERENCES public.notification(id_notification),
+    CONSTRAINT fk_notification_area_receiver_user FOREIGN KEY (id_user) REFERENCES public."user"(id_user),
+    CONSTRAINT fk_notification_area_receiver_area FOREIGN KEY (id_area) REFERENCES public.area(id_area)
+);
+
 CREATE TABLE public.employee_doc (
     id_employee_doc               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee                   UUID NOT NULL,

@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS public.notification_receiver CASCADE;
 DROP TABLE IF EXISTS public.notification_doc CASCADE;
 DROP TABLE IF EXISTS public.notification CASCADE;
 DROP TABLE IF EXISTS public.notification_type CASCADE;
+DROP TABLE IF EXISTS public.notification_area_receiver CASCADE;
 DROP TABLE IF EXISTS public.receiver_type CASCADE;
 
 -- Drop the schema

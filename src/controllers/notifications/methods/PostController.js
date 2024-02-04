@@ -3,6 +3,9 @@ import HttpStatus from 'http-status-codes';
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { sendNewNotificationMail } from '../../../helpers/mailing/newNotificationEmail.js';
+import { createIndividualNotificationReceiverData } from '../../../helpers/notificationReceivers.js';
+
+const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 
 export class PostController {
   static async createNotification(req, res) {
@@ -193,9 +196,10 @@ export class PostController {
       // Receivers
 
       const receiverTypes = await prisma.receiver_type.findMany();
-      const allEmployeesReceiverId = receiverTypes.find((r) =>
-        r.receiver_type.toLowerCase().includes('todos'),
-      )?.id_receiver_type;
+
+      const areaTypeId = receiverTypes.find((r) =>
+        r.receiver_type.toLowerCase().includes('area'),
+      ).id_receiver_type;
 
       const receiverHasAllEmployees =
         JSON.parse(receivers).findIndex((receiver) =>
@@ -207,9 +211,16 @@ export class PostController {
         await prisma.notification_receiver.create({
           data: {
             id_notification: newNotification.id_notification,
-            id_receiver: userId,
-            id_receiver_type: allEmployeesReceiverId,
+            id_receiver: ALL_EMPLOYEES_ID,
+            id_receiver_type: areaTypeId,
           },
+        });
+
+        createIndividualNotificationReceiverData({
+          notificationId: newNotification.id_notification,
+          areaId: ALL_EMPLOYEES_ID,
+          isAllEmployees: true,
+          userId,
         });
       } else {
         await prisma.notification_receiver.createMany({
@@ -221,24 +232,82 @@ export class PostController {
             ).id_receiver_type,
           })),
         });
+
+        try {
+          JSON.parse(receivers).forEach((receiver) => {
+            if (receiver.type === 'area') {
+              createIndividualNotificationReceiverData({
+                notificationId: newNotification.id_notification,
+                areaId: receiver.id,
+                userId,
+              });
+            }
+          });
+        } catch (error) {
+          console.error('🟥', error);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            data: null,
+            message: 'Error al crear la notificación',
+          });
+          prisma.notification.delete({
+            where: {
+              id_notification: newNotification.id_notification,
+            },
+          });
+          prisma.notification_receiver.deleteMany({
+            where: {
+              id_notification: newNotification.id_notification,
+            },
+          });
+          return;
+        }
       }
 
       // Create docs entries (if any)
 
       const notificationDocsPromises = [];
-      docs.forEach((doc) => {
-        const promise = prisma.notification_doc.create({
-          data: {
-            id_notification: newNotification.id_notification,
-            notification_doc_name: doc.name,
-            notification_doc_url: doc.url,
-          },
+      try {
+        docs.forEach((doc) => {
+          const promise = prisma.notification_doc.create({
+            data: {
+              id_notification: newNotification.id_notification,
+              notification_doc_name: doc.name,
+              notification_doc_url: doc.url,
+            },
+          });
+
+          notificationDocsPromises.push(promise);
         });
 
-        notificationDocsPromises.push(promise);
-      });
-
-      await Promise.all(notificationDocsPromises);
+        await Promise.all(notificationDocsPromises);
+      } catch (error) {
+        console.error('🟥', error);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          data: null,
+          message: 'Error al crear la notificación',
+        });
+        prisma.notification.delete({
+          where: {
+            id_notification: newNotification.id_notification,
+          },
+        });
+        prisma.notification_receiver.deleteMany({
+          where: {
+            id_notification: newNotification.id_notification,
+          },
+        });
+        prisma.notification_area_receiver.deleteMany({
+          where: {
+            id_notification: newNotification.id_notification,
+          },
+        });
+        prisma.notification_doc.deleteMany({
+          where: {
+            id_notification: newNotification.id_notification,
+          },
+        });
+        return;
+      }
 
       res.status(HttpStatus.CREATED).json({
         data: newNotification,
