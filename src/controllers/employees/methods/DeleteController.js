@@ -1,4 +1,5 @@
 import HttpStatus from 'http-status-codes';
+import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
@@ -178,6 +179,296 @@ export class DeleteController {
         data: null,
         message:
           'Ocurrió un error al eliminar las vacaciones. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - absenceId
+  static async deleteEmployeeAbsence(req, res) {
+    const {
+      params: { absenceId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const absence = await prisma.absence.findUnique({
+        where: {
+          id_absence: absenceId,
+          absence_isactive: true,
+        },
+      });
+
+      if (!absence) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'La ausencia no existe',
+        });
+        return;
+      }
+
+      await prisma.absence.update({
+        where: {
+          id_absence: absenceId,
+          absence_isactive: true,
+        },
+        data: {
+          absence_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Ausencia eliminada exitosamente',
+      });
+
+      registerChange({
+        changedField: 'absence',
+        changedFieldLabel: 'Eliminación de Ausencia',
+        changedTable: 'absence',
+        previousValue: `${absence.reason_absence} - ${dayjs(absence.date_absence).format('DD/MM/YYYY')}`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: absence.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar la ausencia. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - trainingId
+  static async deleteEmployeeTraining(req, res) {
+    const {
+      params: { trainingId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const training = await prisma.training.findUnique({
+        where: {
+          id_training: trainingId,
+          training_isactive: true,
+        },
+      });
+
+      if (!training) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'La capacitación no existe',
+        });
+        return;
+      }
+
+      await prisma.training.update({
+        where: {
+          id_training: trainingId,
+          training_isactive: true,
+        },
+        data: {
+          training_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Capacitación eliminada exitosamente',
+      });
+
+      registerChange({
+        changedField: 'training',
+        changedFieldLabel: 'Eliminación de Capacitación',
+        changedTable: 'training',
+        previousValue: `${training.reason_training} - ${dayjs(training.date_training).format('DD/MM/YYYY')}`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: training.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar la capacitación. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - formalWarningId
+  static async deleteEmployeeFormalWarning(req, res) {
+    const {
+      params: { formalWarningId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const formalWarning = await prisma.formal_warning.findUnique({
+        where: {
+          id_formal_warning: formalWarningId,
+          formal_warning_isactive: true,
+        },
+      });
+
+      if (!formalWarning) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El llamado de atención no existe',
+        });
+        return;
+      }
+
+      await prisma.formal_warning.update({
+        where: {
+          id_formal_warning: formalWarningId,
+          formal_warning_isactive: true,
+        },
+        data: {
+          formal_warning_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Llamado de atención eliminado exitosamente',
+      });
+
+      registerChange({
+        changedField: 'formal_warning',
+        changedFieldLabel: 'Eliminación de Llamado de Atención',
+        changedTable: 'formal_warning',
+        previousValue: formalWarning.reason_formal_warning,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: formalWarning.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar El llamado de atención. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - extraHourId
+  static async deleteEmployeeExtraHour(req, res) {
+    const {
+      params: { extraHourId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const extraHour = await prisma.extra_hours.findUnique({
+        where: {
+          id_extra_hours: extraHourId,
+          extra_hours_isactive: true,
+        },
+      });
+
+      if (!extraHour) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'La hora extra no existe',
+        });
+        return;
+      }
+
+      await prisma.extra_hours.update({
+        where: {
+          id_extra_hours: extraHourId,
+          extra_hours_isactive: true,
+        },
+        data: {
+          extra_hours_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Hora extra eliminada exitosamente',
+      });
+
+      registerChange({
+        changedField: 'extra_hours',
+        changedFieldLabel: 'Eliminación de Hora Extra',
+        changedTable: 'extra_hours',
+        previousValue: `${dayjs(extraHour.date_extra_hours).format('DD/MM/YYYY')} - ${extraHour.qty_extra_hours} horas`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: extraHour.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar la hora extra. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  // @param - lateArrivalId
+  static async deleteEmployeeLateArrival(req, res) {
+    const {
+      params: { lateArrivalId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const lateArrival = await prisma.late_arrival.findUnique({
+        where: {
+          id_late_arrival: lateArrivalId,
+          late_arrival_isactive: true,
+        },
+      });
+
+      if (!lateArrival) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'La llegada tarde no existe',
+        });
+        return;
+      }
+
+      await prisma.late_arrival.update({
+        where: {
+          id_late_arrival: lateArrivalId,
+          late_arrival_isactive: true,
+        },
+        data: {
+          late_arrival_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Llegada tarde eliminada exitosamente',
+      });
+
+      registerChange({
+        changedField: 'late_arrival',
+        changedFieldLabel: 'Eliminación de Llegada Tarde',
+        changedTable: 'late_arrival',
+        previousValue: `${dayjs(lateArrival.date_late_arrival).format('DD/MM/YYYY')} - Llegada a las ${lateArrival.time_late_arrival}`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: lateArrival.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar la llegada tarde. Intente de nuevo más tarde.',
       });
     }
   }

@@ -296,6 +296,36 @@ employeeRouter.delete(
   Employees.DeleteController.deleteEmployeeDoc,
 );
 employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_ABSENCE,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeAbsence,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_TRAINING,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeTraining,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FORMAL_WARNING,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeFormalWarning,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_EXTRA_HOUR,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeExtraHour,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LATE_ARRIVAL,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeLateArrival,
+);
+employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LICENSE,
   isAuthenticated,
   isAdmin,

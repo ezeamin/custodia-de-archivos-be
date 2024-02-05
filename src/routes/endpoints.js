@@ -45,6 +45,12 @@ export const ENDPOINTS = {
     PUT_TRAINING_TYPE: '/trainings/types/:trainingTypeId',
     DELETE_EMPLOYEE: '/:employeeId',
     DELETE_EMPLOYEE_DOC: '/:employeeId/docs/:docId',
+    DELETE_EMPLOYEE_ABSENCE: '/:employeeId/absences/:absenceId',
+    DELETE_EMPLOYEE_TRAINING: '/:employeeId/trainings/:trainingId',
+    DELETE_EMPLOYEE_FORMAL_WARNING:
+      '/:employeeId/formal-warnings/:formalWarningId',
+    DELETE_EMPLOYEE_EXTRA_HOUR: '/:employeeId/extra-hours/:extraHourId',
+    DELETE_EMPLOYEE_LATE_ARRIVAL: '/:employeeId/late-arrivals/:lateArrivalId',
     DELETE_EMPLOYEE_LICENSE: '/:employeeId/licenses/:licenseId',
     DELETE_EMPLOYEE_VACATION: '/:employeeId/vacations/:vacationId',
     DELETE_EMPLOYEE_FAMILY_MEMBER: '/:employeeId/family/:familyMemberId',
