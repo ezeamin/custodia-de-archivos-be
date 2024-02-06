@@ -16,6 +16,8 @@ export const registerEmployeeUpdateChanges = async (
       : null,
     no_file: previousData.no_file,
     working_hours: previousData.working_hours,
+    drivers_license_expiration_date:
+      previousData.drivers_license_expiration_date,
   };
   const personPreviousData = {
     id_gender: previousData.person.id_gender,
@@ -168,6 +170,23 @@ export const registerEmployeeUpdateChanges = async (
       changedFieldLabel: 'Horas de Trabajo',
       previousValue: employeePreviousData.working_hours,
       newValue: employeeNewData.working_hours,
+    });
+  }
+
+  if (
+    employeeNewData &&
+    employeeNewData.drivers_license_expiration_date &&
+    employeePreviousData.drivers_license_expiration_date !==
+      employeeNewData.drivers_license_expiration_date
+  ) {
+    registerChange({
+      modifyingUser: userId,
+      employeeId: previousData.id_employee,
+      changedTable: 'employee',
+      changedField: 'drivers_license_expiration_date',
+      changedFieldLabel: 'Expiración Carnet de Manejo',
+      previousValue: employeePreviousData.drivers_license_expiration_date,
+      newValue: employeeNewData.drivers_license_expiration_date,
     });
   }
 

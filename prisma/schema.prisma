@@ -50,34 +50,35 @@ model civil_status_type {
 }
 
 model employee {
-  id_employee         String             @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_person           String             @unique @db.Uuid
-  id_status           String             @db.Uuid
-  id_area             String             @db.Uuid
-  no_file             Int                @unique
-  email               String             @unique @db.VarChar(75)
-  employment_date     DateTime           @db.Timestamp(6)
-  termination_date    DateTime?          @db.Timestamp(6)
-  position            String             @db.VarChar(100)
-  working_hours       Int?               @default(0)
-  picture_url         String             @db.VarChar(300)
-  employee_isactive   Boolean            @default(true)
-  employee_created_at DateTime           @default(now()) @db.Timestamp(6)
-  employee_updated_at DateTime?          @default(now()) @db.Timestamp(6)
-  absence             absence[]
-  area                area               @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
-  person              person             @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
-  employee_status     employee_status    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
-  employee_doc        employee_doc[]
-  employee_history    employee_history[]
-  extra_hours         extra_hours[]
-  family_member       family_member[]
-  formal_warning      formal_warning[]
-  late_arrival        late_arrival[]
-  license             license[]
-  training            training[]
-  user                user[]
-  vacation            vacation[]
+  id_employee                     String             @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_person                       String             @unique @db.Uuid
+  id_status                       String             @db.Uuid
+  id_area                         String             @db.Uuid
+  no_file                         Int                @unique
+  email                           String             @unique @db.VarChar(75)
+  employment_date                 DateTime           @db.Timestamp(6)
+  termination_date                DateTime?          @db.Timestamp(6)
+  position                        String             @db.VarChar(100)
+  working_hours                   Int?               @default(0)
+  picture_url                     String             @db.VarChar(300)
+  drivers_license_expiration_date DateTime?          @db.Timestamp(6)
+  employee_isactive               Boolean            @default(true)
+  employee_created_at             DateTime           @default(now()) @db.Timestamp(6)
+  employee_updated_at             DateTime?          @default(now()) @db.Timestamp(6)
+  absence                         absence[]
+  area                            area               @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
+  person                          person             @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
+  employee_status                 employee_status    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
+  employee_doc                    employee_doc[]
+  employee_history                employee_history[]
+  extra_hours                     extra_hours[]
+  family_member                   family_member[]
+  formal_warning                  formal_warning[]
+  late_arrival                    late_arrival[]
+  license                         license[]
+  training                        training[]
+  user                            user[]
+  vacation                        vacation[]
 }
 
 model employee_doc {

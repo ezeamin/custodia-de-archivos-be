@@ -11,12 +11,15 @@ export const formatEmployeeData = (originalData) => {
       termination_date: originalData.endDate,
       no_file: originalData.fileNumber,
       working_hours: originalData.workingHours,
+      drivers_license_expiration_date: originalData.driversLicenseDate,
     },
     person: {
       id_gender: originalData.genderId,
       id_civil_status: originalData.civilStatusId,
-      name: uppercaseName(originalData.name),
-      surname: uppercaseName(originalData.lastname),
+      name: originalData.name ? uppercaseName(originalData.name) : undefined,
+      surname: originalData.lastname
+        ? uppercaseName(originalData.lastname)
+        : undefined,
       birth_date: originalData.birthdate,
       identification_number: originalData.dni,
     },

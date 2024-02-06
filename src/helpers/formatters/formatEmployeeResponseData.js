@@ -41,6 +41,7 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
   },
   startDate: employee.employment_date,
   endDate: employee.termination_date,
+  driversLicenseDate: employee.drivers_license_expiration_date,
   user: user
     ? {
         id: user.id_user,

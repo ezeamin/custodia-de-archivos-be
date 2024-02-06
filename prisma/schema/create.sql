@@ -79,12 +79,21 @@ CREATE TABLE public.civil_status_type (
     CONSTRAINT pk_civil_status_type PRIMARY KEY (id_civil_status_type)
 );
 
+CREATE TABLE public.health_insurance (
+    id_health_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
+    health_insurance varchar(50),
+    affiliate_number varchar(20),
+    health_insurance_isactive boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_health_insurance PRIMARY KEY (id_health_insurance)
+);
+
 CREATE TABLE public.person (
     id_person            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_gender            UUID ,
     id_address           UUID ,
     id_phone             UUID ,
     id_civil_status      UUID ,
+    id_health_insurance  UUID ,
     name                 varchar(50) NOT NULL,
     surname              varchar(50) NOT NULL,
     birth_date           timestamp NOT NULL,
@@ -96,7 +105,8 @@ CREATE TABLE public.person (
     CONSTRAINT fk_person_gender FOREIGN KEY (id_gender) REFERENCES public.gender(id_gender),
     CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public."address"(id_address),
     CONSTRAINT fk_person_phone FOREIGN KEY (id_phone) REFERENCES public.phone(id_phone),
-    CONSTRAINT fk_person_civil_status FOREIGN KEY (id_civil_status) REFERENCES public.civil_status_type(id_civil_status_type)
+    CONSTRAINT fk_person_civil_status FOREIGN KEY (id_civil_status) REFERENCES public.civil_status_type(id_civil_status_type),
+    CONSTRAINT fk_person_health_insurance FOREIGN KEY (id_health_insurance) REFERENCES public.health_insurance(id_health_insurance)
 );
 
 CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
@@ -119,28 +129,65 @@ CREATE TABLE public.third_party (
     CONSTRAINT fk_third_party_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
 );
 
+CREATE TABLE public.preoccupational_checkup (
+    id_preoccupational_checkup                  UUID DEFAULT uuid_generate_v7() NOT NULL,
+    is_fit                                      boolean NOT NULL,   
+    observations_preoccupational_checkup        varchar(200),
+    preoccupational_checkup_isactive            boolean DEFAULT true NOT NULL,
+    preoccupational_checkup_created_at          timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    preoccupational_checkup_updated_at          timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_preoccupational_checkup PRIMARY KEY (id_preoccupational_checkup)
+);
+
 CREATE TABLE public.employee (
-    id_employee          UUID DEFAULT uuid_generate_v7() NOT NULL,
-    id_person            UUID NOT NULL UNIQUE,
-    id_status            UUID NOT NULL,
-    id_area              UUID NOT NULL,
-    no_file              integer NOT NULL UNIQUE,
-    email                varchar(75) NOT NULL UNIQUE,
-    employment_date      timestamp NOT NULL,
-    termination_date     timestamp,
-    position             varchar(100) NOT NULL,
-    working_hours        integer DEFAULT 0,
-    picture_url          varchar(300) NOT NULL,
-    employee_isactive    boolean DEFAULT true NOT NULL,
-    employee_created_at  timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    employee_updated_at  timestamp DEFAULT CURRENT_TIMESTAMP,
+    id_employee                         UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_person                           UUID NOT NULL UNIQUE,
+    id_status                           UUID NOT NULL,
+    id_area                             UUID NOT NULL,
+    id_preoccupational_checkup          UUID,
+    no_file                             integer NOT NULL UNIQUE,
+    email                               varchar(75) NOT NULL UNIQUE,
+    employment_date                     timestamp NOT NULL,
+    termination_date                    timestamp,
+    position                            varchar(100) NOT NULL,
+    working_hours                       integer DEFAULT 0,
+    picture_url                         varchar(300) NOT NULL,
+    drivers_license_expiration_date     timestamp,
+    employee_isactive                   boolean DEFAULT true NOT NULL,
+    employee_created_at                 timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    employee_updated_at                 timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_employee PRIMARY KEY (id_employee),
     CONSTRAINT fk_employee_status FOREIGN KEY (id_status) REFERENCES public.employee_status(id_status),
     CONSTRAINT fk_employee_area FOREIGN KEY (id_area) REFERENCES public.area(id_area),
-    CONSTRAINT fk_employee_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
+    CONSTRAINT fk_employee_person FOREIGN KEY (id_person) REFERENCES public.person(id_person),
+    CONSTRAINT fk_employee_preoccupational_checkup FOREIGN KEY (id_preoccupational_checkup) REFERENCES public.preoccupational_checkup(id_preoccupational_checkup)
 );
 
 CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
+
+CREATE TABLE public.life_insurance (
+    id_life_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_employee UUID NOT NULL,
+    life_insurance_name varchar(50) NOT NULL,
+    policy_number varchar(20) NOT NULL,
+    life_insurance_isactive boolean DEFAULT true NOT NULL,
+    life_insurance_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    life_insurance_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_life_insurance PRIMARY KEY (id_life_insurance),
+    CONSTRAINT fk_life_insurance_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+);
+
+CREATE TABLE public.employee_beneficiary_life_insurance (
+    id_beneficiary_life_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_life_insurance UUID NOT NULL,
+    id_person UUID NOT NULL,
+    beneficiary_percentage integer DEFAULT 100 NOT NULL,
+    beneficiary_life_insurance_isactive boolean DEFAULT true NOT NULL,
+    beneficiary_life_insurance_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    beneficiary_life_insurance_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_beneficiary_life_insurance PRIMARY KEY (id_beneficiary_life_insurance),
+    CONSTRAINT fk_beneficiary_life_insurance_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
+);
 
 CREATE TABLE public.family_relationship_type (
     id_family_relationship_type             UUID DEFAULT uuid_generate_v7() NOT NULL,
@@ -524,6 +571,20 @@ CREATE TRIGGER update_employee_updated_at
 BEFORE UPDATE ON public.employee
 FOR EACH ROW
 EXECUTE PROCEDURE update_employee_updated_at();
+
+-- preoccupational_checkup updated_at trigger
+CREATE OR REPLACE FUNCTION update_preoccupational_checkup_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.preoccupational_checkup_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_preoccupational_checkup_updated_at
+BEFORE UPDATE ON public.preoccupational_checkup
+FOR EACH ROW
+EXECUTE PROCEDURE update_preoccupational_checkup_updated_at();
 
 -- user updated_at trigger
 CREATE OR REPLACE FUNCTION update_user_updated_at()

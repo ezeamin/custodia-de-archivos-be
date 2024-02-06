@@ -1,10 +1,10 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
-import { calculateDateDiffInAges } from '../../../helpers/helpers.js';
 import { getDownloadLink } from '../../../helpers/cloudinary.js';
 import { formatHistoryData } from '../../../helpers/formatters/formatHistoryData.js';
 import { formatEmployeeResponseData } from '../../../helpers/formatters/formatEmployeeResponseData.js';
+import { formatEmployeesData } from '../../../helpers/formatters/formatEmployeesData.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -64,30 +64,12 @@ export class GetController {
 
       const [count, data] = await Promise.all([countPromise, dataPromise]);
 
-      const formattedData = data.map((employee) => ({
-        id: employee.id_employee,
-        dni: employee.person.identification_number,
-        imgSrc: employee.picture_url,
-        lastname: employee.person.surname,
-        firstname: employee.person.name,
-        age: calculateDateDiffInAges(employee.person.birth_date),
-        antiquity: calculateDateDiffInAges(employee.employment_date),
-        position: employee.position,
-        area: {
-          id: employee.area.id_area,
-          description: employee.area.area,
-        },
-        fileNumber: employee.no_file,
-        status: {
-          id: employee.id_status,
-          description: employee.employee_status.status,
-        },
-      }));
+      const formattedData = formatEmployeesData(data);
 
       res.json({
         data: formattedData,
         totalElements: count,
-        message: 'Employees retrieved successfully',
+        message: 'Empleados recuperados exitosamente',
       });
     } catch (e) {
       console.error('🟥', e);
@@ -229,7 +211,6 @@ export class GetController {
     }
   }
 
-  // http://localhost:3000/api/v1/employees/:employeeId/history
   // @param - employeeId
   static async employeeHistory(req, res) {
     const {
