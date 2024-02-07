@@ -115,6 +115,35 @@ export class GetController {
             },
           },
           employee_status: true,
+          life_insurance: {
+            include: {
+              employee_life_insurance_beneficiary: {
+                include: {
+                  person: {
+                    include: {
+                      address: {
+                        include: {
+                          street: {
+                            include: {
+                              locality: {
+                                include: {
+                                  province: true,
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      phone: true,
+                    },
+                  },
+                  family_relationship_type: true,
+                },
+              },
+            },
+          },
+          health_insurance: true,
+          preoccupational_checkup: true,
         },
       });
 

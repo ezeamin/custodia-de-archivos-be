@@ -50,25 +50,29 @@ model civil_status_type {
 }
 
 model employee {
-  id_employee                     String             @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_person                       String             @unique @db.Uuid
-  id_status                       String             @db.Uuid
-  id_area                         String             @db.Uuid
-  no_file                         Int                @unique
-  email                           String             @unique @db.VarChar(75)
-  employment_date                 DateTime           @db.Timestamp(6)
-  termination_date                DateTime?          @db.Timestamp(6)
-  position                        String             @db.VarChar(100)
-  working_hours                   Int?               @default(0)
-  picture_url                     String             @db.VarChar(300)
-  drivers_license_expiration_date DateTime?          @db.Timestamp(6)
-  employee_isactive               Boolean            @default(true)
-  employee_created_at             DateTime           @default(now()) @db.Timestamp(6)
-  employee_updated_at             DateTime?          @default(now()) @db.Timestamp(6)
+  id_employee                     String                   @id(map: "pk_employee") @unique(map: "unq_id_employee") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_person                       String                   @unique @db.Uuid
+  id_status                       String                   @db.Uuid
+  id_area                         String                   @db.Uuid
+  id_preoccupational_checkup      String?                  @db.Uuid
+  id_health_insurance             String?                  @db.Uuid
+  no_file                         Int                      @unique
+  email                           String                   @unique @db.VarChar(75)
+  employment_date                 DateTime                 @db.Timestamp(6)
+  termination_date                DateTime?                @db.Timestamp(6)
+  position                        String                   @db.VarChar(100)
+  working_hours                   Int?                     @default(0)
+  picture_url                     String                   @db.VarChar(300)
+  drivers_license_expiration_date DateTime?                @db.Timestamp(6)
+  employee_isactive               Boolean                  @default(true)
+  employee_created_at             DateTime                 @default(now()) @db.Timestamp(6)
+  employee_updated_at             DateTime?                @default(now()) @db.Timestamp(6)
   absence                         absence[]
-  area                            area               @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
-  person                          person             @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
-  employee_status                 employee_status    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
+  area                            area                     @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
+  health_insurance                health_insurance?        @relation(fields: [id_health_insurance], references: [id_health_insurance], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_health_insurance")
+  person                          person                   @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
+  preoccupational_checkup         preoccupational_checkup? @relation(fields: [id_preoccupational_checkup], references: [id_preoccupational_checkup], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_preoccupational_checkup")
+  employee_status                 employee_status          @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_status")
   employee_doc                    employee_doc[]
   employee_history                employee_history[]
   extra_hours                     extra_hours[]
@@ -76,6 +80,7 @@ model employee {
   formal_warning                  formal_warning[]
   late_arrival                    late_arrival[]
   license                         license[]
+  life_insurance                  life_insurance[]
   training                        training[]
   user                            user[]
   vacation                        vacation[]
@@ -143,10 +148,11 @@ model family_member {
 }
 
 model family_relationship_type {
-  id_family_relationship_type       String          @id(map: "pk_family_relationship_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  family_relationship_type          String          @db.VarChar(20)
-  family_relationship_type_isactive Boolean         @default(true)
-  family_member                     family_member[]
+  id_family_relationship_type         String                                @id(map: "pk_family_relationship_type") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  family_relationship_type            String                                @db.VarChar(20)
+  family_relationship_type_isactive   Boolean                               @default(true)
+  employee_life_insurance_beneficiary employee_life_insurance_beneficiary[]
+  family_member                       family_member[]
 }
 
 model formal_warning {
@@ -275,25 +281,26 @@ model notification_type {
 }
 
 model person {
-  id_person             String             @id(map: "pk_person") @unique(map: "unq_id_person") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_gender             String?            @db.Uuid
-  id_address            String?            @db.Uuid
-  id_phone              String?            @db.Uuid
-  id_civil_status       String?            @db.Uuid
-  name                  String             @db.VarChar(50)
-  surname               String             @db.VarChar(50)
-  birth_date            DateTime           @db.Timestamp(6)
-  identification_number String             @unique @db.VarChar(8)
-  person_isactive       Boolean            @default(true)
-  person_created_at     DateTime           @default(now()) @db.Timestamp(6)
-  person_updated_at     DateTime?          @default(now()) @db.Timestamp(6)
-  employee              employee?
-  family_member         family_member[]
-  address               address?           @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
-  civil_status_type     civil_status_type? @relation(fields: [id_civil_status], references: [id_civil_status_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_civil_status")
-  gender                gender?            @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
-  phone                 phone?             @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
-  third_party           third_party?
+  id_person                           String                                @id(map: "pk_person") @unique(map: "unq_id_person") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_gender                           String?                               @db.Uuid
+  id_address                          String?                               @db.Uuid
+  id_phone                            String?                               @db.Uuid
+  id_civil_status                     String?                               @db.Uuid
+  name                                String                                @db.VarChar(50)
+  surname                             String                                @db.VarChar(50)
+  birth_date                          DateTime                              @db.Timestamp(6)
+  identification_number               String                                @unique @db.VarChar(8)
+  person_isactive                     Boolean                               @default(true)
+  person_created_at                   DateTime                              @default(now()) @db.Timestamp(6)
+  person_updated_at                   DateTime?                             @default(now()) @db.Timestamp(6)
+  employee                            employee?
+  employee_life_insurance_beneficiary employee_life_insurance_beneficiary[]
+  family_member                       family_member[]
+  address                             address?                              @relation(fields: [id_address], references: [id_address], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_address")
+  civil_status_type                   civil_status_type?                    @relation(fields: [id_civil_status], references: [id_civil_status_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_civil_status")
+  gender                              gender?                               @relation(fields: [id_gender], references: [id_gender], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_gender")
+  phone                               phone?                                @relation(fields: [id_phone], references: [id_phone], onDelete: NoAction, onUpdate: NoAction, map: "fk_person_phone")
+  third_party                         third_party?
 }
 
 model phone {
@@ -433,4 +440,48 @@ model notification_area_receiver {
   area                                area         @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_area_receiver_area")
   notification                        notification @relation(fields: [id_notification], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_area_receiver_notification")
   user                                user         @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_area_receiver_user")
+}
+
+model health_insurance {
+  id_health_insurance       String     @id(map: "pk_health_insurance") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  health_insurance          String     @db.VarChar(50)
+  affiliate_number          String     @db.VarChar(20)
+  health_insurance_isactive Boolean    @default(true)
+  employee                  employee[]
+}
+
+model life_insurance {
+  id_life_insurance                   String                                @id(map: "pk_life_insurance") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_employee                         String                                @db.Uuid
+  life_insurance_name                 String                                @db.VarChar(50)
+  policy_number                       String                                @db.VarChar(20)
+  life_insurance_isactive             Boolean                               @default(true)
+  life_insurance_created_at           DateTime                              @default(now()) @db.Timestamp(6)
+  life_insurance_updated_at           DateTime?                             @default(now()) @db.Timestamp(6)
+  employee_life_insurance_beneficiary employee_life_insurance_beneficiary[]
+  employee                            employee                              @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_employee")
+}
+
+model preoccupational_checkup {
+  id_preoccupational_checkup           String     @id(map: "pk_preoccupational_checkup") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  is_fit                               Boolean
+  observations_preoccupational_checkup String?    @db.VarChar(200)
+  preoccupational_checkup_isactive     Boolean    @default(true)
+  preoccupational_checkup_created_at   DateTime   @default(now()) @db.Timestamp(6)
+  preoccupational_checkup_updated_at   DateTime?  @default(now()) @db.Timestamp(6)
+  employee                             employee[]
+}
+
+model employee_life_insurance_beneficiary {
+  id_life_insurance_beneficiary         String                   @id(map: "pk_life_insurance_beneficiary") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_life_insurance                     String                   @db.Uuid
+  id_person                             String                   @db.Uuid
+  id_relationship_type                  String                   @db.Uuid
+  beneficiary_percentage                Int                      @default(100)
+  life_insurance_beneficiary_isactive   Boolean                  @default(true)
+  life_insurance_beneficiary_created_at DateTime                 @default(now()) @db.Timestamp(6)
+  life_insurance_beneficiary_updated_at DateTime?                @default(now()) @db.Timestamp(6)
+  life_insurance                        life_insurance           @relation(fields: [id_life_insurance], references: [id_life_insurance], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_beneficiary_life_insurance")
+  person                                person                   @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_beneficiary_person")
+  family_relationship_type              family_relationship_type @relation(fields: [id_relationship_type], references: [id_family_relationship_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_beneficiary_relationship_type")
 }

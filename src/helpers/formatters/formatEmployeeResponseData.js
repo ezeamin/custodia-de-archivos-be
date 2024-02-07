@@ -8,6 +8,60 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
   firstname: employee.person.name,
   birthdate: employee.person.birth_date,
   workingHours: employee.working_hours,
+  healthInsurance: employee.health_insurance
+    ? {
+        name: employee.health_insurance.health_insurance,
+        affiliateNumber: employee.health_insurance.affiliate_number,
+      }
+    : null,
+  preoccupationalCheckup: employee.preoccupational_checkup
+    ? {
+        fit: employee.preoccupational_checkup.fit,
+        observations: employee.preoccupational_checkup.observations,
+      }
+    : null,
+  lifeInsurances: employee.life_insurance.map((insurance) => ({
+    id: insurance.id_life_insurance,
+    name: insurance.life_insurance_name,
+    policyNumber: insurance.policy_number,
+    beneficiaries: insurance.employee_life_insurance_beneficiary.map(
+      (beneficiary) => ({
+        id: beneficiary.id_life_insurance_beneficiary,
+        name: beneficiary.person.name,
+        lastname: beneficiary.person.surname,
+        dni: beneficiary.person.identification_number,
+        phone: beneficiary.person.phone
+          ? beneficiary.person.phone.phone_no
+          : null,
+        address: beneficiary.person.address
+          ? {
+              street: {
+                id: beneficiary.person.address.street.street_api_id,
+                description: beneficiary.person.address.street.street,
+              },
+              streetNumber: beneficiary.person.address.street_number,
+              apt: beneficiary.person.address.floor || null,
+              state: {
+                id: beneficiary.person.address.street.locality.province
+                  .province_api_id,
+                description:
+                  beneficiary.person.address.street.locality.province.province,
+              },
+              locality: {
+                id: beneficiary.person.address.street.locality.locality_api_id,
+                description:
+                  beneficiary.person.address.street.locality.locality,
+              },
+            }
+          : null,
+        relationship: {
+          id: beneficiary.id_family_relationship_type,
+          description:
+            beneficiary.family_relationship_type.family_relationship_type,
+        },
+      }),
+    ),
+  })),
   civilStatus: employee.person.civil_status_type
     ? {
         id: employee.person.id_civil_status,

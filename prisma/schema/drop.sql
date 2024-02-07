@@ -14,7 +14,7 @@ DROP TABLE IF EXISTS public.employee_history CASCADE;
 DROP TABLE IF EXISTS public."user" CASCADE;
 DROP TABLE IF EXISTS public.health_insurance CASCADE;
 DROP TABLE IF EXISTS public.life_insurance_type CASCADE;
-DROP TABLE IF EXISTS public.employee_beneficiary_life_insurance CASCADE;
+DROP TABLE IF EXISTS public.employee_life_insurance_beneficiary CASCADE;
 DROP TABLE IF EXISTS public.preoccupational_checkup CASCADE;
 DROP TABLE IF EXISTS public.employee CASCADE;
 DROP TABLE IF EXISTS public.third_party CASCADE;

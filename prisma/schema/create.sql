@@ -79,21 +79,12 @@ CREATE TABLE public.civil_status_type (
     CONSTRAINT pk_civil_status_type PRIMARY KEY (id_civil_status_type)
 );
 
-CREATE TABLE public.health_insurance (
-    id_health_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
-    health_insurance varchar(50),
-    affiliate_number varchar(20),
-    health_insurance_isactive boolean DEFAULT true NOT NULL,
-    CONSTRAINT pk_health_insurance PRIMARY KEY (id_health_insurance)
-);
-
 CREATE TABLE public.person (
     id_person            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_gender            UUID ,
     id_address           UUID ,
     id_phone             UUID ,
     id_civil_status      UUID ,
-    id_health_insurance  UUID ,
     name                 varchar(50) NOT NULL,
     surname              varchar(50) NOT NULL,
     birth_date           timestamp NOT NULL,
@@ -105,8 +96,7 @@ CREATE TABLE public.person (
     CONSTRAINT fk_person_gender FOREIGN KEY (id_gender) REFERENCES public.gender(id_gender),
     CONSTRAINT fk_person_address FOREIGN KEY (id_address) REFERENCES public."address"(id_address),
     CONSTRAINT fk_person_phone FOREIGN KEY (id_phone) REFERENCES public.phone(id_phone),
-    CONSTRAINT fk_person_civil_status FOREIGN KEY (id_civil_status) REFERENCES public.civil_status_type(id_civil_status_type),
-    CONSTRAINT fk_person_health_insurance FOREIGN KEY (id_health_insurance) REFERENCES public.health_insurance(id_health_insurance)
+    CONSTRAINT fk_person_civil_status FOREIGN KEY (id_civil_status) REFERENCES public.civil_status_type(id_civil_status_type)
 );
 
 CREATE UNIQUE INDEX unq_id_person ON public.person (id_person);
@@ -139,12 +129,21 @@ CREATE TABLE public.preoccupational_checkup (
     CONSTRAINT pk_preoccupational_checkup PRIMARY KEY (id_preoccupational_checkup)
 );
 
+CREATE TABLE public.health_insurance (
+    id_health_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
+    health_insurance varchar(50) NOT NULL,
+    affiliate_number varchar(20) NOT NULL,
+    health_insurance_isactive boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_health_insurance PRIMARY KEY (id_health_insurance)
+);
+
 CREATE TABLE public.employee (
     id_employee                         UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_person                           UUID NOT NULL UNIQUE,
     id_status                           UUID NOT NULL,
     id_area                             UUID NOT NULL,
     id_preoccupational_checkup          UUID,
+    id_health_insurance                 UUID ,
     no_file                             integer NOT NULL UNIQUE,
     email                               varchar(75) NOT NULL UNIQUE,
     employment_date                     timestamp NOT NULL,
@@ -160,10 +159,18 @@ CREATE TABLE public.employee (
     CONSTRAINT fk_employee_status FOREIGN KEY (id_status) REFERENCES public.employee_status(id_status),
     CONSTRAINT fk_employee_area FOREIGN KEY (id_area) REFERENCES public.area(id_area),
     CONSTRAINT fk_employee_person FOREIGN KEY (id_person) REFERENCES public.person(id_person),
-    CONSTRAINT fk_employee_preoccupational_checkup FOREIGN KEY (id_preoccupational_checkup) REFERENCES public.preoccupational_checkup(id_preoccupational_checkup)
+    CONSTRAINT fk_employee_preoccupational_checkup FOREIGN KEY (id_preoccupational_checkup) REFERENCES public.preoccupational_checkup(id_preoccupational_checkup),
+    CONSTRAINT fk_employee_health_insurance FOREIGN KEY (id_health_insurance) REFERENCES public.health_insurance(id_health_insurance)
 );
 
 CREATE UNIQUE INDEX unq_id_employee ON public.employee (id_employee);
+
+CREATE TABLE public.family_relationship_type (
+    id_family_relationship_type             UUID DEFAULT uuid_generate_v7() NOT NULL,
+    family_relationship_type                varchar(20) NOT NULL,
+    family_relationship_type_isactive       boolean DEFAULT true NOT NULL,
+    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
+);
 
 CREATE TABLE public.life_insurance (
     id_life_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
@@ -177,23 +184,19 @@ CREATE TABLE public.life_insurance (
     CONSTRAINT fk_life_insurance_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
 );
 
-CREATE TABLE public.employee_beneficiary_life_insurance (
-    id_beneficiary_life_insurance UUID DEFAULT uuid_generate_v7() NOT NULL,
+CREATE TABLE public.employee_life_insurance_beneficiary (
+    id_life_insurance_beneficiary UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_life_insurance UUID NOT NULL,
     id_person UUID NOT NULL,
+    id_relationship_type UUID NOT NULL,
     beneficiary_percentage integer DEFAULT 100 NOT NULL,
-    beneficiary_life_insurance_isactive boolean DEFAULT true NOT NULL,
-    beneficiary_life_insurance_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    beneficiary_life_insurance_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_beneficiary_life_insurance PRIMARY KEY (id_beneficiary_life_insurance),
-    CONSTRAINT fk_beneficiary_life_insurance_person FOREIGN KEY (id_person) REFERENCES public.person(id_person)
-);
-
-CREATE TABLE public.family_relationship_type (
-    id_family_relationship_type             UUID DEFAULT uuid_generate_v7() NOT NULL,
-    family_relationship_type                varchar(20) NOT NULL,
-    family_relationship_type_isactive       boolean DEFAULT true NOT NULL,
-    CONSTRAINT pk_family_relationship_type PRIMARY KEY (id_family_relationship_type)
+    life_insurance_beneficiary_isactive boolean DEFAULT true NOT NULL,
+    life_insurance_beneficiary_created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    life_insurance_beneficiary_updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_life_insurance_beneficiary PRIMARY KEY (id_life_insurance_beneficiary),
+    CONSTRAINT fk_life_insurance_beneficiary_life_insurance FOREIGN KEY (id_life_insurance) REFERENCES public.life_insurance(id_life_insurance),
+    CONSTRAINT fk_life_insurance_beneficiary_person FOREIGN KEY (id_person) REFERENCES public.person(id_person),
+    CONSTRAINT fk_life_insurance_beneficiary_relationship_type FOREIGN KEY (id_relationship_type) REFERENCES public.family_relationship_type(id_family_relationship_type)
 );
 
 CREATE TABLE public.family_member (
@@ -557,6 +560,20 @@ CREATE TRIGGER update_family_member_updated_at
 BEFORE UPDATE ON public.family_member
 FOR EACH ROW
 EXECUTE PROCEDURE update_family_member_updated_at();
+
+-- employee_life_insurance_beneficiary updated_at trigger
+CREATE OR REPLACE FUNCTION update_employee_life_insurance_beneficiary_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.life_insurance_beneficiary_updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_employee_life_insurance_beneficiary_updated_at
+BEFORE UPDATE ON public.employee_life_insurance_beneficiary
+FOR EACH ROW
+EXECUTE PROCEDURE update_employee_life_insurance_beneficiary_updated_at();
 
 -- employee updated_at trigger
 CREATE OR REPLACE FUNCTION update_employee_updated_at()
