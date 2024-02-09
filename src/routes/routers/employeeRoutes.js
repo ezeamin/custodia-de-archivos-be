@@ -230,6 +230,12 @@ employeeRouter.post(
   Employees.PostController.createFamilyMember,
 );
 employeeRouter.post(
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LIFE_INSURANCE,
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeLifeInsurance,
+);
+employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_LICENSE_TYPE,
   isAuthenticated,
   isAdmin,
@@ -268,6 +274,12 @@ employeeRouter.put(
   isAuthenticated,
   isAdmin,
   Employees.PutController.updateEmployeeFamilyMember,
+);
+employeeRouter.put(
+  ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_LIFE_INSURANCE,
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateEmployeeLifeInsurance,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_LICENSE_TYPE,
@@ -342,6 +354,12 @@ employeeRouter.delete(
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeFamilyMember,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LIFE_INSURANCE,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeLifeInsurance,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_LICENSE_TYPE,

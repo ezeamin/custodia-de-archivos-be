@@ -653,4 +653,62 @@ export class DeleteController {
       });
     }
   }
+
+  // @param - employeeId
+  // @param - lifeInsuranceId
+  static async deleteEmployeeLifeInsurance(req, res) {
+    const {
+      params: { employeeId, lifeInsuranceId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const lifeInsurance = await prisma.life_insurance.findUnique({
+        where: {
+          id_life_insurance: lifeInsuranceId,
+          life_insurance_isactive: true,
+        },
+      });
+
+      if (!lifeInsurance) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El seguro de vida no existe',
+        });
+        return;
+      }
+
+      await prisma.life_insurance.update({
+        where: {
+          id_life_insurance: lifeInsuranceId,
+          life_insurance_isactive: true,
+        },
+        data: {
+          life_insurance_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Seguro de vida eliminado exitosamente',
+      });
+
+      registerChange({
+        changedField: 'life_insurance',
+        changedFieldLabel: 'Eliminación de Seguro de Vida',
+        changedTable: 'life_insurance',
+        previousValue: `${lifeInsurance.life_insurance_name} - Nro. ${lifeInsurance.policy_number}`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar el seguro de vida. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

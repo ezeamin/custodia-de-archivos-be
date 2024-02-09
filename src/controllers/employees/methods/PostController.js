@@ -1036,4 +1036,49 @@ export class PostController {
       });
     }
   }
+
+  // @param - employeeId
+  static async createEmployeeLifeInsurance(req, res) {
+    const {
+      params: { employeeId },
+      body: { name, policyNumber },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      await prisma.life_insurance.create({
+        data: {
+          life_insurance_name: name,
+          policy_number: policyNumber.toString(),
+          employee: {
+            connect: {
+              id_employee: employeeId,
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Seguro de vida creado exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'life_insurance',
+        changedField: 'life_insurance',
+        changedFieldLabel: 'Creación de Seguro de Vida',
+        previousValue: null,
+        newValue: `${name} - Nro. ${policyNumber}`,
+        modifyingUser: loggedUserId,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el seguro de vida. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

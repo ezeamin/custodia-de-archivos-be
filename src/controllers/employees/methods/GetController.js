@@ -116,6 +116,9 @@ export class GetController {
           },
           employee_status: true,
           life_insurance: {
+            where: {
+              life_insurance_isactive: true,
+            },
             include: {
               employee_life_insurance_beneficiary: {
                 include: {

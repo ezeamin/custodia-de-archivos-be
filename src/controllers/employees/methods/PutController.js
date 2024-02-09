@@ -724,4 +724,64 @@ export class PutController {
       });
     }
   }
+
+  // @param - employeeId
+  // @param - lifeInsuranceId
+  static async updateEmployeeLifeInsurance(req, res) {
+    const {
+      params: { employeeId, lifeInsuranceId },
+      body: { name, policyNumber },
+      user: { id: loggedInUser },
+    } = req;
+
+    try {
+      const lifeInsurance = await prisma.life_insurance.findUnique({
+        where: {
+          id_life_insurance: lifeInsuranceId,
+        },
+      });
+
+      if (!lifeInsurance) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El seguro de vida no existe',
+        });
+        return;
+      }
+
+      const previousData = lifeInsurance;
+
+      await prisma.life_insurance.update({
+        where: {
+          id_life_insurance: lifeInsuranceId,
+        },
+        data: {
+          life_insurance_name: name,
+          policy_number: policyNumber.toString(),
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Seguro de vida actualizado exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'life_insurance',
+        changedField: 'life_insurance',
+        changedFieldLabel: 'Actualización de Seguro de Vida',
+        previousValue: `${previousData.life_insurance_name} - Nro. ${previousData.policy_number}`,
+        newValue: `${name} - Nro. ${policyNumber}`,
+        modifyingUser: loggedInUser,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al actualizar el seguro de vida. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }
