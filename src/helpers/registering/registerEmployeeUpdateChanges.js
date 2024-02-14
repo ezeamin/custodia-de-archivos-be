@@ -18,6 +18,8 @@ export const registerEmployeeUpdateChanges = async (
     working_hours: previousData.working_hours,
     drivers_license_expiration_date:
       previousData.drivers_license_expiration_date,
+    health_insurance: previousData.health_insurance,
+    preoccupational_checkup: previousData.preoccupational_checkup,
   };
   const personPreviousData = {
     id_gender: previousData.person.id_gender,
@@ -40,6 +42,8 @@ export const registerEmployeeUpdateChanges = async (
   const localityNewData = newData.locality || null;
   const provinceNewData = newData.province || null;
   const streetNewData = newData.street || null;
+  const healthInsuranceNewData = newData.health_insurance || null;
+  const preoccupationalCheckupNewData = newData.preoccupational_checkup || null;
 
   // --------------------------------------------------------
   // A - Employee
@@ -187,6 +191,44 @@ export const registerEmployeeUpdateChanges = async (
       changedFieldLabel: 'Expiración Carnet de Manejo',
       previousValue: employeePreviousData.drivers_license_expiration_date,
       newValue: employeeNewData.drivers_license_expiration_date,
+    });
+  }
+
+  if (
+    healthInsuranceNewData &&
+    JSON.stringify({
+      health_insurance: employeePreviousData.health_insurance.health_insurance,
+      affiliate_number: employeePreviousData.health_insurance.affiliate_number,
+    }) !== JSON.stringify(healthInsuranceNewData)
+  ) {
+    registerChange({
+      modifyingUser: userId,
+      employeeId: previousData.id_employee,
+      changedTable: 'employee',
+      changedField: 'health_insurance',
+      changedFieldLabel: 'Obra Social',
+      previousValue: `${employeePreviousData.health_insurance.health_insurance} - ${employeePreviousData.health_insurance.affiliate_number}`,
+      newValue: `${healthInsuranceNewData.health_insurance} - ${healthInsuranceNewData.affiliate_number}`,
+    });
+  }
+
+  if (
+    preoccupationalCheckupNewData &&
+    JSON.stringify({
+      is_fit: employeePreviousData.preoccupational_checkup.is_fit,
+      observations_preoccupational_checkup:
+        employeePreviousData.preoccupational_checkup
+          .observations_preoccupational_checkup,
+    }) !== JSON.stringify(preoccupationalCheckupNewData)
+  ) {
+    registerChange({
+      modifyingUser: userId,
+      employeeId: previousData.id_employee,
+      changedTable: 'employee',
+      changedField: 'preoccupational_checkup',
+      changedFieldLabel: 'Preocupacionales',
+      previousValue: `Apto: ${employeePreviousData.preoccupational_checkup.is_fit ? 'Si' : 'No'} - ${employeePreviousData.preoccupational_checkup.observations_preoccupational_checkup}`,
+      newValue: `Apto: ${preoccupationalCheckupNewData.is_fit ? 'Si' : 'No'} - ${preoccupationalCheckupNewData.observations_preoccupational_checkup}`,
     });
   }
 
@@ -415,6 +457,4 @@ export const registerEmployeeUpdateChanges = async (
       newValue: personNewData.id_civil_status,
     });
   }
-
-  // if (personNewData.family)
 };

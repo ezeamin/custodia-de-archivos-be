@@ -16,8 +16,9 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
     : null,
   preoccupationalCheckup: employee.preoccupational_checkup
     ? {
-        fit: employee.preoccupational_checkup.fit,
-        observations: employee.preoccupational_checkup.observations,
+        fit: employee.preoccupational_checkup.is_fit,
+        observations:
+          employee.preoccupational_checkup.observations_preoccupational_checkup,
       }
     : null,
   lifeInsurances: employee.life_insurance.map((insurance) => ({

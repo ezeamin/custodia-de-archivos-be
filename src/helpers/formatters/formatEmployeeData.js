@@ -54,6 +54,23 @@ export const formatEmployeeData = (originalData) => {
           },
         }
       : {}),
+    ...(originalData.healthInsurance
+      ? {
+          health_insurance: {
+            health_insurance: originalData.healthInsurance.name,
+            affiliate_number: originalData.healthInsurance.affiliateNumber,
+          },
+        }
+      : {}),
+    ...(originalData.preoccupationalCheckup
+      ? {
+          preoccupational_checkup: {
+            is_fit: originalData.preoccupationalCheckup.fit,
+            observations_preoccupational_checkup:
+              originalData.preoccupationalCheckup.observations,
+          },
+        }
+      : {}),
   };
 
   // remove all undefined values
@@ -77,8 +94,6 @@ export const formatEmployeeData = (originalData) => {
       }
     }
   });
-
-  console.log(newData);
 
   return newData;
 };

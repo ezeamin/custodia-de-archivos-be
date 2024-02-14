@@ -142,7 +142,7 @@ CREATE TABLE public.employee (
     id_person                           UUID NOT NULL UNIQUE,
     id_status                           UUID NOT NULL,
     id_area                             UUID NOT NULL,
-    id_preoccupational_checkup          UUID,
+    id_preoccupational_checkup          UUID ,
     id_health_insurance                 UUID ,
     no_file                             integer NOT NULL UNIQUE,
     email                               varchar(75) NOT NULL UNIQUE,

@@ -39,6 +39,8 @@ export class PutController {
               phone: true,
             },
           },
+          health_insurance: true,
+          preoccupational_checkup: true,
         },
       });
 
@@ -252,6 +254,65 @@ export class PutController {
             },
             data: {
               username: formattedData.person.identification_number,
+            },
+          });
+        }
+      }
+
+      // -------------------------
+      // E - Health insurance changes
+      // -------------------------
+
+      if (formattedData.health_insurance) {
+        if (employeeOriginalData.id_health_insurance) {
+          await prisma.health_insurance.update({
+            where: {
+              id_health_insurance: employeeOriginalData.id_health_insurance,
+            },
+            data: formattedData.health_insurance,
+          });
+        } else {
+          const newHealthInsurance = await prisma.health_insurance.create({
+            data: formattedData.health_insurance,
+          });
+
+          await prisma.employee.update({
+            where: {
+              id_employee: employeeId,
+            },
+            data: {
+              id_health_insurance: newHealthInsurance.id_health_insurance,
+            },
+          });
+        }
+      }
+
+      // -------------------------
+      // E - Preoccupational Checkup changes
+      // -------------------------
+
+      if (formattedData.preoccupational_checkup) {
+        if (employeeOriginalData.id_preoccupational_checkup) {
+          await prisma.preoccupational_checkup.update({
+            where: {
+              id_preoccupational_checkup:
+                employeeOriginalData.id_preoccupational_checkup,
+            },
+            data: formattedData.preoccupational_checkup,
+          });
+        } else {
+          const newPreoccupationalCheckup =
+            await prisma.preoccupational_checkup.create({
+              data: formattedData.preoccupational_checkup,
+            });
+
+          await prisma.employee.update({
+            where: {
+              id_employee: employeeId,
+            },
+            data: {
+              id_preoccupational_checkup:
+                newPreoccupationalCheckup.id_preoccupational_checkup,
             },
           });
         }
