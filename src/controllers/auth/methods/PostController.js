@@ -139,7 +139,10 @@ export class PostController {
         secure: true,
       });
       res.json({
-        data: { token: accessToken },
+        data: {
+          token: accessToken,
+          shouldChangePass: false,
+        },
         message: 'Refresh token exitoso',
       });
     } catch (err) {

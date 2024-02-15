@@ -1081,4 +1081,246 @@ export class PostController {
       });
     }
   }
+
+  // @param - employeeId
+  // @param - lifeInsuranceId
+  static async createLifeInsuranceBeneficiary(req, res) {
+    const {
+      params: { employeeId, lifeInsuranceId },
+      body: {
+        name,
+        lastname,
+        dni,
+        birthdate,
+        genderId,
+        relationshipId,
+        state,
+        locality,
+        street,
+        streetNumber,
+        apt,
+        force = false,
+      },
+      user: { id: loggedUserId },
+    } = req;
+
+    let person = null;
+    let doesPersonExist = false;
+    try {
+      person = await prisma.person.findUnique({
+        where: {
+          identification_number: dni,
+        },
+        include: {
+          address: {
+            include: {
+              street: {
+                include: {
+                  locality: {
+                    include: {
+                      province: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (person) {
+        doesPersonExist = true;
+        if (!force) {
+          res.json({
+            data: {
+              name: person.name,
+              lastname: person.surname,
+              dni: person.identification_number,
+              address: person.address ? formatAddress(person.address) : null,
+            },
+            message: 'Duplicate',
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el beneficiario. Intente de nuevo más tarde.',
+      });
+    }
+
+    try {
+      let streetId = null;
+      let localityId = null;
+      let provinceId = null;
+
+      // 1. Find or create province
+      let newProvince = await prisma.province.findFirst({
+        where: {
+          province_api_id: state.id,
+        },
+      });
+
+      if (!newProvince) {
+        newProvince = await prisma.province.create({
+          data: {
+            province_api_id: state.id,
+            province: state.description,
+          },
+        });
+      }
+
+      provinceId = newProvince.id_province;
+
+      // 2. Find or create locality
+      let newLocality = await prisma.locality.findFirst({
+        where: {
+          locality_api_id: locality.id,
+        },
+      });
+
+      if (!newLocality) {
+        newLocality = await prisma.locality.create({
+          data: {
+            locality_api_id: locality.id,
+            locality: locality.description,
+            province: {
+              connect: {
+                id_province: provinceId,
+              },
+            },
+          },
+        });
+      }
+
+      localityId = newLocality.id_locality;
+
+      // 3. Find or create street
+      let newStreet = await prisma.street.findFirst({
+        where: {
+          street_api_id: street.id,
+        },
+      });
+
+      if (!newStreet) {
+        newStreet = await prisma.street.create({
+          data: {
+            street_api_id: street.id,
+            street: street.description,
+            locality: {
+              connect: {
+                id_locality: localityId,
+              },
+            },
+          },
+        });
+      }
+
+      streetId = newStreet.id_street;
+
+      if (doesPersonExist) {
+        const shouldUpdateAddress = !person.id_address;
+        const shouldUpdateGender = !person.id_gender;
+
+        person = await prisma.person.update({
+          where: {
+            id_person: person.id_person,
+          },
+          data: {
+            ...(shouldUpdateGender
+              ? { gender: { connect: { id_gender: genderId } } }
+              : {}),
+            ...(shouldUpdateAddress
+              ? {
+                  address: {
+                    create: {
+                      street: {
+                        connect: {
+                          id_street: streetId,
+                        },
+                      },
+                      street_number: +streetNumber,
+                      door: apt,
+                    },
+                  },
+                }
+              : {}),
+          },
+        });
+      } else {
+        person = await prisma.person.create({
+          data: {
+            name,
+            surname: lastname,
+            identification_number: dni,
+            birth_date: birthdate,
+            gender: {
+              connect: {
+                id_gender: genderId,
+              },
+            },
+            address: {
+              create: {
+                street: {
+                  connect: {
+                    id_street: streetId,
+                  },
+                },
+                street_number: streetNumber,
+                door: apt,
+              },
+            },
+          },
+        });
+      }
+
+      const creation = await prisma.employee_life_insurance_beneficiary.create({
+        data: {
+          family_relationship_type: {
+            connect: {
+              id_family_relationship_type: relationshipId,
+            },
+          },
+          life_insurance: {
+            connect: {
+              id_life_insurance: lifeInsuranceId,
+            },
+          },
+          person: {
+            connect: {
+              id_person: person.id_person,
+            },
+          },
+        },
+        include: {
+          life_insurance: true,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Familiar creado exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'employee_life_insurance_beneficiary',
+        changedField: 'employee_life_insurance_beneficiary',
+        changedFieldLabel: 'Creación de Beneficiario',
+        previousValue: null,
+        newValue: `${name} ${lastname} - ${creation.life_insurance.life_insurance_name}`,
+        modifyingUser: loggedUserId,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear el beneficiario. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

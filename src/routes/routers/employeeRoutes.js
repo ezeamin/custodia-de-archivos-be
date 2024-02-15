@@ -236,6 +236,12 @@ employeeRouter.post(
   Employees.PostController.createEmployeeLifeInsurance,
 );
 employeeRouter.post(
+  ENDPOINTS.EMPLOYEES.POST_LIFE_INSURANCE_BENEFICIARY,
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createLifeInsuranceBeneficiary,
+);
+employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_LICENSE_TYPE,
   isAuthenticated,
   isAdmin,

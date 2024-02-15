@@ -36,6 +36,8 @@ export const ENDPOINTS = {
     POST_EMPLOYEE_LATE_ARRIVAL: '/:employeeId/late-arrivals',
     POST_EMPLOYEE_FAMILY_MEMBER: '/:employeeId/family',
     POST_EMPLOYEE_LIFE_INSURANCE: '/:employeeId/life-insurances',
+    POST_LIFE_INSURANCE_BENEFICIARY:
+      '/:employeeId/life-insurances/:lifeInsuranceId/beneficiaries',
     POST_LICENSE_TYPE: '/licenses/types',
     POST_TRAINING_TYPE: '/trainings/types',
     PUT_EMPLOYEE: '/:employeeId',
