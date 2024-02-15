@@ -711,4 +711,68 @@ export class DeleteController {
       });
     }
   }
+
+  // @param - employeeId
+  // @param - lifeInsuranceId
+  // @param - beneficiaryId
+  static async deleteEmployeeLifeInsuranceBeneficiary(req, res) {
+    const {
+      params: { beneficiaryId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const beneficiary =
+        await prisma.employee_life_insurance_beneficiary.findUnique({
+          where: {
+            id_life_insurance_beneficiary: beneficiaryId,
+            life_insurance_beneficiary_isactive: true,
+          },
+          include: {
+            person: true,
+            life_insurance: true,
+          },
+        });
+
+      if (!beneficiary) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El beneficiario no existe',
+        });
+        return;
+      }
+
+      await prisma.employee_life_insurance_beneficiary.update({
+        where: {
+          id_life_insurance_beneficiary: beneficiaryId,
+          life_insurance_beneficiary_isactive: true,
+        },
+        data: {
+          life_insurance_beneficiary_isactive: false,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Beneficiario eliminado exitosamente',
+      });
+
+      registerChange({
+        changedField: 'employee_life_insurance_beneficiary',
+        changedFieldLabel: 'Eliminación de Beneficiario de Seguro de Vida',
+        changedTable: 'employee_life_insurance_beneficiary',
+        previousValue: `${beneficiary.person.lastname}, ${beneficiary.person.name}`,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId: beneficiary.life_insurance.id_employee,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar el beneficiario. Intente de nuevo más tarde.',
+      });
+    }
+  }
 }

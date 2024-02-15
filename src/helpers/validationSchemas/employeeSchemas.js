@@ -60,3 +60,8 @@ export const get_params_licensesTypesByIdSchema = Joi.object({
 export const get_params_trainingsTypesByIdSchema = Joi.object({
   trainingTypeId: uuidRule('trainingTypeId')(),
 });
+export const get_params_lifeInsuranceBeneficiarySchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  lifeInsuranceId: uuidRule('lifeInsuranceId')(),
+  beneficiaryId: uuidRule('beneficiaryId')(),
+});

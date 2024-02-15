@@ -1230,6 +1230,7 @@ export class PostController {
             id_person: person.id_person,
           },
           data: {
+            person_isactive: true,
             ...(shouldUpdateGender
               ? { gender: { connect: { id_gender: genderId } } }
               : {}),
@@ -1302,7 +1303,7 @@ export class PostController {
 
       res.json({
         data: null,
-        message: 'Familiar creado exitosamente',
+        message: 'Beneficiario creado exitosamente',
       });
 
       registerChange({

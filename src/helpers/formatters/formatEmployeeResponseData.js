@@ -31,9 +31,6 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
         name: beneficiary.person.name,
         lastname: beneficiary.person.surname,
         dni: beneficiary.person.identification_number,
-        phone: beneficiary.person.phone
-          ? beneficiary.person.phone.phone_no
-          : null,
         address: beneficiary.person.address
           ? {
               street: {
@@ -56,10 +53,11 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
             }
           : null,
         relationship: {
-          id: beneficiary.id_family_relationship_type,
+          id: beneficiary.id_relationship_type,
           description:
             beneficiary.family_relationship_type.family_relationship_type,
         },
+        percentage: beneficiary.beneficiary_percentage ?? null,
       }),
     ),
   })),

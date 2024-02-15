@@ -21,6 +21,8 @@ export const ENDPOINTS = {
     GET_EMPLOYEE_EXTRA_HOURS: '/:employeeId/extra-hours',
     GET_EMPLOYEE_LATE_ARRIVALS: '/:employeeId/late-arrivals',
     GET_EMPLOYEE_FAMILY_MEMBER: '/:employeeId/family/:familyMemberId',
+    GET_LIFE_INSURANCE_BENEFICIARY:
+      '/:employeeId/life-insurances/:lifeInsuranceId/beneficiaries/:beneficiaryId',
     GET_LICENSES_TYPES: '/licenses/types',
     GET_LICENSE_TYPE: '/licenses/types/:licenseTypeId',
     GET_TRAINING_TYPES: '/trainings/types',
@@ -61,6 +63,8 @@ export const ENDPOINTS = {
     DELETE_EMPLOYEE_FAMILY_MEMBER: '/:employeeId/family/:familyMemberId',
     DELETE_EMPLOYEE_LIFE_INSURANCE:
       '/:employeeId/life-insurances/:lifeInsuranceId',
+    DELETE_LIFE_INSURANCE_BENEFICIARY:
+      '/:employeeId/life-insurances/:lifeInsuranceId/beneficiaries/:beneficiaryId',
     DELETE_LICENSE_TYPE: '/licenses/types/:licenseTypeId',
     DELETE_TRAINING_TYPE: '/trainings/types/:trainingTypeId',
   },

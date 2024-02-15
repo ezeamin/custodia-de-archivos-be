@@ -121,6 +121,9 @@ export class GetController {
             },
             include: {
               employee_life_insurance_beneficiary: {
+                where: {
+                  life_insurance_beneficiary_isactive: true,
+                },
                 include: {
                   person: {
                     include: {
@@ -896,5 +899,12 @@ export class GetController {
         message: 'Error al intentar obtener el familiar del empleado',
       });
     }
+  }
+
+  // @param - employeeId
+  // @param - lifeInsuranceId
+  // @param - beneficiaryId
+  static async lifeInsuranceBeneficiaryById(req, res) {
+    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
   }
 }

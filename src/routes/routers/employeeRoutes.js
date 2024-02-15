@@ -23,6 +23,7 @@ import {
   get_params_employeeTrainingsSchema,
   get_params_employeeVacationsSchema,
   get_params_licensesTypesByIdSchema,
+  get_params_lifeInsuranceBeneficiarySchema,
   get_params_trainingsTypesByIdSchema,
   post_employeeSchema,
 } from '../../helpers/validationSchemas/employeeSchemas.js';
@@ -133,6 +134,14 @@ employeeRouter.get(
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeFamilyMemberSchema),
   Employees.GetController.employeeFamilyMember,
+);
+employeeRouter.get(
+  ENDPOINTS.EMPLOYEES.GET_LIFE_INSURANCE_BENEFICIARY,
+  isAuthenticated,
+  isAdmin,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_lifeInsuranceBeneficiarySchema),
+  Employees.GetController.lifeInsuranceBeneficiaryById,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_LICENSES_TYPES,
@@ -366,6 +375,12 @@ employeeRouter.delete(
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeLifeInsurance,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_LIFE_INSURANCE_BENEFICIARY,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeLifeInsuranceBeneficiary,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_LICENSE_TYPE,
