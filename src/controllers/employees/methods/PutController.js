@@ -845,4 +845,11 @@ export class PutController {
       });
     }
   }
+
+  // @param - employeeId
+  // @param - lifeInsuranceId
+  // @param - beneficiaryId
+  static async updateLifeInsuranceBeneficiary(req, res) {
+    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+  }
 }

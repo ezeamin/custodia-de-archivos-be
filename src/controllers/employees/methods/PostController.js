@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
-import { formatAddress } from '../../../helpers/formatters/formatAddress.js';
+import { formatAddressAsString } from '../../../helpers/formatters/formatAddress.js';
 import { uppercaseName } from '../../../helpers/helpers.js';
 
 export class PostController {
@@ -126,7 +126,7 @@ export class PostController {
             dni: existingPerson.identification_number,
             phone: existingPerson?.phone?.phone_no || null,
             address: existingPerson.address
-              ? formatAddress(existingPerson.address)
+              ? formatAddressAsString(existingPerson.address)
               : null,
           },
           message: 'Duplicate',
@@ -832,7 +832,9 @@ export class PostController {
               lastname: person.surname,
               dni: person.identification_number,
               phone: person?.phone?.phone_no || null,
-              address: person.address ? formatAddress(person.address) : null,
+              address: person.address
+                ? formatAddressAsString(person.address)
+                : null,
             },
             message: 'Duplicate',
           });
@@ -1099,6 +1101,7 @@ export class PostController {
         street,
         streetNumber,
         apt,
+        percentage,
         force = false,
       },
       user: { id: loggedUserId },
@@ -1136,7 +1139,9 @@ export class PostController {
               name: person.name,
               lastname: person.surname,
               dni: person.identification_number,
-              address: person.address ? formatAddress(person.address) : null,
+              address: person.address
+                ? formatAddressAsString(person.address)
+                : null,
             },
             message: 'Duplicate',
           });
@@ -1295,6 +1300,7 @@ export class PostController {
               id_person: person.id_person,
             },
           },
+          beneficiary_percentage: percentage,
         },
         include: {
           life_insurance: true,

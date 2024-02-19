@@ -48,6 +48,8 @@ export const ENDPOINTS = {
     PUT_EMPLOYEE_FAMILY_MEMBER: '/:employeeId/family/:familyMemberId',
     PUT_EMPLOYEE_LIFE_INSURANCE:
       '/:employeeId/life-insurances/:lifeInsuranceId',
+    PUT_LIFE_INSURANCE_BENEFICIARY:
+      '/:employeeId/life-insurances/:lifeInsuranceId/beneficiaries/:beneficiaryId',
     PUT_LICENSE_TYPE: '/licenses/types/:licenseTypeId',
     PUT_TRAINING_TYPE: '/trainings/types/:trainingTypeId',
     DELETE_EMPLOYEE: '/:employeeId',

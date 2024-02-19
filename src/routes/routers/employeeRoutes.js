@@ -297,6 +297,12 @@ employeeRouter.put(
   Employees.PutController.updateEmployeeLifeInsurance,
 );
 employeeRouter.put(
+  ENDPOINTS.EMPLOYEES.PUT_LIFE_INSURANCE_BENEFICIARY,
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateLifeInsuranceBeneficiary,
+);
+employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_LICENSE_TYPE,
   isAuthenticated,
   isAdmin,

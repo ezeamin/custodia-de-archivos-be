@@ -5,6 +5,7 @@ import { getDownloadLink } from '../../../helpers/cloudinary.js';
 import { formatHistoryData } from '../../../helpers/formatters/formatHistoryData.js';
 import { formatEmployeeResponseData } from '../../../helpers/formatters/formatEmployeeResponseData.js';
 import { formatEmployeesData } from '../../../helpers/formatters/formatEmployeesData.js';
+import { formatBeneficiaryData } from '../../../helpers/formatters/formatBeneficiaryData.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -905,6 +906,59 @@ export class GetController {
   // @param - lifeInsuranceId
   // @param - beneficiaryId
   static async lifeInsuranceBeneficiaryById(req, res) {
-    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+    const {
+      params: { beneficiaryId },
+    } = req;
+
+    try {
+      const beneficiary =
+        await prisma.employee_life_insurance_beneficiary.findUnique({
+          where: {
+            id_life_insurance_beneficiary: beneficiaryId,
+            life_insurance_beneficiary_isactive: true,
+          },
+          include: {
+            person: {
+              include: {
+                address: {
+                  include: {
+                    street: {
+                      include: {
+                        locality: {
+                          include: {
+                            province: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                gender: true,
+              },
+            },
+            family_relationship_type: true,
+          },
+        });
+
+      if (!beneficiary) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El beneficiario no existe',
+        });
+        return;
+      }
+
+      const formattedData = formatBeneficiaryData(beneficiary);
+
+      res.json({
+        data: formattedData,
+        message: 'Beneficiario recuperado exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Error al intentar obtener el beneficiario del seguro de vida',
+      });
+    }
   }
 }
