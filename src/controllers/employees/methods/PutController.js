@@ -850,6 +850,204 @@ export class PutController {
   // @param - lifeInsuranceId
   // @param - beneficiaryId
   static async updateLifeInsuranceBeneficiary(req, res) {
-    res.sendStatus(HttpStatus.NOT_IMPLEMENTED);
+    const {
+      params: { beneficiaryId },
+      body: {
+        name,
+        lastname,
+        dni,
+        relationshipId,
+        genderId,
+        percentage,
+        street,
+        streetNumber,
+        apt,
+        locality,
+        state,
+      },
+    } = req;
+
+    try {
+      const beneficiary =
+        await prisma.employee_life_insurance_beneficiary.findUnique({
+          where: {
+            id_life_insurance_beneficiary: beneficiaryId,
+            life_insurance_beneficiary_isactive: true,
+          },
+          include: {
+            person: {
+              include: {
+                address: {
+                  include: {
+                    street: {
+                      include: {
+                        locality: {
+                          include: {
+                            province: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                gender: true,
+              },
+            },
+            family_relationship_type: true,
+          },
+        });
+
+      if (!beneficiary) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'El beneficiario no existe',
+        });
+        return;
+      }
+
+      // -------------------------
+      // A - Address changes
+      // -------------------------
+
+      let provinceId = null;
+      let localityId = null;
+      let streetId = null;
+
+      // 1. Check if province exists
+      // 2. If it doesn't, create it
+      let newProvince = await prisma.province.findUnique({
+        where: {
+          province_api_id: state.id,
+        },
+      });
+
+      if (!newProvince) {
+        newProvince = await prisma.province.create({
+          data: {
+            province: state.description,
+            province_api_id: state.id,
+          },
+        });
+      }
+
+      provinceId = newProvince.id_province;
+
+      // 3. Check if locality exists
+      // 4. If it doesn't, create it
+      let newLocality = await prisma.locality.findUnique({
+        where: {
+          locality_api_id: locality.id,
+        },
+      });
+
+      if (!newLocality) {
+        newLocality = await prisma.locality.create({
+          data: {
+            locality: locality.description,
+            locality_api_id: locality.id,
+            id_province: provinceId,
+          },
+        });
+      }
+
+      localityId = newLocality.id_locality;
+
+      // 5. Check if street exists
+      // 6. If it doesn't, create it
+      let newStreet = await prisma.street.findUnique({
+        where: {
+          street_api_id: street.id,
+        },
+      });
+
+      if (!newStreet) {
+        newStreet = await prisma.street.create({
+          data: {
+            street: street.description,
+            street_api_id: street.id,
+            id_locality: localityId,
+          },
+        });
+      }
+
+      streetId = newStreet.id_street;
+
+      // Update address
+
+      // 1. Check if person has address
+      // 2. If it doesn't, create it
+
+      if (!beneficiary.person.id_address) {
+        const address = await prisma.address.create({
+          data: {
+            id_street: streetId,
+            street_number: streetNumber,
+            door: apt,
+          },
+        });
+
+        await prisma.person.update({
+          where: {
+            id_person: beneficiary.id_person,
+          },
+          data: {
+            id_address: address.id_address,
+          },
+        });
+      } else {
+        await prisma.address.update({
+          where: {
+            id_address: beneficiary.person.id_address,
+          },
+          data: {
+            id_street: streetId,
+            street_number: streetNumber,
+            door: apt,
+          },
+        });
+      }
+
+      // -------------------------
+      // B - Person changes
+      // -------------------------
+
+      await prisma.person.update({
+        where: {
+          id_person: beneficiary.id_person,
+        },
+        data: {
+          name,
+          surname: lastname,
+          identification_number: dni,
+          id_gender: genderId,
+        },
+      });
+
+      // -------------------------
+      // C - Beneficiary changes
+      // -------------------------
+
+      await prisma.employee_life_insurance_beneficiary.update({
+        where: {
+          id_life_insurance_beneficiary: beneficiaryId,
+        },
+        data: {
+          id_relationship_type: relationshipId,
+          beneficiary_percentage: percentage,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Beneficiario actualizado exitosamente',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al actualizar el beneficiario. Intente de nuevo más tarde.',
+      });
+    }
   }
 }
