@@ -148,6 +148,44 @@ export class GetController {
     }
   }
 
+  // @param - areaId
+  static async area(req, res) {
+    const {
+      params: { areaId },
+    } = req;
+
+    try {
+      const data = await prisma.area.findUnique({
+        where: {
+          id_area: areaId,
+          area_isactive: true,
+        },
+      });
+
+      if (!data) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'Área no encontrada',
+        });
+        return;
+      }
+
+      res.json({
+        data: {
+          id: data.id_area,
+          description: data.area,
+        },
+        message: 'Data retrieved successfully',
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message: 'Error trayendo la información del área',
+      });
+    }
+  }
+
   static async civilStatus(_, res) {
     try {
       const data = await prisma.civil_status_type.findMany({

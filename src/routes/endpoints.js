@@ -90,7 +90,11 @@ export const ENDPOINTS = {
     GET_ROLES: '/roles',
     GET_GENDERS: '/genders',
     GET_AREAS: '/areas',
+    GET_AREA: '/areas/:areaId',
     GET_CIVIL_STATUS: '/civil-status',
+    POST_AREA: '/areas',
+    PUT_AREA: '/areas/:areaId',
+    DELETE_AREA: '/areas/:areaId',
   },
   USERS: {
     ROOT: '/users',

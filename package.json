@@ -16,11 +16,7 @@
     "test": "node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
     "test:reset": "node --env-file=.env.test ./src/testing/resetDatabase.js && node --env-file=.env.test --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles"
   },
-  "keywords": [
-    "rolling",
-    "backend"
-  ],
-  "author": "Ezequiel Amin",
+  "author": "Ezequiel Amin & Valentina Ormaechea",
   "license": "ISC",
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.10",
