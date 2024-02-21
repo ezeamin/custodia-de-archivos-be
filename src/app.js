@@ -11,6 +11,7 @@ const app = express();
 
 // CORS
 const whitelist = [
+  'http://localhost:3000',
   'http://localhost:5173',
   'https://custodia-archivos.netlify.app',
 ];

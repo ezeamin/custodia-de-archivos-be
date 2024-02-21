@@ -1,0 +1,65 @@
+/api/v1/auth/login:
+  post:
+    tags:
+      - Auth
+    summary: Log in user
+    description: Log in user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - username
+              - password
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      shouldChangePass:
+                        type: boolean
+                  message:
+                    type: string
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+                properties:
+                  data:
+                    type: "null"
+                  message:
+                    type: string
+      '401':
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+                properties:
+                  data:
+                    type: "null"
+                  message:
+                    type: string
+      '500':
+        description: Internal Server Error
+        content:
+          application/json:
+            schema:
+                properties:
+                  data:
+                    type: "null"
+                  message:
+                    type: string
