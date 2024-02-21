@@ -1,4 +1,4 @@
-import { uppercaseName } from '../helpers.js';
+import { formatPhone, uppercaseName } from '../helpers.js';
 
 export const formatEmployeeData = (originalData) => {
   const newData = {
@@ -28,7 +28,7 @@ export const formatEmployeeData = (originalData) => {
       door: originalData.apt,
     },
     phone: {
-      phone_no: originalData.phone,
+      phone_no: formatPhone(originalData.phone),
     },
     ...(originalData.street
       ? {

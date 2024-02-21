@@ -23,3 +23,16 @@ export const uppercaseName = (name) => {
     .join(' ')
     .trim();
 };
+
+export const formatPhone = (phone) => {
+  // if phone starts with 381, add "549" in front of it
+  if (phone.startsWith('381')) {
+    return `549${phone}`;
+  }
+
+  if (phone.startsWith('0384')) {
+    return phone.replace('0381', '549381');
+  }
+
+  return phone;
+};

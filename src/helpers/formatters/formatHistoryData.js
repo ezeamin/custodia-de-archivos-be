@@ -113,7 +113,7 @@ const getDateFormat = (value) => {
 export const formatHistoryData = async (data) => {
   const tables = await getTableInformation(data);
 
-  return data.map(async (record) => {
+  const returnValuePromises = data.map(async (record) => {
     let prev = record.previous_value;
     let curr = record.current_value;
 
@@ -171,4 +171,8 @@ export const formatHistoryData = async (data) => {
       },
     };
   });
+
+  const returnValue = await Promise.all(returnValuePromises);
+
+  return returnValue;
 };

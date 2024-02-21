@@ -5,7 +5,7 @@ import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
 import { formatAddressAsString } from '../../../helpers/formatters/formatAddress.js';
-import { uppercaseName } from '../../../helpers/helpers.js';
+import { formatPhone, uppercaseName } from '../../../helpers/helpers.js';
 
 export class PostController {
   static async createEmployee(req, res) {
@@ -1018,13 +1018,15 @@ export class PostController {
         const shouldUpdateAddress = !person.id_address;
         const shouldUpdateGender = !person.id_gender;
 
+        const formattedPhone = formatPhone(phone);
+
         person = await prisma.person.update({
           where: {
             id_person: person.id_person,
           },
           data: {
             ...(shouldUpdatePhone
-              ? { phone: { create: { phone_no: phone } } }
+              ? { phone: { create: { phone_no: formattedPhone } } }
               : {}),
             ...(shouldUpdateGender
               ? { gender: { connect: { id_gender: genderId } } }
@@ -1047,6 +1049,8 @@ export class PostController {
           },
         });
       } else {
+        const formattedPhone = formatPhone(phone);
+
         person = await prisma.person.create({
           data: {
             name,
@@ -1060,7 +1064,7 @@ export class PostController {
             },
             phone: {
               create: {
-                phone_no: phone,
+                phone_no: formattedPhone,
               },
             },
             address: {

@@ -268,7 +268,9 @@ export const registerEmployeeUpdateChanges = async (
       changedTable: 'street',
       changedField: 'street',
       changedFieldLabel: 'Calle',
-      previousValue: addressPreviousData ? addressPreviousData.street.id : null,
+      previousValue: addressPreviousData
+        ? addressPreviousData.street.id_street
+        : null,
       newValue: streetNewData.id,
     });
   }
@@ -287,7 +289,7 @@ export const registerEmployeeUpdateChanges = async (
       changedField: 'locality',
       changedFieldLabel: 'Localidad',
       previousValue: addressPreviousData
-        ? addressPreviousData.street.locality.id
+        ? addressPreviousData.street.locality.id_locality
         : null,
       newValue: localityNewData.id,
     });
@@ -307,7 +309,7 @@ export const registerEmployeeUpdateChanges = async (
       changedField: 'province',
       changedFieldLabel: 'Provincia',
       previousValue: addressPreviousData
-        ? addressPreviousData.street.locality.province.id
+        ? addressPreviousData.street.locality.province.id_province
         : null,
       newValue: provinceNewData.id,
     });

@@ -1,4 +1,4 @@
-import { uppercaseName } from '../helpers.js';
+import { formatPhone, uppercaseName } from '../helpers.js';
 
 export const formatFamilyMemberData = (familyMemberData) => ({
   person: {
@@ -9,7 +9,7 @@ export const formatFamilyMemberData = (familyMemberData) => ({
     id_gender: familyMemberData.genderId,
   },
   phone: {
-    phone_no: familyMemberData.phone,
+    phone_no: formatPhone(familyMemberData.phone),
   },
   address: {
     street_number: familyMemberData.streetNumber,
