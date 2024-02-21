@@ -415,6 +415,7 @@ CREATE TABLE public.receiver_type (
 CREATE TABLE public.notification (
     id_notification            UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_notification_type       UUID NOT NULL,
+    id_notification_response   UUID,
     id_sender                  UUID NOT NULL,
     message                    varchar(500) NOT NULL,
     notification_isactive      boolean DEFAULT true NOT NULL,
@@ -422,7 +423,8 @@ CREATE TABLE public.notification (
     notification_updated_at    timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_notification PRIMARY KEY (id_notification),
     CONSTRAINT fk_notification_type FOREIGN KEY (id_notification_type) REFERENCES public.notification_type(id_notification_type),
-    CONSTRAINT fk_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user)
+    CONSTRAINT fk_sender FOREIGN KEY (id_sender) REFERENCES public."user"(id_user),
+    CONSTRAINT fk_notification_response FOREIGN KEY (id_notification_response) REFERENCES public.notification(id_notification)
 );
 
 CREATE TABLE public.notification_receiver (

@@ -8,25 +8,68 @@ const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 export class GetController {
   static async notifications(req, res) {
     const {
-      query: { hasBeenRead: paramHasBeenRead, sent },
+      query: {
+        hasBeenRead: paramHasBeenRead,
+        sent,
+        entries = 10,
+        page = 0,
+        query = '',
+      },
       user: { id: userId },
     } = req;
 
     const hasBeenRead =
       paramHasBeenRead === undefined ? undefined : paramHasBeenRead === 'true';
 
-    try {
-      const data = await prisma.notification.findMany({
-        where: {
-          notification_isactive: true,
-          id_sender: sent ? userId : undefined,
-          notification_receiver: {
-            some: {
-              id_receiver: sent ? undefined : userId,
-              has_read_notification: hasBeenRead,
+    // query searches by name or surname or identification_number of person associated to employee
+    const searchFilters = {
+      notification_isactive: true,
+      id_sender: sent ? userId : undefined,
+      notification_receiver: {
+        some: {
+          id_receiver: sent ? undefined : userId,
+          has_read_notification: hasBeenRead,
+        },
+      },
+      OR: [
+        {
+          user: {
+            employee: {
+              person: {
+                OR: [
+                  {
+                    name: {
+                      contains: query,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    surname: {
+                      contains: query,
+                      mode: 'insensitive',
+                    },
+                  },
+                ],
+              },
             },
           },
         },
+        {
+          notification_type: {
+            title_notification: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ],
+    };
+
+    try {
+      const data = await prisma.notification.findMany({
+        skip: page * entries,
+        take: +entries,
+        where: searchFilters,
         include: {
           notification_type: true,
           notification_doc: true,

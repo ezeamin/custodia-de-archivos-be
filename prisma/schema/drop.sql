@@ -1,5 +1,6 @@
 -- Drop tables
 DROP TABLE IF EXISTS public.employee_doc CASCADE;
+DROP TABLE IF EXISTS public.document_folder CASCADE;
 DROP TABLE IF EXISTS public.login CASCADE;
 DROP TABLE IF EXISTS public.training CASCADE;
 DROP TABLE IF EXISTS public.license CASCADE;
@@ -13,7 +14,7 @@ DROP TABLE IF EXISTS public.extra_hours CASCADE;
 DROP TABLE IF EXISTS public.employee_history CASCADE;
 DROP TABLE IF EXISTS public."user" CASCADE;
 DROP TABLE IF EXISTS public.health_insurance CASCADE;
-DROP TABLE IF EXISTS public.life_insurance_type CASCADE;
+DROP TABLE IF EXISTS public.life_insurance CASCADE;
 DROP TABLE IF EXISTS public.employee_life_insurance_beneficiary CASCADE;
 DROP TABLE IF EXISTS public.preoccupational_checkup CASCADE;
 DROP TABLE IF EXISTS public.employee CASCADE;

@@ -1,4 +1,5 @@
 TRUNCATE TABLE public.employee_doc;
+TRUNCATE TABLE public.document_folder;
 TRUNCATE TABLE public.login;
 TRUNCATE TABLE public.training;
 TRUNCATE TABLE public.license;
