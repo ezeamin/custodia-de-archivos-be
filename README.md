@@ -46,49 +46,6 @@ Descripción corta del proyecto.
   pnpm dev
   ```
 
-## Documentación de API
-
-La tabla a continuación detalla los endpoints de cada servicio disponible:
-
-Permisos:
-
-- 🅰️: Admin
-- 🅱️: Solo Lectura
-- 🆑: Empleado
-- 🛂: Solo accesible por el dueño del recurso
-
-#### Usuarios:
-
-Ruta principal: `/api/v1/users`
-| Método | Endpoint | Protegido | Permisos | Descripción | Parámetros de búsqueda | Body |
-| ------ | -------- | --------- | -------------- | ----------- | ---- | ---- |
-| GET | `/` | ✅ | 🅰️🅱️ | Obtiene todos los usuarios | `{ page: string, entries: string, query: string }` | - |
-| GET | `/:id` | ✅ | 🅰️🅱️ | Obtiene un usuario por su id | - | - |
-| POST | `/` | ❌ | 🅰️ | Crea un nuevo usuario | - | `{ lastname: string, firstname: string, password: string, username: string }` |
-| PUT | `/:id` | ✅ | 🅰️ | Actualiza un usuario por su id | - | `{ isAdmin?: boolean, lastname?: string, firstname?: string, password?: string, username?: string }` |
-| DELETE | `/:id` | ✅ | 🅰️ | Elimina un usuario por su id (borrado lógico) | - | - |
-
-#### Autenticación:
-
-Ruta principal: `/api/v1/auth`
-| Método | Endpoint | Protegido | Permisos | Descripción | Parámetros de búsqueda | Body |
-| ------ | -------- | --------- | ------- | ----------- | ---------------------- | ---- |
-| POST | `/login` | ❌ | 🅰️🅱️🆑🛂 | Inicia sesión con un usuario | - | `{ password: string, username: string }` |
-
-#### Notificaciones:
-
-> [!WARNING]
-> Revisar estas definiciones, son solo un ejemplo.
-
-Ruta principal: `/api/v1/notifications`
-| Método | Endpoint | Protegido | Permisos | Descripción | Parámetros de búsqueda | Body |
-| ------ | -------- | --------- | ------- | ----------- | ---------------------- | ---- |
-| GET | `/` | ❌ | 🅰️🅱️🆑🛂 | Obtiene todas las notificaciones | `{ page: string, entries: string, query: string }` | - |
-| GET | `/:id` | ❌ | 🅰️🅱️🆑🛂 | Obtiene una notificación por su id | - | - |
-| POST | `/` | ✅ | 🅰️🆑🛂 | Crea un nuevo notificación | - | `{ description: string, image: string, name: string, price: number  }` |
-| PUT | `/:id` | ✅ | 🅰️🆑🛂 | Actualiza un notificación por su id | - | `{ description?: string, image?: string, name?: string, price?: number  }` |
-| DELETE | `/:id` | ✅ | 🅰️🆑🛂 | Elimina un notificación por su id (borrado lógico) | - | - |
-
 ## Equipo
 
 - [Valentina Ormaechea](***)
