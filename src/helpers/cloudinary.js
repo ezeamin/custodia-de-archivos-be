@@ -44,8 +44,15 @@ export const getDownloadLink = (originalUrl) => {
   const publicId = originalUrl.split('/').pop();
   const extension = originalUrl.split('.').pop();
 
+  let resource_type = 'raw';
+
+  // check if is image or raw
+  if (imageFormats.includes(extension)) {
+    resource_type = 'image';
+  }
+
   return cloudinary.utils.private_download_url(publicId, extension, {
-    resource_type: 'raw',
+    resource_type,
     type: 'private',
   });
 };

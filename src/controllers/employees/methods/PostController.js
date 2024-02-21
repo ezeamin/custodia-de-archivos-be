@@ -306,13 +306,15 @@ export class PostController {
   static async createEmployeeDoc(req, res) {
     const {
       params: { employeeId },
+      body: { name, folderId },
+      file,
       user: { id: loggedUserId },
     } = req;
 
     let docUrl = '';
 
     // Check if file was sent
-    if (!req.file) {
+    if (!file) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message: 'No se ha enviado un archivo',
@@ -322,7 +324,7 @@ export class PostController {
 
     // Check file size
     const FIVE_MB = 5000000;
-    if (req.file.size > FIVE_MB) {
+    if (file.size > FIVE_MB) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message:
@@ -333,7 +335,7 @@ export class PostController {
 
     // Upload file to cloudinary
     try {
-      const { url } = await handleUpload(req.file, true);
+      const { url } = await handleUpload(file, true);
       docUrl = url;
     } catch (e) {
       console.error('🟥', e);
@@ -345,11 +347,25 @@ export class PostController {
       return;
     }
 
-    const fileExt = req.file.originalname.split('.').pop();
-    const filename = `${req.body.name}.${fileExt}`;
+    const fileExt = file.originalname.split('.').pop();
+    const filename = `${name}.${fileExt}`;
 
-    // Supposing that the body has been validated and sanitized
     try {
+      const folder = await prisma.document_folder.findUnique({
+        where: {
+          id_document_folder: folderId,
+        },
+      });
+
+      if (folder.folder_name === 'Notificaciones') {
+        res.status(HttpStatus.FORBIDDEN).json({
+          data: null,
+          message:
+            'No se puede cargar un documento en la carpeta de Notificaciones',
+        });
+        return;
+      }
+
       await prisma.employee_doc.create({
         data: {
           employee_doc_name: filename,
@@ -362,6 +378,11 @@ export class PostController {
           user: {
             connect: {
               id_user: loggedUserId,
+            },
+          },
+          document_folder: {
+            connect: {
+              id_document_folder: folderId,
             },
           },
         },
@@ -378,7 +399,8 @@ export class PostController {
         changedFieldLabel: 'Carga de Documento',
         previousValue: null,
         newValue: `${filename} - ${dayjs().format('DD/MM/YYYY - HH:mm:ss')}`,
-        modifyingUser: req.user.id,
+        modifyingUser: loggedUserId,
+        employeeId,
       });
     } catch (e) {
       console.error('🟥', e);
@@ -386,6 +408,78 @@ export class PostController {
         data: null,
         message:
           'Ocurrió un error al crear el documento. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
+  static async createEmployeeFolder(req, res) {
+    const {
+      params: { employeeId },
+      body: { name, color },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const existingFolder = await prisma.document_folder.findFirst({
+        where: {
+          folder_name: name,
+          id_employee: employeeId,
+        },
+      });
+
+      if (existingFolder && existingFolder.folder_isactive) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          data: null,
+          message: 'La carpeta ingresada ya existe',
+        });
+        return;
+      }
+
+      if (existingFolder && !existingFolder.folder_isactive) {
+        await prisma.document_folder.update({
+          where: {
+            id_document_folder: existingFolder.id_document_folder,
+          },
+          data: {
+            folder_isactive: true,
+            folder_color: color,
+          },
+        });
+      } else {
+        await prisma.document_folder.create({
+          data: {
+            folder_name: name,
+            folder_color: color,
+            employee: {
+              connect: {
+                id_employee: employeeId,
+              },
+            },
+          },
+        });
+      }
+
+      res.json({
+        data: null,
+        message: 'Carpeta creada exitosamente',
+      });
+
+      registerChange({
+        changedTable: 'document_folder',
+        changedField: 'document_folder',
+        changedFieldLabel: 'Creación de Carpeta',
+        previousValue: null,
+        newValue: name,
+        modifyingUser: loggedUserId,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al crear la carpeta. Intente de nuevo más tarde.',
       });
     }
   }

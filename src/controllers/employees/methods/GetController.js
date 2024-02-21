@@ -220,17 +220,35 @@ export class GetController {
         return;
       }
 
-      const docs = await prisma.employee_doc.findMany({
+      const docsFolders = await prisma.document_folder.findMany({
         where: {
           id_employee: employeeId,
-          employee_doc_isactive: true,
+          folder_isactive: true,
+        },
+        include: {
+          employee_doc: {
+            where: {
+              employee_doc_isactive: true,
+            },
+            orderBy: {
+              employee_doc_name: 'asc',
+            },
+          },
+        },
+        orderBy: {
+          folder_name: 'asc',
         },
       });
 
-      const formattedData = docs.map((doc) => ({
-        id: doc.id_employee_doc,
-        name: doc.employee_doc_name,
-        url: getDownloadLink(doc.employee_doc_url),
+      const formattedData = docsFolders.map((folder) => ({
+        id: folder.id_document_folder,
+        name: folder.folder_name,
+        color: folder.folder_color,
+        documents: folder.employee_doc.map((doc) => ({
+          id: doc.id_employee_doc,
+          name: doc.employee_doc_name,
+          url: getDownloadLink(doc.employee_doc_url),
+        })),
       }));
 
       res.json({

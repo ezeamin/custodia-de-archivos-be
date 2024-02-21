@@ -68,6 +68,7 @@ model employee {
   employee_created_at             DateTime                 @default(now()) @db.Timestamp(6)
   employee_updated_at             DateTime?                @default(now()) @db.Timestamp(6)
   absence                         absence[]
+  document_folder                 document_folder[]
   area                            area                     @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_area")
   health_insurance                health_insurance?        @relation(fields: [id_health_insurance], references: [id_health_insurance], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_health_insurance")
   person                          person                   @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_person")
@@ -87,16 +88,18 @@ model employee {
 }
 
 model employee_doc {
-  id_employee_doc         String    @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  id_employee             String    @db.Uuid
-  id_submitted_by         String    @db.Uuid
-  employee_doc_url        String    @db.VarChar(250)
-  employee_doc_name       String    @db.VarChar(50)
-  employee_doc_isactive   Boolean   @default(true)
-  employee_doc_created_at DateTime  @default(now()) @db.Timestamp(6)
-  employee_doc_updated_at DateTime? @default(now()) @db.Timestamp(6)
-  employee                employee  @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_employee")
-  user                    user      @relation(fields: [id_submitted_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_submitted_by")
+  id_employee_doc         String          @id(map: "pk_employee_doc") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_employee             String          @db.Uuid
+  id_submitted_by         String          @db.Uuid
+  id_document_folder      String          @db.Uuid
+  employee_doc_url        String          @db.VarChar(250)
+  employee_doc_name       String          @db.VarChar(50)
+  employee_doc_isactive   Boolean         @default(true)
+  employee_doc_created_at DateTime        @default(now()) @db.Timestamp(6)
+  employee_doc_updated_at DateTime?       @default(now()) @db.Timestamp(6)
+  document_folder         document_folder @relation(fields: [id_document_folder], references: [id_document_folder], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_document_folder")
+  employee                employee        @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_doc_employee")
+  user                    user            @relation(fields: [id_submitted_by], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_submitted_by")
 }
 
 model employee_history {
@@ -484,4 +487,16 @@ model employee_life_insurance_beneficiary {
   life_insurance                        life_insurance           @relation(fields: [id_life_insurance], references: [id_life_insurance], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_beneficiary_life_insurance")
   person                                person                   @relation(fields: [id_person], references: [id_person], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_beneficiary_person")
   family_relationship_type              family_relationship_type @relation(fields: [id_relationship_type], references: [id_family_relationship_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_life_insurance_beneficiary_relationship_type")
+}
+
+model document_folder {
+  id_document_folder String         @id(map: "pk_document_folder") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  id_employee        String         @db.Uuid
+  folder_name        String         @db.VarChar(50)
+  folder_color       String         @db.VarChar(7)
+  folder_isactive    Boolean        @default(true)
+  folder_created_at  DateTime       @default(now()) @db.Timestamp(6)
+  folder_updated_at  DateTime?      @default(now()) @db.Timestamp(6)
+  employee           employee       @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_document_folder_employee")
+  employee_doc       employee_doc[]
 }

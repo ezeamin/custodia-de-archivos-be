@@ -29,6 +29,7 @@ export const ENDPOINTS = {
     GET_TRAINING_TYPE: '/trainings/types/:trainingTypeId',
     POST_EMPLOYEE: '/',
     POST_EMPLOYEE_DOC: '/:employeeId/docs',
+    POST_EMPLOYEE_FOLDER: '/:employeeId/docs/folders',
     POST_EMPLOYEE_ABSENCE: '/:employeeId/absences',
     POST_EMPLOYEE_LICENSE: '/:employeeId/licenses',
     POST_EMPLOYEE_VACATION: '/:employeeId/vacations',
@@ -45,6 +46,7 @@ export const ENDPOINTS = {
     PUT_EMPLOYEE: '/:employeeId',
     PUT_EMPLOYEE_IMAGE: '/:employeeId/image',
     PUT_EMPLOYEE_DOC: '/:employeeId/docs/:docId',
+    PUT_EMPLOYEE_FOLDER: '/:employeeId/docs/folders/:folderId',
     PUT_EMPLOYEE_FAMILY_MEMBER: '/:employeeId/family/:familyMemberId',
     PUT_EMPLOYEE_LIFE_INSURANCE:
       '/:employeeId/life-insurances/:lifeInsuranceId',
@@ -54,6 +56,7 @@ export const ENDPOINTS = {
     PUT_TRAINING_TYPE: '/trainings/types/:trainingTypeId',
     DELETE_EMPLOYEE: '/:employeeId',
     DELETE_EMPLOYEE_DOC: '/:employeeId/docs/:docId',
+    DELETE_EMPLOYEE_FOLDER: '/:employeeId/docs/folders/:folderId',
     DELETE_EMPLOYEE_ABSENCE: '/:employeeId/absences/:absenceId',
     DELETE_EMPLOYEE_TRAINING: '/:employeeId/trainings/:trainingId',
     DELETE_EMPLOYEE_FORMAL_WARNING:

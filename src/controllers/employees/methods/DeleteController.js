@@ -67,6 +67,90 @@ export class DeleteController {
   }
 
   // @param - employeeId
+  // @param - folderId
+  // This will set the folder to inactive, and all documents inside it too
+  static async deleteEmployeeFolder(req, res) {
+    const {
+      params: { employeeId, folderId },
+      user: { id: loggedUserId },
+    } = req;
+
+    try {
+      const folder = await prisma.document_folder.findUnique({
+        where: {
+          id_document_folder: folderId,
+          folder_isactive: true,
+        },
+        include: {
+          employee_doc: true,
+        },
+      });
+
+      if (!folder) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'La carpeta no existe',
+        });
+        return;
+      }
+
+      await prisma.document_folder.update({
+        where: {
+          id_document_folder: folderId,
+          folder_isactive: true,
+        },
+        data: {
+          folder_isactive: false,
+          employee_doc: {
+            updateMany: {
+              where: {
+                employee_doc_isactive: true,
+              },
+              data: {
+                employee_doc_isactive: false,
+              },
+            },
+          },
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Carpeta eliminada exitosamente',
+      });
+
+      registerChange({
+        changedField: 'folder',
+        changedFieldLabel: 'Eliminación de Carpeta',
+        changedTable: 'folder',
+        previousValue: folder.folder_name,
+        newValue: null,
+        modifyingUser: loggedUserId,
+        employeeId,
+      });
+
+      folder.employee_doc.forEach((doc) => {
+        registerChange({
+          changedField: 'document',
+          changedFieldLabel: 'Eliminación de Documento',
+          changedTable: 'employee_docs',
+          previousValue: doc.employee_doc_url,
+          newValue: null,
+          modifyingUser: loggedUserId,
+          employeeId,
+        });
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al eliminar la carpeta. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  // @param - employeeId
   // @param - licenseId
   static async deleteEmployeeLicense(req, res) {
     const {

@@ -191,6 +191,12 @@ employeeRouter.post(
   Employees.PostController.createEmployeeDoc,
 );
 employeeRouter.post(
+  ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FOLDER,
+  isAuthenticated,
+  isAdmin,
+  Employees.PostController.createEmployeeFolder,
+);
+employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_ABSENCE,
   isAuthenticated,
   isAdmin,
@@ -285,6 +291,12 @@ employeeRouter.put(
   Employees.PutController.updateEmployeeDoc,
 );
 employeeRouter.put(
+  ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FOLDER,
+  isAuthenticated,
+  isAdmin,
+  Employees.PutController.updateEmployeeFolder,
+);
+employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   isAdmin,
@@ -327,6 +339,12 @@ employeeRouter.delete(
   isAuthenticated,
   isAdmin,
   Employees.DeleteController.deleteEmployeeDoc,
+);
+employeeRouter.delete(
+  ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FOLDER,
+  isAuthenticated,
+  isAdmin,
+  Employees.DeleteController.deleteEmployeeFolder,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_ABSENCE,

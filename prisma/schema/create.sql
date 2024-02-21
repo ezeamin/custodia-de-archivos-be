@@ -452,10 +452,23 @@ CREATE TABLE public.notification_area_receiver (
     CONSTRAINT fk_notification_area_receiver_area FOREIGN KEY (id_area) REFERENCES public.area(id_area)
 );
 
+CREATE TABLE public.document_folder (
+    id_document_folder        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    id_employee               UUID NOT NULL,
+    folder_name               varchar(50) NOT NULL,
+    folder_color              varchar(7) NOT NULL,
+    folder_isactive           boolean DEFAULT true NOT NULL,
+    folder_created_at         timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    folder_updated_at         timestamp DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_document_folder PRIMARY KEY (id_document_folder),
+    CONSTRAINT fk_document_folder_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee)
+);
+
 CREATE TABLE public.employee_doc (
     id_employee_doc               UUID DEFAULT uuid_generate_v7() NOT NULL,
     id_employee                   UUID NOT NULL,
     id_submitted_by               UUID NOT NULL,
+    id_document_folder            UUID NOT NULL,
     employee_doc_url              varchar(250) NOT NULL,
     employee_doc_name             varchar(50) NOT NULL,
     employee_doc_isactive         boolean DEFAULT true NOT NULL,
@@ -463,7 +476,8 @@ CREATE TABLE public.employee_doc (
     employee_doc_updated_at       timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_employee_doc PRIMARY KEY (id_employee_doc),
     CONSTRAINT fk_employee_doc_employee FOREIGN KEY (id_employee) REFERENCES public.employee(id_employee),
-    CONSTRAINT fk_user_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user)
+    CONSTRAINT fk_user_submitted_by FOREIGN KEY (id_submitted_by) REFERENCES public."user"(id_user),
+    CONSTRAINT fk_employee_doc_document_folder FOREIGN KEY (id_document_folder) REFERENCES public.document_folder(id_document_folder)
 );
 
 CREATE TABLE public.notification_doc (
@@ -742,6 +756,21 @@ CREATE TRIGGER update_notification_doc_updated_at
 BEFORE UPDATE ON public.notification_doc
 FOR EACH ROW
 EXECUTE PROCEDURE update_notification_doc_updated_at();
+
+-- when a new employee is created, a new document folder is created for that employee with name "Notifications"
+CREATE OR REPLACE FUNCTION create_document_folder_for_employee()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.document_folder (id_employee, folder_name, folder_color)
+    VALUES (NEW.id_employee, 'Notificaciones', '#FFD700');
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER create_document_folder_for_employee
+AFTER INSERT ON public.employee
+FOR EACH ROW
+EXECUTE PROCEDURE create_document_folder_for_employee();
 
 ---------------------------------------------------------------
 -- INSERT DEFAULT VALUES

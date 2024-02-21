@@ -494,6 +494,68 @@ export class PutController {
     }
   }
 
+  // @param - employeeId
+  // @param - folderId
+  static async updateEmployeeFolder(req, res) {
+    const {
+      params: { employeeId, folderId },
+      body: { name, color },
+      user: { id: loggedInUser },
+    } = req;
+
+    try {
+      const folder = await prisma.document_folder.findUnique({
+        where: {
+          id_document_folder: folderId,
+          folder_isactive: true,
+        },
+      });
+
+      if (!folder) {
+        res.status(HttpStatus.NOT_FOUND).json({
+          data: null,
+          message: 'La carpeta no existe',
+        });
+        return;
+      }
+
+      const previousData = folder;
+
+      await prisma.document_folder.update({
+        where: {
+          id_document_folder: folderId,
+          folder_isactive: true,
+        },
+        data: {
+          folder_name: name,
+          folder_color: color,
+        },
+      });
+
+      res.json({
+        data: null,
+        message: 'Carpeta actualizada exitosamente',
+      });
+
+      registerChange({
+        changedField: 'employee_folder',
+        changedFieldLabel: 'Actualización de Carpeta',
+        changedTable: 'employee_folder',
+        previousValue: `${previousData.folder_name} - Color ${previousData.folder_color}`,
+        newValue: `${name} - Color ${color}`,
+        modifyingUser: loggedInUser,
+        employeeId,
+      });
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Ocurrió un error al actualizar la carpeta. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
   // @param - licenseTypeId
   static async updateLicenseType(req, res) {
     const {

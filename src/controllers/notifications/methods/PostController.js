@@ -3,7 +3,10 @@ import HttpStatus from 'http-status-codes';
 import { prisma } from '../../../helpers/prisma.js';
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { sendNewNotificationMail } from '../../../helpers/mailing/newNotificationEmail.js';
-import { createIndividualNotificationReceiverData } from '../../../helpers/notificationReceivers.js';
+import {
+  createDocumentEntriesInProfile,
+  createIndividualNotificationReceiverData,
+} from '../../../helpers/notificationReceivers.js';
 
 const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 
@@ -202,8 +205,8 @@ export class PostController {
       ).id_receiver_type;
 
       const receiverHasAllEmployees =
-        JSON.parse(receivers).findIndex((receiver) =>
-          receiver.type.toLowerCase().includes('todos'),
+        JSON.parse(receivers).findIndex(
+          (receiver) => receiver.id === ALL_EMPLOYEES_ID,
         ) !== -1;
 
       if (receiverHasAllEmployees) {
@@ -216,12 +219,36 @@ export class PostController {
           },
         });
 
-        createIndividualNotificationReceiverData({
-          notificationId: newNotification.id_notification,
-          areaId: ALL_EMPLOYEES_ID,
-          isAllEmployees: true,
-          userId,
-        });
+        try {
+          const promises = [];
+          promises.push(
+            createIndividualNotificationReceiverData({
+              notificationId: newNotification.id_notification,
+              areaId: ALL_EMPLOYEES_ID,
+              isAllEmployees: true,
+              userId,
+            }),
+          );
+
+          await Promise.all(promises);
+        } catch (error) {
+          console.error('🟥', error);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            data: null,
+            message: error.message,
+          });
+          prisma.notification.delete({
+            where: {
+              id_notification: newNotification.id_notification,
+            },
+          });
+          prisma.notification_receiver.deleteMany({
+            where: {
+              id_notification: newNotification.id_notification,
+            },
+          });
+          return;
+        }
       } else {
         await prisma.notification_receiver.createMany({
           data: JSON.parse(receivers).map((receiver) => ({
@@ -234,20 +261,24 @@ export class PostController {
         });
 
         try {
+          const promises = [];
           JSON.parse(receivers).forEach((receiver) => {
             if (receiver.type === 'area') {
-              createIndividualNotificationReceiverData({
-                notificationId: newNotification.id_notification,
-                areaId: receiver.id,
-                userId,
-              });
+              promises.push(
+                createIndividualNotificationReceiverData({
+                  notificationId: newNotification.id_notification,
+                  areaId: receiver.id,
+                  userId,
+                }),
+              );
             }
           });
+          await Promise.all(promises);
         } catch (error) {
           console.error('🟥', error);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             data: null,
-            message: 'Error al crear la notificación',
+            message: error.message,
           });
           prisma.notification.delete({
             where: {
@@ -277,6 +308,21 @@ export class PostController {
           });
 
           notificationDocsPromises.push(promise);
+        });
+
+        // Relate entries to employees docs
+        const areasIds = [];
+        JSON.parse(receivers).forEach((receiver) => {
+          areasIds.push(receiver.id);
+        });
+
+        areasIds.forEach(async (area) => {
+          await createDocumentEntriesInProfile({
+            docs,
+            areaId: area,
+            userId,
+            isAllEmployees: receiverHasAllEmployees,
+          });
         });
 
         await Promise.all(notificationDocsPromises);
