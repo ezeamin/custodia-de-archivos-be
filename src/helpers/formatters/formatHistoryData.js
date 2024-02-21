@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { ISODateRegex, uuidRegex } from '../regex.js';
 import { prisma } from '../prisma.js';
+import { getDownloadLink } from '../cloudinary.js';
 
 const optionsMap = {
   phone: {
@@ -112,7 +113,7 @@ const getDateFormat = (value) => {
 export const formatHistoryData = async (data) => {
   const tables = await getTableInformation(data);
 
-  return data.map((record) => {
+  return data.map(async (record) => {
     let prev = record.previous_value;
     let curr = record.current_value;
 
@@ -142,6 +143,20 @@ export const formatHistoryData = async (data) => {
         if (curr && isCurrUUID)
           curr = options.find((el) => el.id === curr)?.description || curr;
       }
+    }
+
+    if (!isPrevDate && !isCurrDate) {
+      const isPrevPrivateLink =
+        typeof prev === 'string' &&
+        prev.includes('http') &&
+        prev.includes('private');
+      const isCurrPrivateLink =
+        typeof curr === 'string' &&
+        curr.includes('http') &&
+        curr.includes('private');
+
+      if (isPrevPrivateLink) prev = await getDownloadLink(prev);
+      if (isCurrPrivateLink) curr = await getDownloadLink(curr);
     }
 
     return {

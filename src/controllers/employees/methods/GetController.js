@@ -240,16 +240,22 @@ export class GetController {
         },
       });
 
-      const formattedData = docsFolders.map((folder) => ({
-        id: folder.id_document_folder,
-        name: folder.folder_name,
-        color: folder.folder_color,
-        documents: folder.employee_doc.map((doc) => ({
+      const formattedDataPromises = docsFolders.map(async (folder) => {
+        const documents = folder.employee_doc.map(async (doc) => ({
           id: doc.id_employee_doc,
           name: doc.employee_doc_name,
-          url: getDownloadLink(doc.employee_doc_url),
-        })),
-      }));
+          url: await getDownloadLink(doc.employee_doc_url),
+        }));
+
+        return {
+          id: folder.id_document_folder,
+          name: folder.folder_name,
+          color: folder.folder_color,
+          documents: await Promise.all(documents),
+        };
+      });
+
+      const formattedData = await Promise.all(formattedDataPromises);
 
       res.json({
         data: formattedData,

@@ -323,12 +323,12 @@ export class PostController {
     }
 
     // Check file size
-    const FIVE_MB = 5000000;
-    if (file.size > FIVE_MB) {
+    const TWENTY_MB = 20000000;
+    if (file.size > TWENTY_MB) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message:
-          'El tamaño del archivo es demasiado grande. El máximo permitido es de 5MB',
+          'El tamaño del archivo es demasiado grande. El máximo permitido es de 20MB',
       });
       return;
     }

@@ -40,7 +40,7 @@ export const handleUpload = async (file, privateDoc = false) => {
   return res;
 };
 
-export const getDownloadLink = (originalUrl) => {
+export const getDownloadLink = async (originalUrl) => {
   const publicId = originalUrl.split('/').pop();
   const extension = originalUrl.split('.').pop();
 
@@ -51,10 +51,19 @@ export const getDownloadLink = (originalUrl) => {
     resource_type = 'image';
   }
 
-  return cloudinary.utils.private_download_url(publicId, extension, {
+  const url = cloudinary.utils.private_download_url(publicId, extension, {
     resource_type,
     type: 'private',
   });
+
+  // test if url throws 404
+  const res = await fetch(url);
+
+  if (res.status === 404) {
+    return originalUrl;
+  }
+
+  return url;
 };
 
 export const deleteFile = async (originalUrl, privateDoc = false) => {
