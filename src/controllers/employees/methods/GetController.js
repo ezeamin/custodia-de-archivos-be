@@ -1,11 +1,17 @@
 import HttpStatus from 'http-status-codes';
+import ExcelJS from 'exceljs';
+import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { getDownloadLink } from '../../../helpers/cloudinary.js';
+
 import { formatHistoryData } from '../../../helpers/formatters/formatHistoryData.js';
 import { formatEmployeeResponseData } from '../../../helpers/formatters/formatEmployeeResponseData.js';
 import { formatEmployeesData } from '../../../helpers/formatters/formatEmployeesData.js';
 import { formatBeneficiaryData } from '../../../helpers/formatters/formatBeneficiaryData.js';
+import { formatAddressAsString } from '../../../helpers/formatters/formatAddress.js';
+import { formatDni } from '../../../helpers/formatters/formatDni.js';
+import { mapStatus } from '../../../helpers/formatters/mapStatus.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -78,6 +84,391 @@ export class GetController {
         data: null,
         message:
           'Error al intentar obtener los empleados. Intente de nuevo más tarde.',
+      });
+    }
+  }
+
+  static async employeesReport(_, res) {
+    // Use exceljs to generate .xlsx file with data of all employees
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Empleados');
+
+    worksheet.columns = [
+      { header: 'Apellido', key: 'surname', width: 25 },
+      {
+        header: 'Nombre',
+        key: 'name',
+        width: 25,
+      },
+      {
+        header: 'DNI',
+        key: 'identification_number',
+        width: 20,
+      },
+      {
+        header: 'Fecha de nacimiento',
+        key: 'birth_date',
+        width: 20,
+      },
+      {
+        header: 'Género',
+        key: 'gender',
+        width: 20,
+      },
+      {
+        header: 'Estado civil',
+        key: 'civil_status',
+        width: 20,
+      },
+      // --------------------------
+      {
+        header: 'Teléfono',
+        key: 'phone',
+        width: 25,
+      },
+      {
+        header: 'Email',
+        key: 'email',
+        width: 40,
+      },
+      {
+        header: 'Dirección',
+        key: 'address',
+        width: 50,
+      },
+      // {
+      //   header: 'Familiares',
+      //   key: 'family',
+      //   width: 25,
+      // },
+      // --------------------------
+      {
+        header: 'Estado',
+        key: 'status',
+        width: 15,
+      },
+      {
+        header: 'Nro. legajo',
+        key: 'file_number',
+        width: 15,
+      },
+      {
+        header: 'Área',
+        key: 'area',
+        width: 25,
+      },
+      {
+        header: 'Puesto',
+        key: 'position',
+        width: 25,
+      },
+      {
+        header: 'Horas de trabajo',
+        key: 'working_hours',
+        width: 20,
+      },
+      {
+        header: 'Vencimiento carnet',
+        key: 'drivers_license',
+        width: 25,
+      },
+      {
+        header: 'Fecha de ingreso',
+        key: 'entry_date',
+        width: 25,
+      },
+      {
+        header: 'Fecha de egreso',
+        key: 'exit_date',
+        width: 25,
+      },
+      // --------------------------
+      {
+        header: 'Obra social',
+        key: 'health_insurance',
+        width: 20,
+      },
+      {
+        header: 'Nro. Afiliado',
+        key: 'affiliate_number',
+        width: 20,
+      },
+      {
+        header: 'Preocupacional - Aptitud',
+        key: 'is_fit',
+        width: 30,
+      },
+      {
+        header: 'Preocupacional - Observaciones',
+        key: 'observations_preoccupational_checkup',
+        width: 35,
+      },
+      // {
+      //   header: 'Seguro de vida',
+      //   key: 'life_insurance',
+      //   width: 15,
+      // },
+      // --------------------------
+      {
+        header: 'Total inasistencias',
+        key: 'absences',
+        width: 20,
+      },
+      {
+        header: 'Total licencias',
+        key: 'licenses',
+        width: 20,
+      },
+      {
+        header: 'Total vacaciones',
+        key: 'vacations',
+        width: 20,
+      },
+      {
+        header: 'Total capacitaciones',
+        key: 'trainings',
+        width: 20,
+      },
+      {
+        header: 'Total llamados de at.',
+        key: 'formal_warnings',
+        width: 20,
+      },
+      {
+        header: 'Total horas extras',
+        key: 'extra_hours',
+        width: 20,
+      },
+      {
+        header: 'Total llegadas tarde',
+        key: 'late_arrivals',
+        width: 20,
+      },
+    ];
+
+    try {
+      const employees = await prisma.employee.findMany({
+        include: {
+          area: true,
+          person: {
+            include: {
+              address: {
+                include: {
+                  street: {
+                    include: {
+                      locality: {
+                        include: {
+                          province: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              gender: true,
+              phone: true,
+              civil_status_type: true,
+            },
+          },
+          employee_status: true,
+          absence: {
+            where: {
+              absence_isactive: true,
+            },
+          },
+          license: {
+            where: {
+              license_isactive: true,
+            },
+          },
+          vacation: {
+            where: {
+              vacation_isactive: true,
+            },
+          },
+          training: {
+            where: {
+              training_isactive: true,
+            },
+          },
+          formal_warning: {
+            where: {
+              formal_warning_isactive: true,
+            },
+          },
+          extra_hours: {
+            where: {
+              extra_hours_isactive: true,
+            },
+          },
+          late_arrival: {
+            where: {
+              late_arrival_isactive: true,
+            },
+          },
+          health_insurance: true,
+          preoccupational_checkup: true,
+          // life_insurance: {
+          //   where: {
+          //     life_insurance_isactive: true,
+          //   },
+          // },
+        },
+      });
+
+      employees.forEach((employee) => {
+        const formattedAddress = employee.person.address
+          ? formatAddressAsString(employee.person.address)
+          : 'N/A';
+
+        const status = mapStatus(employee.employee_status.status);
+
+        worksheet.addRow({
+          surname: employee.person.surname,
+          name: employee.person.name,
+          identification_number: formatDni(
+            employee.person.identification_number,
+          ),
+          birth_date: dayjs(employee.person.birth_date).format('DD/MM/YYYY'),
+          gender: employee.person.gender.gender,
+          civil_status: employee.person.civil_status_type
+            ? employee.person.civil_status_type.civil_status_type
+            : 'N/A',
+          // -------------------------------------
+          phone: employee.person.phone ? employee.person.phone.phone_no : 'N/A',
+          email: employee.email,
+          address: formattedAddress,
+          // -------------------------------------
+          status,
+          file_number: employee.no_file,
+          area: employee.area.area,
+          position: employee.position,
+          working_hours: employee.working_hours || 'N/A',
+          drivers_license: employee.drivers_license_expiration_date
+            ? dayjs(employee.drivers_license_expiration_date).format(
+                'DD/MM/YYYY',
+              )
+            : 'N/A',
+          entry_date: dayjs(employee.employment_date).format('DD/MM/YYYY'),
+          exit_date: employee.termination_date
+            ? dayjs(employee.termination_date).format('DD/MM/YYYY')
+            : 'N/A',
+          // -------------------------------------
+          health_insurance: employee.health_insurance
+            ? employee.health_insurance.health_insurance
+            : 'N/A',
+          affiliate_number: employee.health_insurance
+            ? employee.health_insurance.affiliate_number
+            : 'N/A',
+          is_fit:
+            // eslint-disable-next-line no-nested-ternary
+            employee.preoccupational_checkup &&
+            employee.preoccupational_checkup.is_fit
+              ? 'Apto'
+              : employee.preoccupational_checkup &&
+                  !employee.preoccupational_checkup.is_fit
+                ? 'No apto'
+                : 'N/A',
+          observations_preoccupational_checkup: employee.preoccupational_checkup
+            ? employee.preoccupational_checkup.observations
+            : 'N/A',
+          // -------------------------------------
+          absences: employee.absence.length,
+          licenses: employee.license.length,
+          vacations: employee.vacation.length,
+          trainings: employee.training.length,
+          formal_warnings: employee.formal_warning.length,
+          extra_hours: employee.extra_hours.reduce(
+            (acc, curr) => acc + curr.qty_extra_hours,
+            0,
+          ),
+          late_arrivals: employee.late_arrival.length,
+        });
+      });
+
+      // Set border bottom and bold font for first row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).eachCell((cell) => {
+        // eslint-disable-next-line no-param-reassign
+        cell.border = {
+          left: { style: 'thin' },
+          bottom: { style: 'thick' },
+          right: { style: 'thin' },
+        };
+
+        // eslint-disable-next-line no-param-reassign
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFB8B8B8' },
+        };
+      });
+
+      // Set border thin for other rows
+      const endSectionColNumber = [6, 9, 17, 21];
+      for (let i = 2; i <= worksheet.rowCount; i += 1) {
+        worksheet.getRow(i).eachCell((cell, colNumber) => {
+          // eslint-disable-next-line no-param-reassign
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: {
+              style: endSectionColNumber.includes(colNumber) ? 'thick' : 'thin',
+            },
+          };
+
+          // eslint-disable-next-line no-param-reassign
+          cell.alignment = { vertical: 'middle', horizontal: 'left' };
+
+          if (cell.text === 'N/A') {
+            // eslint-disable-next-line no-param-reassign
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFE6B8B7' },
+            };
+          }
+        });
+      }
+
+      // Set border right for last column of each section
+      const endSectionColLetter = ['F', 'I', 'Q', 'U'];
+      for (let i = 1; i <= endSectionColLetter; i += 1) {
+        const letter = endSectionColLetter[i];
+        worksheet.getCell(`${letter}1`).border = {
+          right: {
+            style: 'thick',
+          },
+          bottom: {
+            style: 'thick',
+          },
+          left: {
+            style: 'thin',
+          },
+        };
+      }
+
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=empleados.xlsx',
+      );
+
+      await workbook.xlsx.write(res);
+
+      res.end();
+    } catch (e) {
+      console.error('🟥', e);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        data: null,
+        message:
+          'Error al intentar obtener la información necesaria. Intente de nuevo más tarde.',
       });
     }
   }

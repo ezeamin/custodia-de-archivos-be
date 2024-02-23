@@ -67,7 +67,7 @@ export class PostController {
       res.cookie('refresh_token', refreshToken, {
         expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: 'none',
         secure: true,
       });
       res.json({
@@ -136,7 +136,7 @@ export class PostController {
       res.cookie('refresh_token', newRefreshToken, {
         expires: new Date(Date.now() + 2 * 60 * 60 * 1000),
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: 'none',
         secure: true,
       });
       res.json({
@@ -262,7 +262,7 @@ export class PostController {
       // delete refreshToken cookie
       res.clearCookie('refresh_token', {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: 'none',
         secure: true,
       });
       res.json({

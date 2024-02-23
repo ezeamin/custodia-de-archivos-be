@@ -10,6 +10,7 @@ export const ENDPOINTS = {
   EMPLOYEES: {
     ROOT: '/employees',
     GET_EMPLOYEES: '/',
+    GET_EMPLOYEES_REPORT: '/report',
     GET_EMPLOYEE: '/:employeeId',
     GET_EMPLOYEE_DOCS: '/:employeeId/docs',
     GET_EMPLOYEE_HISTORY: '/:employeeId/history',

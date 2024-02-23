@@ -42,6 +42,13 @@ employeeRouter.get(
   Employees.GetController.employees,
 );
 employeeRouter.get(
+  ENDPOINTS.EMPLOYEES.GET_EMPLOYEES_REPORT,
+  isAuthenticated,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
+  Employees.GetController.employeesReport,
+);
+employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE,
   isAuthenticated,
   (req, res, next) =>
