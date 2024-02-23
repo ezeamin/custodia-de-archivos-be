@@ -141,6 +141,11 @@ async function insertData() {
         user_type: 'third_party',
         user_type_label: 'Solo Lectura',
       },
+      {
+        id_user_type: '018dd17a-2ec0-7db7-a398-c401a5817b45',
+        user_type: 'area',
+        user_type_label: 'Area',
+      },
     ],
   });
 

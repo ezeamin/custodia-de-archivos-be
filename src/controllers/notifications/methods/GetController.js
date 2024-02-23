@@ -77,6 +77,9 @@ export class GetController {
             include: {
               receiver_type: true,
             },
+            where: {
+              id_receiver: sent ? undefined : userId,
+            },
           },
           user: {
             include: {
@@ -113,6 +116,7 @@ export class GetController {
 
       // Received notification
 
+      // filter notification_receivers to only get the ones that are for the user
       const notifications = data || [];
 
       const employeeArea = await prisma.employee.findFirst({
@@ -144,18 +148,20 @@ export class GetController {
           id_sender: {
             not: userId,
           },
-          notification_receiver: {
+          notification_area_receiver: {
             some: {
-              id_receiver: {
+              id_area: {
                 in: [employeeAreaId, ALL_EMPLOYEES_ID],
               },
               has_read_notification: hasBeenRead,
+              id_user: userId,
             },
           },
         },
         include: {
           notification_type: true,
           notification_doc: true,
+          notification_area_receiver: true,
           notification_receiver: {
             include: {
               receiver_type: true,
@@ -190,6 +196,7 @@ export class GetController {
       const formattedData = await formatNotifications({
         data: notifications,
         sent,
+        hasBeenRead,
       });
 
       res.json({
@@ -312,6 +319,30 @@ export class GetController {
                   time_read_notification: argentineanDate,
                 },
               });
+
+            // Check if everyone in the area has read the notification
+
+            const allNotificationReceivers =
+              await prisma.notification_area_receiver.findMany({
+                where: {
+                  id_notification: notificationId,
+                  id_area: employeeArea.id_area,
+                },
+              });
+
+            if (
+              allNotificationReceivers.every((r) => r.has_read_notification)
+            ) {
+              await prisma.notification_receiver.update({
+                where: {
+                  id_notification: notificationId,
+                  id_receiver: employeeArea.id_area,
+                },
+                data: {
+                  has_read_notification: true,
+                },
+              });
+            }
           } else {
             notificationReceiver = await prisma.notification_receiver.update({
               where: {

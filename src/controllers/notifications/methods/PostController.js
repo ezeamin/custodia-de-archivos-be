@@ -21,7 +21,7 @@ export class PostController {
     let docs = [];
     const isResponse = isResponseBody === 'true';
 
-    // Check if user can create this type of notification
+    // Check if user can create this type of notification (roles)
     try {
       const allowedRolesPromise = prisma.notification_allowed_role.findMany({
         where: {
@@ -178,6 +178,7 @@ export class PostController {
       }));
     }
 
+    // Create notification
     let newNotification = null;
     try {
       newNotification = await prisma.notification.create({
@@ -196,7 +197,7 @@ export class PostController {
         },
       });
 
-      // Receivers
+      // Create receivers entries in "notification_receiver" table
 
       const receiverTypes = await prisma.receiver_type.findMany();
 
@@ -209,8 +210,9 @@ export class PostController {
           (receiver) => receiver.id === ALL_EMPLOYEES_ID,
         ) !== -1;
 
+      // "All employees"
       if (receiverHasAllEmployees) {
-        // Create a single notification_receiver entry (all employees)
+        // Create a single notification_receiver entry ("all employees")
         await prisma.notification_receiver.create({
           data: {
             id_notification: newNotification.id_notification,
@@ -218,6 +220,8 @@ export class PostController {
             id_receiver_type: areaTypeId,
           },
         });
+
+        // Iterate over all employees affected and add area_receivers entries to all
 
         try {
           const promises = [];
@@ -250,6 +254,9 @@ export class PostController {
           return;
         }
       } else {
+        // "Normal" receivers, or multiple areas
+
+        // Add one entry per receiver, either employee or area
         await prisma.notification_receiver.createMany({
           data: JSON.parse(receivers).map((receiver) => ({
             id_notification: newNotification.id_notification,
@@ -260,15 +267,25 @@ export class PostController {
           })),
         });
 
+        // Create individual notifications for each area's employees (avoid duplicate entries)
+
+        const individualReceivers = JSON.parse(receivers)
+          .filter((receiver) => receiver.type === 'user')
+          .map((receiver) => receiver.id);
+
         try {
           const promises = [];
           JSON.parse(receivers).forEach((receiver) => {
-            if (receiver.type === 'area') {
+            if (
+              receiver.type === 'area' &&
+              !individualReceivers.includes(receiver.id)
+            ) {
               promises.push(
                 createIndividualNotificationReceiverData({
                   notificationId: newNotification.id_notification,
                   areaId: receiver.id,
                   userId,
+                  individualReceivers,
                 }),
               );
             }
@@ -311,6 +328,7 @@ export class PostController {
         });
 
         // Relate entries to employees docs
+
         const areasIds = [];
         JSON.parse(receivers).forEach((receiver) => {
           areasIds.push(receiver.id);
@@ -355,6 +373,8 @@ export class PostController {
         return;
       }
 
+      // Finish process and return response
+
       res.status(HttpStatus.CREATED).json({
         data: newNotification,
         message: 'Notificación creada exitosamente',
@@ -369,6 +389,7 @@ export class PostController {
     }
 
     // Send email to receivers
+
     JSON.parse(receivers).forEach(async (receiver) => {
       if (receiver.type === 'user') {
         const receiverInfo = await prisma.user.findUnique({
@@ -383,10 +404,6 @@ export class PostController {
             },
           },
         });
-
-        // TODO: What happens if receiver is not an employee: For eg. "Recursos Humanos"?
-        // TODO: What happens when you send to an area the notification? -> Should sent to all employees of that area
-        // TODO: Check performance of this query, it awaits searchs for each user in the list of receivers
 
         sendNewNotificationMail({
           name: receiverInfo.employee.person.name,

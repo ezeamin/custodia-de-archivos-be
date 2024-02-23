@@ -128,11 +128,15 @@ export class GetController {
           area_isactive: true,
           ...(filterAssignable ? { is_assignable: true } : {}),
         },
+        orderBy: {
+          area: 'asc',
+        },
       });
 
       const formattedData = data.map((item) => ({
         id: item.id_area,
         description: item.area,
+        responsibleEmail: item.responsible_email,
       }));
 
       res.json({
@@ -174,6 +178,7 @@ export class GetController {
         data: {
           id: data.id_area,
           description: data.area,
+          responsibleEmail: data.responsible_email,
         },
         message: 'Data retrieved successfully',
       });

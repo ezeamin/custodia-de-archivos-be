@@ -847,16 +847,6 @@ VALUES (
     '43706393'
 );
 
-INSERT INTO public.person (id_person,id_gender,name,surname,birth_date,identification_number)
-VALUES (
-    '018d3b85-ad41-7129-b181-0f1fc7c71234',
-    '018d3b85-ad41-71c2-a317-95f3fa1a632d',
-    'Carlos',
-    'Amin',
-    '1967-02-07',
-    '17860733'
-);
-
 INSERT INTO public.notification_type (id_notification_type,title_notification,start_hour,end_hour,description_notification,can_modify)
 VALUES (
     '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
@@ -885,14 +875,6 @@ VALUES (
     'Programador',
     8,
     'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg'
-);
-
-INSERT INTO public.family_member (id_family_member, id_person, id_employee, id_relationship_type)
-VALUES (
-    '018d644d-08e5-746c-81fb-8d317e387126',
-    '018d3b85-ad41-7129-b181-0f1fc7c71234',
-    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
-    '018d4131-99a7-7301-95f5-f1851f99af92'
 );
 
 -- Insert default admin user

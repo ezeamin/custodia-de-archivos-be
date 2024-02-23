@@ -7,10 +7,53 @@ export class PutController {
   static async updateArea(req, res) {
     const {
       params: { areaId },
-      body: { title },
+      body: { title, responsibleEmail },
     } = req;
 
     try {
+      const emailInUseAreaPromise = prisma.area.findFirst({
+        where: {
+          responsible_email: responsibleEmail,
+          area_isactive: true,
+          is_assignable: true,
+          NOT: {
+            area: title,
+          },
+        },
+      });
+
+      const emailInUseEmployeePromise = prisma.employee.findFirst({
+        where: {
+          email: responsibleEmail,
+          employee_isactive: true,
+        },
+      });
+
+      const emailInUseThirdPartyPromise = prisma.third_party.findFirst({
+        where: {
+          email: responsibleEmail,
+          third_party_isactive: true,
+        },
+      });
+
+      const [emailInUseArea, emailInUseEmployee, emailInUseThirdParty] =
+        await Promise.all([
+          emailInUseAreaPromise,
+          emailInUseEmployeePromise,
+          emailInUseThirdPartyPromise,
+        ]);
+
+      const emailInUse =
+        emailInUseArea || emailInUseEmployee || emailInUseThirdParty;
+
+      if (emailInUse) {
+        res.status(HttpStatus.CONFLICT).json({
+          data: null,
+          message: 'El correo ya está en uso',
+        });
+        return;
+      }
+
       const area = await prisma.area.findUnique({
         where: {
           id_area: areaId,
@@ -49,6 +92,7 @@ export class PutController {
         },
         data: {
           area: title,
+          responsible_email: responsibleEmail,
         },
       });
 

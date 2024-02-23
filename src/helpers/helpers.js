@@ -15,6 +15,12 @@ export const generateFirstPassword = () => {
   return password.toString();
 };
 
+export const generateRandomUsername = () => {
+  // 8 digits long - only numbers
+  const username = Math.floor(10000000 + Math.random() * 90000000);
+  return username.toString();
+};
+
 export const uppercaseName = (name) => {
   // make the first letter of every word uppercase, and the rest lowercase
   return name

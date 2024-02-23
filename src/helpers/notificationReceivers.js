@@ -7,6 +7,7 @@ export const createIndividualNotificationReceiverData = async ({
   areaId,
   userId,
   isAllEmployees = false,
+  individualReceivers,
 }) => {
   let usersInArea = [];
   usersInArea = await prisma.user.findMany({
@@ -40,8 +41,14 @@ export const createIndividualNotificationReceiverData = async ({
     },
   });
 
+  usersInArea = usersInArea.filter(
+    (user) => !individualReceivers.includes(user.id_user),
+  );
+
   if (usersInArea.length === 0) {
-    throw new Error('No se encontraron usuarios en el area indicada');
+    throw new Error(
+      'No se encontraron usuarios en el área indicada, o se está enviando por separado a todos los usuarios de esa área',
+    );
   }
 
   // Create entry in notification_area_receiver

@@ -36,10 +36,12 @@ model address {
 model area {
   id_area                    String                       @id(map: "pk_area") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   area                       String                       @unique @db.VarChar(20)
+  responsible_email          String?                      @db.VarChar(75)
   is_assignable              Boolean                      @default(true)
   area_isactive              Boolean                      @default(true)
   employee                   employee[]
   notification_area_receiver notification_area_receiver[]
+  user                       user[]
 }
 
 model civil_status_type {
@@ -237,11 +239,14 @@ model login {
 model notification {
   id_notification            String                       @id(map: "pk_notification") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_notification_type       String                       @db.Uuid
+  id_notification_response   String?                      @db.Uuid
   id_sender                  String                       @db.Uuid
   message                    String                       @db.VarChar(500)
   notification_isactive      Boolean                      @default(true)
   notification_created_at    DateTime                     @default(now()) @db.Timestamp(6)
   notification_updated_at    DateTime?                    @default(now()) @db.Timestamp(6)
+  notification               notification?                @relation("notificationTonotification", fields: [id_notification_response], references: [id_notification], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_response")
+  other_notification         notification[]               @relation("notificationTonotification")
   notification_type          notification_type            @relation(fields: [id_notification_type], references: [id_notification_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_type")
   user                       user                         @relation(fields: [id_sender], references: [id_user], onDelete: NoAction, onUpdate: NoAction, map: "fk_sender")
   notification_area_receiver notification_area_receiver[]
@@ -377,6 +382,7 @@ model user {
   id_user_type               String                       @db.Uuid
   id_employee                String?                      @db.Uuid
   id_third_party             String?                      @db.Uuid
+  id_area                    String?                      @db.Uuid
   username                   String                       @unique @db.VarChar(8)
   password                   String                       @db.VarChar(100)
   has_changed_def_pass       Boolean                      @default(false)
@@ -394,6 +400,7 @@ model user {
   notification               notification[]
   notification_area_receiver notification_area_receiver[]
   training                   training[]
+  area                       area?                        @relation(fields: [id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_area")
   employee                   employee?                    @relation(fields: [id_employee], references: [id_employee], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_employee")
   third_party                third_party?                 @relation(fields: [id_third_party], references: [id_third_party], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_third_party")
   user_type                  user_type                    @relation(fields: [id_user_type], references: [id_user_type], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_type")

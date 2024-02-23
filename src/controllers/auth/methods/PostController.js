@@ -33,6 +33,7 @@ export class PostController {
             include: { person: true },
           },
           user_type: true,
+          area: true,
         },
       });
 

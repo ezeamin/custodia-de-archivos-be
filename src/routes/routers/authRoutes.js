@@ -1,6 +1,10 @@
 import express from 'express';
 
+import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { validateBody } from '../../middlewares/validateBody.js';
+
+import { Auth } from '../../controllers/auth/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 import {
   post_loginSchema,
@@ -8,46 +12,9 @@ import {
   post_resetPasswordSchema,
 } from '../../helpers/validationSchemas/authSchemas.js';
 
-import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
-
-import { Auth } from '../../controllers/auth/index.js';
-import { ENDPOINTS } from '../endpoints.js';
-
 export const authRouter = express.Router();
 
 // POST ---------------------------
-
-/**
- * @swagger
- * /api/v1/auth/login:
- *  post:
- *    tags:
- *      - Auth
- *    summary: Login
- *    description: Login
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *        schema:
- *          properties:
- *              username:
- *                type: string
- *              password:
- *                type: string
- *          required:
- *            - username
- *            - password
- *    responses:
- *      200:
- *        description: Success
- *      400:
- *        description: Bad request
- *      401:
- *        description: Unauthorized
- *      500:
- *        description: Internal Server Error
- */
 authRouter.post(
   ENDPOINTS.AUTH.POST_LOGIN,
   (req, res, next) => validateBody(req, res, next, post_loginSchema),

@@ -1,8 +1,9 @@
 import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
-import { isAdmin } from '../../middlewares/isAdmin.js';
-import { isAdminOrReadOnly } from '../../middlewares/isAdminOrReadOnly.js';
+import { checkRole } from '../../middlewares/checkRole.js';
+
+import { roles } from '../../constants/roles.js';
 
 import { Users } from '../../controllers/users/index.js';
 import { ENDPOINTS } from '../endpoints.js';
@@ -26,14 +27,16 @@ export const userRouter = express.Router();
 userRouter.get(
   ENDPOINTS.USERS.GET_USERS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.AREA, roles.THIRD_PARTY]),
   (req, res, next) => validateQuery(req, res, next, get_query_userSchema),
   Users.GetController.users,
 );
 userRouter.get(
   ENDPOINTS.USERS.GET_LOGIN_LOGS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY]),
   (req, res, next) => validateQuery(req, res, next, get_query_loginLogsSchema),
   Users.GetController.loginLogs,
 );
@@ -42,14 +45,14 @@ userRouter.get(
 userRouter.post(
   ENDPOINTS.USERS.POST_USER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   (req, res, next) => validateBody(req, res, next, post_userSchema),
   Users.PostController.createUser,
 );
 userRouter.post(
   ENDPOINTS.USERS.POST_READ_ONLY_USER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   (req, res, next) => validateBody(req, res, next, post_readOnlyUserSchema),
   Users.PostController.createReadOnlyUser,
 );
@@ -58,7 +61,7 @@ userRouter.post(
 userRouter.put(
   ENDPOINTS.USERS.PUT_CREATE_ADMIN,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   (req, res, next) =>
     validateParams(req, res, next, put_params_createAdminSchema),
   Users.PutController.createAdmin,
@@ -68,7 +71,7 @@ userRouter.put(
 userRouter.delete(
   ENDPOINTS.USERS.DELETE_ADMIN_USER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   (req, res, next) =>
     validateParams(req, res, next, delete_params_deleteAdminSchema),
   Users.DeleteController.deleteAdminUser,
@@ -76,7 +79,7 @@ userRouter.delete(
 userRouter.delete(
   ENDPOINTS.USERS.DELETE_READ_ONLY_USER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   (req, res, next) =>
     validateParams(req, res, next, delete_params_deleteReadOnlySchema),
   Users.DeleteController.deleteReadOnlyUser,

@@ -1,6 +1,9 @@
 import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
+import { checkRole } from '../../middlewares/checkRole.js';
+
+import { roles } from '../../constants/roles.js';
 
 import { Params } from '../../controllers/params/index.js';
 import { ENDPOINTS } from '../endpoints.js';
@@ -48,6 +51,7 @@ paramsRouter.get(
 paramsRouter.post(
   ENDPOINTS.PARAMS.POST_AREA,
   isAuthenticated,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   Params.PostController.createArea,
 );
 
@@ -55,6 +59,7 @@ paramsRouter.post(
 paramsRouter.put(
   ENDPOINTS.PARAMS.PUT_AREA,
   isAuthenticated,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   Params.PutController.updateArea,
 );
 
@@ -62,5 +67,6 @@ paramsRouter.put(
 paramsRouter.delete(
   ENDPOINTS.PARAMS.DELETE_AREA,
   isAuthenticated,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
   Params.DeleteController.deleteArea,
 );

@@ -45,7 +45,7 @@ const formatReceiver = async (receiver) => {
   };
 };
 
-const formatReceivedNotifications = (data) => {
+const formatReceivedNotifications = (data, hasBeenRead) => {
   return data.map((item) => ({
     id: item.id_notification,
     message: item.message,
@@ -61,7 +61,7 @@ const formatReceivedNotifications = (data) => {
       title: item.notification_type.title_notification,
       description: item.notification_type.description_notification,
     },
-    hasBeenRead: true,
+    hasBeenRead,
     date: item.notification_date,
     files: item.notification_doc.map((doc) => ({
       id: doc.id_notification_doc,
@@ -71,8 +71,10 @@ const formatReceivedNotifications = (data) => {
   }));
 };
 
-export const formatNotifications = async ({ data, sent }) => {
-  if (!sent) return formatReceivedNotifications(data);
+export const formatNotifications = async ({ data, sent, hasBeenRead }) => {
+  if (!sent) return formatReceivedNotifications(data, hasBeenRead);
+
+  // Sent notifications formatting
 
   const resultPromises = data.map(async (item) => {
     const receiversPromises = [];

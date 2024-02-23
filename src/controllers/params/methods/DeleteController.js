@@ -16,6 +16,9 @@ export class DeleteController {
           area_isactive: true,
           is_assignable: true,
         },
+        include: {
+          user: true,
+        },
       });
 
       if (!area) {
@@ -35,6 +38,17 @@ export class DeleteController {
           area_isactive: false,
         },
       });
+
+      if (area.user.length > 0) {
+        await prisma.user.update({
+          where: {
+            id_user: area.user[0].id_user,
+          },
+          data: {
+            user_isactive: false,
+          },
+        });
+      }
 
       res.json({
         data: null,

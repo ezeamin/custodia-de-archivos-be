@@ -1,15 +1,18 @@
 import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
-import { isAdmin } from '../../middlewares/isAdmin.js';
-import { isAdminOrReadOnly } from '../../middlewares/isAdminOrReadOnly.js';
+import { checkRole } from '../../middlewares/checkRole.js';
+import { validateParams } from '../../middlewares/validateParams.js';
+import { validateBody } from '../../middlewares/validateBody.js';
+import { validateFile } from '../../middlewares/validateFile.js';
+
+import { roles } from '../../constants/roles.js';
 
 import { Employees } from '../../controllers/employees/index.js';
 import { ENDPOINTS } from '../endpoints.js';
 
 import { upload } from '../../helpers/multer.js';
 
-import { validateParams } from '../../middlewares/validateParams.js';
 import {
   get_params_employeeAbsencesSchema,
   get_params_employeeByIdSchema,
@@ -27,8 +30,6 @@ import {
   get_params_trainingsTypesByIdSchema,
   post_employeeSchema,
 } from '../../helpers/validationSchemas/employeeSchemas.js';
-import { validateBody } from '../../middlewares/validateBody.js';
-import { validateFile } from '../../middlewares/validateFile.js';
 
 export const employeeRouter = express.Router();
 
@@ -36,13 +37,15 @@ export const employeeRouter = express.Router();
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEES,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   Employees.GetController.employees,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeByIdSchema),
   Employees.GetController.employeeById,
@@ -50,7 +53,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_DOCS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeDocsSchema),
   Employees.GetController.employeeDocs,
@@ -58,7 +62,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_HISTORY,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeHistorySchema),
 
@@ -67,7 +72,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_ABSENCES,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeAbsencesSchema),
 
@@ -76,7 +82,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LICENSES,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeLicensesSchema),
 
@@ -85,7 +92,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_VACATIONS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeVacationsSchema),
 
@@ -94,7 +102,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_TRAININGS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeTrainingsSchema),
 
@@ -103,7 +112,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FORMAL_WARNINGS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeFormalWarningsSchema),
 
@@ -112,7 +122,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_EXTRA_HOURS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeExtraHoursSchema),
 
@@ -121,7 +132,8 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LATE_ARRIVALS,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeLateArrivalsSchema),
 
@@ -130,7 +142,7 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeFamilyMemberSchema),
   Employees.GetController.employeeFamilyMember,
@@ -138,7 +150,7 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_lifeInsuranceBeneficiarySchema),
   Employees.GetController.lifeInsuranceBeneficiaryById,
@@ -146,13 +158,15 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_LICENSES_TYPES,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   Employees.GetController.licensesTypes,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_LICENSE_TYPE,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_licensesTypesByIdSchema),
   Employees.GetController.licensesTypesById,
@@ -160,13 +174,15 @@ employeeRouter.get(
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_TRAINING_TYPES,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   Employees.GetController.trainingsTypes,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_TRAINING_TYPE,
   isAuthenticated,
-  isAdminOrReadOnly,
+  (req, res, next) =>
+    checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_trainingsTypesByIdSchema),
   Employees.GetController.trainingsTypesById,
@@ -176,7 +192,7 @@ employeeRouter.get(
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   upload.single('imgFile'),
   (req, res, next) => validateFile(req, res, next),
   (req, res, next) => validateBody(req, res, next, post_employeeSchema),
@@ -185,7 +201,7 @@ employeeRouter.post(
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_DOC,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   upload.single('file'),
   (req, res, next) => validateFile(req, res, next),
   Employees.PostController.createEmployeeDoc,
@@ -193,79 +209,79 @@ employeeRouter.post(
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FOLDER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeFolder,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_ABSENCE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeAbsence,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LICENSE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeLicense,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_VACATION,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeVacation,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_TRAINING,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeTraining,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FORMAL_WARNING,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeFormalWarning,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LATE_ARRIVAL,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeLateArrival,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_EXTRA_HOUR,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeExtraHour,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createFamilyMember,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LIFE_INSURANCE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createEmployeeLifeInsurance,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createLifeInsuranceBeneficiary,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_LICENSE_TYPE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createLicenseType,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_TRAINING_TYPE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PostController.createTrainingType,
 );
 
@@ -273,13 +289,13 @@ employeeRouter.post(
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateEmployee,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_IMAGE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   upload.single('imgFile'),
   (req, res, next) => validateFile(req, res, next),
   Employees.PutController.updateEmployeeImage,
@@ -287,43 +303,43 @@ employeeRouter.put(
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_DOC,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateEmployeeDoc,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FOLDER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateEmployeeFolder,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateEmployeeFamilyMember,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_LIFE_INSURANCE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateEmployeeLifeInsurance,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateLifeInsuranceBeneficiary,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_LICENSE_TYPE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateLicenseType,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_TRAINING_TYPE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.PutController.updateTrainingType,
 );
 
@@ -331,90 +347,90 @@ employeeRouter.put(
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployee,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_DOC,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeDoc,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FOLDER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeFolder,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_ABSENCE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeAbsence,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_TRAINING,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeTraining,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FORMAL_WARNING,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeFormalWarning,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_EXTRA_HOUR,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeExtraHour,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LATE_ARRIVAL,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeLateArrival,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LICENSE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeLicense,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_VACATION,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeVacation,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeFamilyMember,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LIFE_INSURANCE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeLifeInsurance,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteEmployeeLifeInsuranceBeneficiary,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_LICENSE_TYPE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteLicenseType,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_TRAINING_TYPE,
   isAuthenticated,
-  isAdmin,
+  (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   Employees.DeleteController.deleteTrainingType,
 );
