@@ -1,6 +1,12 @@
 import HttpStatus from 'http-status-codes';
+import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
+import {
+  generateFirstPassword,
+  generateRandomUsername,
+} from '../../../helpers/helpers.js';
+import { sendNewUserMail } from '../../../helpers/mailing/newUserMail.js';
 
 export class PutController {
   // @param - areaId
@@ -85,7 +91,7 @@ export class PutController {
         return;
       }
 
-      await prisma.area.update({
+      const updatedArea = await prisma.area.update({
         where: {
           id_area: areaId,
           is_assignable: true,
@@ -94,12 +100,59 @@ export class PutController {
           area: title,
           responsible_email: responsibleEmail,
         },
+        include: {
+          user: true,
+        },
       });
 
-      res.json({
-        data: null,
-        message: 'Área actualizada exitosamente',
-      });
+      // Create user if it doesn't have one
+
+      if (updatedArea.user.length === 0) {
+        const username = generateRandomUsername();
+        const password = generateFirstPassword();
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        await prisma.user.create({
+          data: {
+            username,
+            password: hashedPassword,
+            user_type: {
+              connect: {
+                user_type: 'area',
+              },
+            },
+            area: {
+              connect: {
+                id_area: updatedArea.id_area,
+              },
+            },
+          },
+        });
+
+        res.json({
+          data: {
+            username,
+            password,
+          },
+          message: 'Área actualizada exitosamente',
+        });
+
+        // Avoid sending mails in test environment
+        if (process.env.NODE_ENV === 'test') return;
+
+        const fullname = `Responsable de ${title}`;
+        sendNewUserMail({
+          name: fullname,
+          email: responsibleEmail,
+          username,
+          password,
+        });
+      } else {
+        res.json({
+          data: null,
+          message: 'Área actualizada exitosamente',
+        });
+      }
     } catch (e) {
       console.error('🟥', e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

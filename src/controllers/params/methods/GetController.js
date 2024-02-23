@@ -128,6 +128,9 @@ export class GetController {
           area_isactive: true,
           ...(filterAssignable ? { is_assignable: true } : {}),
         },
+        include: {
+          user: true,
+        },
         orderBy: {
           area: 'asc',
         },
@@ -137,6 +140,7 @@ export class GetController {
         id: item.id_area,
         description: item.area,
         responsibleEmail: item.responsible_email,
+        username: item.user.length > 0 ? item.user[0].username : null,
       }));
 
       res.json({
@@ -164,6 +168,9 @@ export class GetController {
           id_area: areaId,
           area_isactive: true,
         },
+        include: {
+          user: true,
+        },
       });
 
       if (!data) {
@@ -179,6 +186,7 @@ export class GetController {
           id: data.id_area,
           description: data.area,
           responsibleEmail: data.responsible_email,
+          username: data.user.length > 0 ? data.user[0].username : null,
         },
         message: 'Data retrieved successfully',
       });
