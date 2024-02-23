@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { formatNotifications } from '../../../helpers/formatters/formatNotifications.js';
+import { roles } from '../../../constants/roles.js';
 
 const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 
@@ -15,88 +16,66 @@ export class GetController {
         page = 0,
         query = '',
       },
-      user: { id: userId },
+      user: { id: userId, role: userRole },
     } = req;
 
     const hasBeenRead =
       paramHasBeenRead === undefined ? undefined : paramHasBeenRead === 'true';
 
-    // query searches by name or surname or identification_number of person associated to employee
-    const searchFilters = {
-      notification_isactive: true,
-      id_sender: sent ? userId : undefined,
-      notification_receiver: {
-        some: {
-          id_receiver: sent ? undefined : userId,
-          has_read_notification: hasBeenRead,
-        },
-      },
-      OR: [
-        {
-          user: {
-            employee: {
-              person: {
-                OR: [
-                  {
-                    name: {
-                      contains: query,
-                      mode: 'insensitive',
-                    },
-                  },
-                  {
-                    surname: {
-                      contains: query,
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-        {
-          notification_type: {
-            title_notification: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-        },
-      ],
-    };
+    // GETs are different depending on the userRole
 
     try {
-      const data = await prisma.notification.findMany({
-        skip: page * entries,
-        take: +entries,
-        where: searchFilters,
-        include: {
-          notification_type: true,
-          notification_doc: true,
-          notification_receiver: {
-            include: {
-              receiver_type: true,
-            },
-            where: {
-              id_receiver: sent ? undefined : userId,
-            },
+      if (userRole === roles.AREA) {
+        const area = await prisma.user.findFirst({
+          where: {
+            id_user: userId,
           },
-          user: {
-            include: {
-              employee: {
-                include: {
-                  person: true,
-                },
+          include: {
+            area: true,
+          },
+        });
+
+        const areaId = area.id_area;
+
+        // Get notifications by areaId
+
+        const data = await prisma.notification.findMany({
+          skip: page * entries,
+          take: +entries,
+          where: {
+            notification_isactive: true,
+            id_sender: sent ? userId : undefined,
+            notification_receiver: {
+              some: {
+                id_receiver: sent ? undefined : areaId,
+                has_read_notification: hasBeenRead,
               },
             },
+            OR: [
+              {
+                notification_type: {
+                  title_notification: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+              {
+                user: {
+                  area: {
+                    area: {
+                      contains: query,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              },
+            ],
           },
-        },
-        orderBy: {
-          notification_created_at: 'desc',
-        },
-      });
+        });
 
-      if (sent) {
+        // Check for empty data
+
         if (!data) {
           res.status(HttpStatus.NOT_FOUND).json({
             data: null,
@@ -105,104 +84,177 @@ export class GetController {
           return;
         }
 
+        // Response
+
         const formattedData = await formatNotifications({ data, sent });
 
         res.json({
           data: formattedData,
           message: 'Notificaciones obtenidas exitosamente',
         });
-        return;
-      }
+      } else {
+        // Employee or admin roles
 
-      // Received notification
+        // Get notifications by userId
 
-      // filter notification_receivers to only get the ones that are for the user
-      const notifications = data || [];
-
-      const employeeArea = await prisma.employee.findFirst({
-        where: {
-          user: {
-            some: {
-              id_user: userId,
-            },
-          },
-        },
-        select: {
-          id_area: true,
-        },
-      });
-
-      if (!employeeArea) {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          data: null,
-          message: 'Error al obtener las notificaciones',
-        });
-        return;
-      }
-
-      const employeeAreaId = employeeArea.id_area;
-
-      const areaNotifications = await prisma.notification.findMany({
-        where: {
-          notification_isactive: true,
-          id_sender: {
-            not: userId,
-          },
-          notification_area_receiver: {
-            some: {
-              id_area: {
-                in: [employeeAreaId, ALL_EMPLOYEES_ID],
+        const userNotifications = await prisma.notification.findMany({
+          where: {
+            notification_isactive: true,
+            id_sender: sent ? userId : undefined,
+            notification_receiver: {
+              some: {
+                id_receiver: sent ? undefined : userId,
+                has_read_notification: hasBeenRead,
               },
-              has_read_notification: hasBeenRead,
-              id_user: userId,
             },
-          },
-        },
-        include: {
-          notification_type: true,
-          notification_doc: true,
-          notification_area_receiver: true,
-          notification_receiver: {
-            include: {
-              receiver_type: true,
-            },
-          },
-          user: {
-            include: {
-              employee: {
-                include: {
-                  person: true,
+            OR: [
+              {
+                user: {
+                  employee: {
+                    person: {
+                      OR: [
+                        {
+                          name: {
+                            contains: query,
+                            mode: 'insensitive',
+                          },
+                        },
+                        {
+                          surname: {
+                            contains: query,
+                            mode: 'insensitive',
+                          },
+                        },
+                      ],
+                    },
+                  },
                 },
               },
-            },
+              {
+                notification_type: {
+                  title_notification: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            ],
           },
-        },
-        orderBy: {
-          notification_created_at: 'desc',
-        },
-      });
-
-      notifications.push(...(areaNotifications || []));
-
-      if (!data) {
-        // || no hay data del area o de todos los empleados
-        res.status(HttpStatus.NOT_FOUND).json({
-          data: null,
-          message: 'No se encontraron notificaciones',
+          include: {
+            user: {
+              include: {
+                employee: {
+                  include: {
+                    person: true,
+                  },
+                },
+                area: true,
+              },
+            },
+            notification_type: true,
+            notification_doc: true,
+          },
         });
-        return;
+
+        // Check for empty data
+
+        if (!userNotifications) {
+          res.status(HttpStatus.NOT_FOUND).json({
+            data: null,
+            message: 'No se encontraron notificaciones',
+          });
+          return;
+        }
+
+        // Get notifications between area notifications
+
+        const areaNotifications = await prisma.notification.findMany({
+          where: {
+            notification_isactive: true,
+            id_sender: sent ? userId : undefined,
+            notification_area_receiver: {
+              some: {
+                id_user: sent ? undefined : userId,
+                has_read_notification: hasBeenRead,
+              },
+            },
+            OR: [
+              {
+                notification_type: {
+                  title_notification: {
+                    contains: query,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+              {
+                user: {
+                  area: {
+                    area: {
+                      contains: query,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            notification_receiver: {
+              include: {
+                receiver_type: true,
+              },
+            },
+            user: {
+              include: {
+                employee: {
+                  include: {
+                    person: true,
+                  },
+                },
+                area: true,
+              },
+            },
+            notification_type: true,
+            notification_doc: true,
+          },
+        });
+
+        // Check for empty data
+
+        if (!areaNotifications && !userNotifications) {
+          res.status(HttpStatus.NOT_FOUND).json({
+            data: null,
+            message: 'No se encontraron notificaciones',
+          });
+          return;
+        }
+
+        const totalNotifications = [...userNotifications, ...areaNotifications];
+
+        // Limit response to page and entries quantity
+
+        // TODO: Change this to limit from DB - too slow and exponentially slower with more data
+        const notifications = totalNotifications.slice(
+          page * entries,
+          page * entries + +entries,
+        );
+
+        // Format data
+
+        const formattedData = await formatNotifications({
+          data: notifications,
+          sent,
+          hasBeenRead,
+        });
+
+        // Response
+
+        res.json({
+          data: formattedData,
+          message: 'Notificaciones obtenidas exitosamente',
+        });
       }
-
-      const formattedData = await formatNotifications({
-        data: notifications,
-        sent,
-        hasBeenRead,
-      });
-
-      res.json({
-        data: formattedData,
-        message: 'Notificaciones obtenidas exitosamente',
-      });
     } catch (error) {
       console.error('🟥', error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

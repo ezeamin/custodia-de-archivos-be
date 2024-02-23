@@ -7,6 +7,7 @@ import {
   createDocumentEntriesInProfile,
   createIndividualNotificationReceiverData,
 } from '../../../helpers/notificationReceivers.js';
+import { roles } from '../../../constants/roles.js';
 
 const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 
@@ -178,6 +179,16 @@ export class PostController {
       }));
     }
 
+    // Check if receiver is "All Employees"
+    const receiverHasAllEmployees = JSON.parse(receivers).some(
+      (receiver) => receiver.id === ALL_EMPLOYEES_ID,
+    );
+
+    // Get a list of individual users to send notification
+    const individualReceivers = JSON.parse(receivers)
+      .filter((receiver) => receiver.type === 'user')
+      .map((receiver) => receiver.id);
+
     // Create notification
     let newNotification = null;
     try {
@@ -196,120 +207,6 @@ export class PostController {
           },
         },
       });
-
-      // Create receivers entries in "notification_receiver" table
-
-      const receiverTypes = await prisma.receiver_type.findMany();
-
-      const areaTypeId = receiverTypes.find((r) =>
-        r.receiver_type.toLowerCase().includes('area'),
-      ).id_receiver_type;
-
-      const receiverHasAllEmployees =
-        JSON.parse(receivers).findIndex(
-          (receiver) => receiver.id === ALL_EMPLOYEES_ID,
-        ) !== -1;
-
-      // "All employees"
-      if (receiverHasAllEmployees) {
-        // Create a single notification_receiver entry ("all employees")
-        await prisma.notification_receiver.create({
-          data: {
-            id_notification: newNotification.id_notification,
-            id_receiver: ALL_EMPLOYEES_ID,
-            id_receiver_type: areaTypeId,
-          },
-        });
-
-        // Iterate over all employees affected and add area_receivers entries to all
-
-        try {
-          const promises = [];
-          promises.push(
-            createIndividualNotificationReceiverData({
-              notificationId: newNotification.id_notification,
-              areaId: ALL_EMPLOYEES_ID,
-              isAllEmployees: true,
-              userId,
-            }),
-          );
-
-          await Promise.all(promises);
-        } catch (error) {
-          console.error('🟥', error);
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            data: null,
-            message: error.message,
-          });
-          prisma.notification.delete({
-            where: {
-              id_notification: newNotification.id_notification,
-            },
-          });
-          prisma.notification_receiver.deleteMany({
-            where: {
-              id_notification: newNotification.id_notification,
-            },
-          });
-          return;
-        }
-      } else {
-        // "Normal" receivers, or multiple areas
-
-        // Add one entry per receiver, either employee or area
-        await prisma.notification_receiver.createMany({
-          data: JSON.parse(receivers).map((receiver) => ({
-            id_notification: newNotification.id_notification,
-            id_receiver: receiver.id,
-            id_receiver_type: receiverTypes.find(
-              (r) => r.receiver_type === receiver.type,
-            ).id_receiver_type,
-          })),
-        });
-
-        // Create individual notifications for each area's employees (avoid duplicate entries)
-
-        const individualReceivers = JSON.parse(receivers)
-          .filter((receiver) => receiver.type === 'user')
-          .map((receiver) => receiver.id);
-
-        try {
-          const promises = [];
-          JSON.parse(receivers).forEach((receiver) => {
-            if (
-              receiver.type === 'area' &&
-              !individualReceivers.includes(receiver.id)
-            ) {
-              promises.push(
-                createIndividualNotificationReceiverData({
-                  notificationId: newNotification.id_notification,
-                  areaId: receiver.id,
-                  userId,
-                  individualReceivers,
-                }),
-              );
-            }
-          });
-          await Promise.all(promises);
-        } catch (error) {
-          console.error('🟥', error);
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            data: null,
-            message: error.message,
-          });
-          prisma.notification.delete({
-            where: {
-              id_notification: newNotification.id_notification,
-            },
-          });
-          prisma.notification_receiver.deleteMany({
-            where: {
-              id_notification: newNotification.id_notification,
-            },
-          });
-          return;
-        }
-      }
 
       // Create docs entries (if any)
 
@@ -373,6 +270,80 @@ export class PostController {
         return;
       }
 
+      // Check if sender is employee, or area or admin
+
+      if (userRole === roles.EMPLOYEE) {
+        //! Employee -> Area = Send to Area User
+
+        // If sender is employee, then it can send to a user or to an area but, if it is an area,
+        // it will create 1 entry and none at notification_area_receiver
+
+        const promises = [];
+        JSON.parse(receivers).forEach((receiver) => {
+          const promise = prisma.notification_receiver.create({
+            data: {
+              id_receiver: receiver.id,
+              notification: {
+                connect: {
+                  id_notification: newNotification.id_notification,
+                },
+              },
+              receiver_type: {
+                connect: {
+                  receiver_type: receiver.type,
+                },
+              },
+            },
+          });
+
+          promises.push(promise);
+        });
+
+        await Promise.all(promises);
+      } else {
+        //! Admin | Area -> Area | Employee = Send to All Users in Area (not Area User) | Send to User
+        // If sender is admin or area, then it can send to a user or to an area but, if it is an area,
+        // it will create entries at notification_area_receiver, one for each employee of that area.
+        // Area User WON'T receive the notification.
+
+        const promises = [];
+        JSON.parse(receivers).forEach((receiver) => {
+          const promiseNotRec = prisma.notification_receiver.create({
+            data: {
+              id_receiver: receiver.id,
+              notification: {
+                connect: {
+                  id_notification: newNotification.id_notification,
+                },
+              },
+              receiver_type: {
+                connect: {
+                  receiver_type: receiver.type,
+                },
+              },
+            },
+          });
+
+          if (receiver.type === 'area') {
+            // Add entries to notification_area_receiver
+
+            const promiseNotAreaRec = createIndividualNotificationReceiverData({
+              areaId: receiver.id,
+              notificationId: newNotification.id_notification,
+              userId,
+              isAllEmployees: receiverHasAllEmployees,
+              individualReceivers,
+            });
+
+            promises.push(promiseNotAreaRec);
+          }
+
+          promises.push(promiseNotRec);
+        });
+
+        await Promise.all(promises);
+      }
+
       // Finish process and return response
 
       res.status(HttpStatus.CREATED).json({
@@ -390,29 +361,82 @@ export class PostController {
 
     // Send email to receivers
 
-    JSON.parse(receivers).forEach(async (receiver) => {
-      if (receiver.type === 'user') {
-        const receiverInfo = await prisma.user.findUnique({
-          where: {
-            id_user: receiver.id,
-          },
-          include: {
-            employee: {
+    try {
+      JSON.parse(receivers).forEach(async (receiver) => {
+        if (receiver.type === 'user') {
+          const receiverInfo = await prisma.user.findUnique({
+            where: {
+              id_user: receiver.id,
+            },
+            include: {
+              employee: {
+                include: {
+                  person: true,
+                },
+              },
+            },
+          });
+
+          sendNewNotificationMail({
+            name: receiverInfo.employee.person.name,
+            email: receiverInfo.employee.email,
+            username: receiverInfo.username,
+            notificationId: newNotification.id_notification,
+          });
+        } else if (receiver.type === 'area') {
+          const areaInfo = await prisma.area.findUnique({
+            where: {
+              id_area: receiver.id,
+              area_isactive: true,
+            },
+            include: {
+              user: true,
+            },
+          });
+
+          // TODO: What happens if message is sent to area user, but it wasn't yet created?
+
+          // Send to Area User only
+          if (userRole === roles.EMPLOYEE) {
+            if (areaInfo.responsible_email && areaInfo.user.length > 0) {
+              sendNewNotificationMail({
+                name: areaInfo.area,
+                email: areaInfo.responsible_email,
+                username: areaInfo.user[0].username,
+                notificationId: newNotification.id_notification,
+              });
+            }
+          } else {
+            // Send to All Employees of Area
+            const areaEmployees = await prisma.employee.findMany({
+              where: {
+                area: {
+                  id_area: receiver.id,
+                },
+                employee_isactive: true,
+                NOT: {
+                  id_user: userId, // do not send email to sender
+                },
+              },
               include: {
                 person: true,
               },
-            },
-          },
-        });
+            });
 
-        sendNewNotificationMail({
-          name: receiverInfo.employee.person.name,
-          email: receiverInfo.employee.email,
-          username: receiverInfo.username,
-          notificationId: newNotification.id_notification,
-        });
-      }
-    });
+            areaEmployees.forEach((employee) => {
+              sendNewNotificationMail({
+                name: employee.person.name,
+                email: employee.email,
+                username: employee.person.identification_number,
+                notificationId: newNotification.id_notification,
+              });
+            });
+          }
+        }
+      });
+    } catch (error) {
+      console.error('🟥', error);
+    }
   }
 
   static async createNotificationType(req, res) {

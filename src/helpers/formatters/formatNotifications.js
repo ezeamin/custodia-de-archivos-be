@@ -51,10 +51,16 @@ const formatReceivedNotifications = (data, hasBeenRead) => {
     message: item.message,
     issuer: {
       id: item.user.id_user,
-      firstname: item.user.employee.person.name,
-      lastname: item.user.employee.person.surname,
-      email: item.user.employee.email,
-      imgSrc: item.user.employee.picture_url,
+      firstname: item.user.employee
+        ? item.user.employee.person.name
+        : item.user.area.area,
+      lastname: item.user.employee ? item.user.employee.person.surname : 'Area',
+      email: item.user.employee
+        ? item.user.employee.email
+        : item.user.area.responsible_email,
+      imgSrc: item.user.employee
+        ? item.user.employee.picture_url
+        : DEFAULT_IMAGE_URL,
     },
     type: {
       id: item.notification_type.id_notification_type,
