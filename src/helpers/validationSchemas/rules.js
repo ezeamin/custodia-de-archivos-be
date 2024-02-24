@@ -99,3 +99,40 @@ export const numberRules = (name, min = -9999999999, max = 9999999999) => {
         '*': `Revisa el campo "${name}"`,
       });
 };
+
+export const typeRule = (name) => {
+  return () =>
+    Joi.object({
+      id: Joi.string()
+        .trim()
+        .min(1)
+        .required()
+        .messages({
+          'string.empty': `El campo "id" de "${name}" no puede estar vacio`,
+          'string.min': `El campo "id" de "${name}" debe tener al menos 1 caracter`,
+          'any.required': `El campo "id" de "${name}" es obligatorio`,
+          '*': `Revisa el campo "id" de "${name}"`,
+        }),
+      description: textRules(`"description" de "${name}"`, 3, 100)(),
+    }).messages({
+      'object.unknown': `El campo "{#key}" en "${name}" no está permitido`,
+      '*': `Formato de "${name}" incorrecto`,
+    });
+};
+
+export const phoneRules = (name = 'phone') => {
+  return () =>
+    Joi.string()
+      .trim()
+      .required()
+      .min(9)
+      .max(14)
+      .regex(/^[0-9]+$/)
+      .messages({
+        'string.empty': `El campo "${name}" no puede estar vacio`,
+        'string.length': `El campo "${name}" debe tener 10 caracteres`,
+        'string.pattern.base': `El campo "${name}" debe ser un teléfono válido`,
+        'any.required': `El campo "${name}" es obligatorio`,
+        '*': `Revisa el campo "${name}"`,
+      });
+};

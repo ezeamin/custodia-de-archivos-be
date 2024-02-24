@@ -28,7 +28,33 @@ import {
   get_params_licensesTypesByIdSchema,
   get_params_lifeInsuranceBeneficiarySchema,
   get_params_trainingsTypesByIdSchema,
+  post_employeeAbsenceSchema,
+  post_employeeDocFolderSchema,
+  post_employeeDocSchema,
+  post_employeeExtraHourSchema,
+  post_employeeFamilyMemberSchema,
+  post_employeeFormalWarningSchema,
+  post_employeeLateArrivalSchema,
+  post_employeeLicenseSchema,
+  post_employeeLifeInsuranceSchema,
   post_employeeSchema,
+  post_employeeTrainingSchema,
+  post_employeeVacationSchema,
+  post_licenseTypeSchema,
+  post_lifeInsuranceBeneficiarySchema,
+  post_params_employeeAbsenceSchema,
+  post_params_employeeDocFolderSchema,
+  post_params_employeeDocSchema,
+  post_params_employeeExtraHourSchema,
+  post_params_employeeFamilyMemberSchema,
+  post_params_employeeFormalWarningSchema,
+  post_params_employeeLateArrivalSchema,
+  post_params_employeeLicenseSchema,
+  post_params_employeeLifeInsuranceSchema,
+  post_params_employeeTrainingSchema,
+  post_params_employeeVacationSchema,
+  post_params_lifeInsuranceBeneficiarySchema,
+  post_trainingTypeSchema,
 } from '../../helpers/validationSchemas/employeeSchemas.js';
 
 export const employeeRouter = express.Router();
@@ -210,85 +236,130 @@ employeeRouter.post(
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   upload.single('file'),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeDocSchema),
   (req, res, next) => validateFile(req, res, next),
+  (req, res, next) => validateBody(req, res, next, post_employeeDocSchema),
   Employees.PostController.createEmployeeDoc,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FOLDER,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeDocFolderSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_employeeDocFolderSchema),
   Employees.PostController.createEmployeeFolder,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_ABSENCE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeAbsenceSchema),
+  (req, res, next) => validateBody(req, res, next, post_employeeAbsenceSchema),
   Employees.PostController.createEmployeeAbsence,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LICENSE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeLicenseSchema),
+  (req, res, next) => validateBody(req, res, next, post_employeeLicenseSchema),
   Employees.PostController.createEmployeeLicense,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_VACATION,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeVacationSchema),
+  (req, res, next) => validateBody(req, res, next, post_employeeVacationSchema),
   Employees.PostController.createEmployeeVacation,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_TRAINING,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeTrainingSchema),
+  (req, res, next) => validateBody(req, res, next, post_employeeTrainingSchema),
   Employees.PostController.createEmployeeTraining,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FORMAL_WARNING,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeFormalWarningSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_employeeFormalWarningSchema),
   Employees.PostController.createEmployeeFormalWarning,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LATE_ARRIVAL,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeLateArrivalSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_employeeLateArrivalSchema),
   Employees.PostController.createEmployeeLateArrival,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_EXTRA_HOUR,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeExtraHourSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_employeeExtraHourSchema),
   Employees.PostController.createEmployeeExtraHour,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeFamilyMemberSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_employeeFamilyMemberSchema),
   Employees.PostController.createFamilyMember,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_EMPLOYEE_LIFE_INSURANCE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_employeeLifeInsuranceSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_employeeLifeInsuranceSchema),
   Employees.PostController.createEmployeeLifeInsurance,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, post_params_lifeInsuranceBeneficiarySchema),
+  (req, res, next) =>
+    validateBody(req, res, next, post_lifeInsuranceBeneficiarySchema),
   Employees.PostController.createLifeInsuranceBeneficiary,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_LICENSE_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) => validateBody(req, res, next, post_licenseTypeSchema),
   Employees.PostController.createLicenseType,
 );
 employeeRouter.post(
   ENDPOINTS.EMPLOYEES.POST_TRAINING_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) => validateBody(req, res, next, post_trainingTypeSchema),
   Employees.PostController.createTrainingType,
 );
 
