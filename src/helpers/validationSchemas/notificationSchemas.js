@@ -1,11 +1,13 @@
 import Joi from 'joi';
 import {
+  entriesRules,
   hourRules,
-  numberRules,
+  pageRules,
   queryBooleanRules,
+  queryRules,
   textRules,
   uuidRule,
-} from './rules';
+} from './rules.js';
 
 // ----------------------------
 // BODY
@@ -84,9 +86,9 @@ export const put_params_notificationTypeSchema = Joi.object({
 export const get_query_notificationsSchema = Joi.object({
   hasBeenRead: queryBooleanRules('hasBeenRead')(),
   sent: queryBooleanRules('sent')(),
-  page: numberRules('page', 0, 1000)(),
-  entries: numberRules('entries', 1, 100)(),
-  query: textRules('query', 0, 100)(),
+  page: pageRules()(),
+  entries: entriesRules()(),
+  query: queryRules()(),
 }).messages({
   'object.unknown': 'El query "{#key}" no está permitido',
   '*': 'Formato del query incorrecto',

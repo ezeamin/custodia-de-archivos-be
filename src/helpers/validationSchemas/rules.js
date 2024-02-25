@@ -137,6 +137,21 @@ export const phoneRules = (name = 'phone') => {
       });
 };
 
+export const hourRules = (name) => {
+  return () =>
+    Joi.string()
+      .pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'hour')
+      .messages({
+        'string.pattern.base': `El campo "${name}" debe ser una hora válida`,
+        'any.required': `El campo "${name}" es obligatorio`,
+        '*': `Revisa el campo "${name}"`,
+      });
+};
+
+// ----------------------------
+// QUERY
+// ----------------------------
+
 export const queryBooleanRules = (name) => {
   return () =>
     Joi.string()
@@ -149,13 +164,31 @@ export const queryBooleanRules = (name) => {
       });
 };
 
-export const hourRules = (name) => {
+export const pageRules = () => {
   return () =>
-    Joi.string()
-      .pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'hour')
-      .messages({
-        'string.pattern.base': `El campo "${name}" debe ser una hora válida`,
-        'any.required': `El campo "${name}" es obligatorio`,
-        '*': `Revisa el campo "${name}"`,
-      });
+    Joi.number().min(0).max(1000).messages({
+      'number.base': `El query "page" debe ser de tipo "number"`,
+      'number.empty': `El query "page" no puede estar vacío`,
+      'number.min': `El query "page" debe ser mayor a 0`,
+      'number.max': `El query "page" debe ser menor a 1000`,
+    });
+};
+
+export const entriesRules = () => {
+  return () =>
+    Joi.number().min(1).max(100).messages({
+      'number.base': `El query "entries" debe ser de tipo "number"`,
+      'number.empty': `El query "entries" no puede estar vacío`,
+      'number.min': `El query "entries" debe ser mayor a 0`,
+      'number.max': `El query "entries" debe ser menor a 100`,
+    });
+};
+
+export const queryRules = () => {
+  return () =>
+    Joi.string().trim().max(100).messages({
+      'string.base': `El query "query" debe ser de tipo "string"`,
+      'string.empty': `El query "query" no puede estar vacío`,
+      'string.max': `El query "query" debe tener como máximo 100 caracteres`,
+    });
 };

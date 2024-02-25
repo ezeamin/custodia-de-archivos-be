@@ -72,6 +72,11 @@ export class GetController {
               },
             ],
           },
+          include: {
+            notification_receiver: true,
+            notification_type: true,
+            notification_doc: true,
+          },
         });
 
         // Check for empty data
@@ -153,6 +158,11 @@ export class GetController {
             },
             notification_type: true,
             notification_doc: true,
+            notification_receiver: {
+              include: {
+                receiver_type: true,
+              },
+            },
           },
         });
 
@@ -347,6 +357,14 @@ export class GetController {
           });
         }
 
+        if (!receiver) {
+          res.status(HttpStatus.FORBIDDEN).json({
+            data: null,
+            message: 'No tiene permisos para ver esta notificación',
+          });
+          return;
+        }
+
         // Update to "read" only if that status is false
         if (!receiver.has_read_notification) {
           const receiverId =
@@ -387,6 +405,7 @@ export class GetController {
             ) {
               await prisma.notification_receiver.update({
                 where: {
+                  id_notification_receiver: receiverId,
                   id_notification: notificationId,
                   id_receiver: employeeArea.id_area,
                 },

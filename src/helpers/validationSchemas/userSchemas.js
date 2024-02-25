@@ -1,6 +1,14 @@
 import Joi from 'joi';
 
-import { dniRules, emailRules, textRules, uuidRule } from './rules.js';
+import {
+  dniRules,
+  emailRules,
+  entriesRules,
+  pageRules,
+  queryRules,
+  textRules,
+  uuidRule,
+} from './rules.js';
 
 // ----------------------------
 // BODY
@@ -42,23 +50,9 @@ export const delete_params_deleteReadOnlySchema = put_params_createAdminSchema;
 // ----------------------------
 
 export const get_query_userSchema = Joi.object({
-  page: Joi.number().integer().min(0).messages({
-    'number.base': 'El parámetro "page" debe ser un número',
-    'number.integer': 'El parámetro "page" debe ser un número entero',
-    'number.min': 'El parámetro "page" no puede ser menor a 0',
-    '*': 'Revisa el parámetro "page"',
-  }),
-  entries: Joi.number().integer().min(1).max(100).messages({
-    'number.base': 'El parámetro "entries" debe ser un número',
-    'number.integer': 'El parámetro "entries" debe ser un número entero',
-    'number.min': 'El parámetro "entries" no puede ser menor a 1',
-    'number.max': 'El parámetro "entries" no puede ser mayor a 100',
-    '*': 'Revisa el parámetro "entries"',
-  }),
-  query: Joi.string().messages({
-    'string.base': 'El parámetro "query" debe ser un texto',
-    '*': 'Revisa el parámetro "query"',
-  }),
+  page: pageRules()(),
+  entries: entriesRules()(),
+  query: queryRules()(),
   role: Joi.string().valid('ADMIN', 'EMPLOYEE', 'THIRD_PARTY').messages({
     'string.base': 'El parámetro "role" debe ser un texto',
     'any.only':
@@ -71,25 +65,9 @@ export const get_query_userSchema = Joi.object({
 });
 
 export const get_query_loginLogsSchema = Joi.object({
-  page: Joi.number().integer().min(0).messages({
-    'number.base': 'El parámetro "page" debe ser un número',
-    'number.integer': 'El parámetro "page" debe ser un número entero',
-    'number.min': 'El parámetro "page" no puede ser menor a 0',
-    '*': 'Revisa el parámetro "page"',
-  }),
-  entries: Joi.number().integer().min(1).max(100).messages({
-    'number.base': 'El parámetro "entries" debe ser un número',
-    'number.integer': 'El parámetro "entries" debe ser un número entero',
-    'number.min': 'El parámetro "entries" no puede ser menor a 1',
-    'number.max': 'El parámetro "entries" no puede ser mayor a 100',
-    '*': 'Revisa el parámetro "entries"',
-  }),
-  query: Joi.number().integer().positive().messages({
-    'number.base': 'El parámetro "query" debe ser un número',
-    'number.integer': 'El parámetro "query" debe ser un número entero',
-    'number.positive': 'El parámetro "query" debe ser un número positivo',
-    '*': 'Revisa el parámetro "query"',
-  }),
+  page: pageRules()(),
+  entries: entriesRules()(),
+  query: queryRules()(),
 }).messages({
   'object.unknown': 'No se permiten parámetros adicionales',
   '*': 'Revisa los parámetros de la consulta',

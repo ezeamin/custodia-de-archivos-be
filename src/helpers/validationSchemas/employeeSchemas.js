@@ -4,8 +4,11 @@ import {
   dateBeforeTodayRules,
   dniRules,
   emailRules,
+  entriesRules,
   numberRules,
+  pageRules,
   phoneRules,
+  queryRules,
   textRules,
   typeRule,
   uuidRule,
@@ -404,9 +407,9 @@ export const delete_params_trainingTypeSchema = Joi.object({
 // ----------------------------
 
 export const get_query_employeesSchema = Joi.object({
-  page: numberRules('page', 0, 1000)(),
-  entries: numberRules('entries', 1, 100)(),
-  query: textRules('query', 0, 50)(),
+  page: pageRules()(),
+  entries: entriesRules(),
+  query: queryRules()(),
 }).messages({
   'object.unknown': 'El query "{#key}" no está permitido',
   '*': 'Formato del query incorrecto',

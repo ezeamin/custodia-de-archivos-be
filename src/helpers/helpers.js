@@ -31,6 +31,8 @@ export const uppercaseName = (name) => {
 };
 
 export const formatPhone = (phone) => {
+  if (!phone || typeof phone !== 'string') return phone;
+
   // if phone starts with 381, add "549" in front of it
   if (phone.startsWith('381')) {
     return `549${phone}`;
@@ -42,3 +44,5 @@ export const formatPhone = (phone) => {
 
   return phone;
 };
+
+

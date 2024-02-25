@@ -38,6 +38,12 @@ export const createIndividualNotificationReceiverData = async ({
           },
         },
       },
+      area: {
+        select: {
+          area: true,
+          responsible_email: true,
+        },
+      },
     },
   });
 
@@ -65,8 +71,8 @@ export const createIndividualNotificationReceiverData = async ({
   // Send email to each user
   usersInArea.forEach((user) => {
     sendNewNotificationMail({
-      name: user.employee.person.name,
-      email: user.employee.email,
+      name: user.employee ? user.employee.person.name : user.area.area,
+      email: user.employee ? user.employee.email : user.area.responsible_email,
       notificationId,
       username: user.username,
     });
@@ -102,7 +108,7 @@ export const createDocumentEntriesInProfile = async ({
     },
   });
 
-  const employees = usersInArea.map((user) => user.employee);
+  const employees = usersInArea.map((user) => user.employee).filter(Boolean);
 
   const todayInArgentina = dayjs().add(3, 'hour').format('DD/MM/YYYY');
 

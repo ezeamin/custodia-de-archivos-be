@@ -9,9 +9,6 @@ import { validateQuery } from '../../middlewares/validateQuery.js';
 
 import { roles } from '../../constants/roles.js';
 
-import { Employees } from '../../controllers/employees/index.js';
-import { ENDPOINTS } from '../endpoints.js';
-
 import { upload } from '../../helpers/multer.js';
 
 import {
@@ -92,6 +89,9 @@ import {
   put_params_trainingTypeSchema,
   put_trainingTypeSchema,
 } from '../../helpers/validationSchemas/employeeSchemas.js';
+
+import { Employees } from '../../controllers/employees/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const employeeRouter = express.Router();
 

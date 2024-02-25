@@ -180,12 +180,12 @@ export class PostController {
     }
 
     // Check if receiver is "All Employees"
-    const receiverHasAllEmployees = JSON.parse(receivers).some(
+    const receiverHasAllEmployees = receivers.some(
       (receiver) => receiver.id === ALL_EMPLOYEES_ID,
     );
 
     // Get a list of individual users to send notification
-    const individualReceivers = JSON.parse(receivers)
+    const individualReceivers = receivers
       .filter((receiver) => receiver.type === 'user')
       .map((receiver) => receiver.id);
 
@@ -227,7 +227,7 @@ export class PostController {
         // Relate entries to employees docs
 
         const areasIds = [];
-        JSON.parse(receivers).forEach((receiver) => {
+        receivers.forEach((receiver) => {
           areasIds.push(receiver.id);
         });
 
@@ -279,7 +279,7 @@ export class PostController {
         // it will create 1 entry and none at notification_area_receiver
 
         const promises = [];
-        JSON.parse(receivers).forEach((receiver) => {
+        receivers.forEach((receiver) => {
           const promise = prisma.notification_receiver.create({
             data: {
               id_receiver: receiver.id,
@@ -307,7 +307,7 @@ export class PostController {
         // Area User WON'T receive the notification.
 
         const promises = [];
-        JSON.parse(receivers).forEach((receiver) => {
+        receivers.forEach((receiver) => {
           const promiseNotRec = prisma.notification_receiver.create({
             data: {
               id_receiver: receiver.id,
@@ -362,7 +362,7 @@ export class PostController {
     // Send email to receivers
 
     try {
-      JSON.parse(receivers).forEach(async (receiver) => {
+      receivers.forEach(async (receiver) => {
         if (receiver.type === 'user') {
           const receiverInfo = await prisma.user.findUnique({
             where: {
@@ -414,8 +414,10 @@ export class PostController {
                   id_area: receiver.id,
                 },
                 employee_isactive: true,
-                NOT: {
-                  id_user: userId, // do not send email to sender
+                user: {
+                  none: {
+                    id_user: userId,
+                  },
                 },
               },
               include: {

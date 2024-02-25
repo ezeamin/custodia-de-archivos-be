@@ -4,12 +4,12 @@ import { upload } from '../../helpers/multer.js';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { checkRole } from '../../middlewares/checkRole.js';
+import { validateBody } from '../../middlewares/validateBody.js';
+import { validateParams } from '../../middlewares/validateParams.js';
+import { validateQuery } from '../../middlewares/validateQuery.js';
 
 import { roles } from '../../constants/roles.js';
 
-import { Notifications } from '../../controllers/notifications/index.js';
-import { ENDPOINTS } from '../endpoints.js';
-import { validateQuery } from '../../middlewares/validateQuery.js';
 import {
   get_params_notificationAreaReceiversSchema,
   get_params_notificationByIdSchema,
@@ -22,8 +22,10 @@ import {
   put_notificationTypeSchema,
   put_params_notificationTypeSchema,
 } from '../../helpers/validationSchemas/notificationSchemas.js';
-import { validateParams } from '../../middlewares/validateParams.js';
-import { validateBody } from '../../middlewares/validateBody.js';
+
+import { Notifications } from '../../controllers/notifications/index.js';
+import { ENDPOINTS } from '../endpoints.js';
+import { parseArrayEntry } from '../../middlewares/parseArrayEntry.js';
 
 export const notificationRouter = express.Router();
 
@@ -34,15 +36,6 @@ notificationRouter.get(
   (req, res, next) =>
     validateQuery(req, res, next, get_query_notificationsSchema),
   Notifications.GetController.notifications,
-);
-notificationRouter.get(
-  ENDPOINTS.NOTIFICATIONS.GET_NOTIFICATION,
-  isAuthenticated,
-  (req, res, next) =>
-    validateParams(req, res, next, get_params_notificationByIdSchema),
-  (req, res, next) =>
-    validateQuery(req, res, next, get_query_notificationByIdSchema),
-  Notifications.GetController.notificationById,
 );
 notificationRouter.get(
   ENDPOINTS.NOTIFICATIONS.GET_RECEIVERS,
@@ -70,12 +63,22 @@ notificationRouter.get(
     validateParams(req, res, next, get_params_notificationTypeByIdSchema),
   Notifications.GetController.notificationTypeById,
 );
+notificationRouter.get(
+  ENDPOINTS.NOTIFICATIONS.GET_NOTIFICATION,
+  isAuthenticated,
+  (req, res, next) =>
+    validateParams(req, res, next, get_params_notificationByIdSchema),
+  (req, res, next) =>
+    validateQuery(req, res, next, get_query_notificationByIdSchema),
+  Notifications.GetController.notificationById,
+);
 
 // POST ---------------------------
 notificationRouter.post(
   ENDPOINTS.NOTIFICATIONS.POST_NOTIFICATION,
   isAuthenticated,
   upload.array('files', 5),
+  parseArrayEntry('receivers'),
   (req, res, next) => validateBody(req, res, next, post_notificationSchema),
   Notifications.PostController.createNotification,
 );
