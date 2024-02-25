@@ -178,6 +178,81 @@ export const post_lifeInsuranceBeneficiarySchema = Joi.object({
 
 // PUT ------------------------------------------------------
 
+export const put_employeeSchema = Joi.any();
+// export const put_employeeSchema = Joi.object({
+//   statusId: uuidRule('statusId')(),
+// }).messages({
+//   'object.unknown': 'El campo "{#key}" no está permitido',
+//   '*': 'Formato del body incorrecto',
+// });
+
+export const put_employeeImageSchema = Joi.object({}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_employeeDocSchema = Joi.object({
+  name: textRules('name', 3, 50),
+}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_employeeDocFolderSchema = Joi.object({
+  name: textRules('name', 3, 50),
+  color: textRules('color', 3, 50),
+}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_employeeFamilyMemberSchema = Joi.object().messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_employeeLifeInsuranceSchema = Joi.object({
+  name: textRules('name', 3, 50)(),
+  policyNumber: textRules('policyNumber', 3, 50)(),
+}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_lifeInsuranceBeneficiarySchema = Joi.object({
+  name: textRules('name', 3, 50)(),
+  lastname: textRules('lastname', 3, 50)(),
+  dni: dniRules('dni')(),
+  birthdate: dateBeforeTodayRules('birthdate')(),
+  relationshipId: uuidRule('relationshipId')(),
+  genderId: uuidRule('genderId')(),
+  street: typeRule('street')(),
+  locality: typeRule('locality')(),
+  state: typeRule('state')(),
+  streetNumber: numberRules('streetNumber', 1, 10000)(),
+  apt: textRules('apt', 1, 10)(),
+  percentage: numberRules('percentage', 1, 100)(),
+}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_licenseTypeSchema = Joi.object({
+  title: textRules('title', 3, 50),
+  description: textRules('description', 3, 100),
+}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
+export const put_trainingTypeSchema = Joi.object({
+  title: textRules('title', 3, 50),
+  description: textRules('description', 3, 100),
+}).messages({
+  'object.unknown': 'El campo "{#key}" no está permitido',
+  '*': 'Formato del body incorrecto',
+});
+
 // ----------------------------
 // PARAMS
 // ----------------------------
@@ -239,5 +314,88 @@ export const post_params_lifeInsuranceBeneficiarySchema = Joi.object({
 });
 
 // PUT ------------------------------------------------------
+export const put_params_employeeSchema = get_params_employeeByIdSchema;
+export const put_params_employeeImageSchema = get_params_employeeByIdSchema;
+export const put_params_employeeDocSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  docId: uuidRule('docId')(),
+});
+export const put_params_employeeDocFolderSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  folderId: uuidRule('folderId')(),
+});
+export const put_params_employeeFamilyMemberSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  familyMemberId: uuidRule('familyMemberId')(),
+});
+export const put_params_employeeLifeInsuranceSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  lifeInsuranceId: uuidRule('lifeInsuranceId')(),
+});
+export const put_params_lifeInsuranceBeneficiarySchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  lifeInsuranceId: uuidRule('lifeInsuranceId')(),
+  beneficiaryId: uuidRule('beneficiaryId')(),
+});
+export const put_params_licenseTypeSchema = Joi.object({
+  licenseTypeId: uuidRule('licenseTypeId')(),
+});
+export const put_params_trainingTypeSchema = Joi.object({
+  trainingTypeId: uuidRule('trainingTypeId')(),
+});
 
 // DELETE ---------------------------------------------------
+
+export const delete_params_employeeSchema = get_params_employeeByIdSchema;
+export const delete_params_employeeDocSchema = put_params_employeeDocSchema;
+export const delete_params_employeeDocFolderSchema =
+  put_params_employeeDocFolderSchema;
+export const delete_params_employeeAbsenceSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  absenceId: uuidRule('absenceId')(),
+});
+export const delete_params_employeeTrainingSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  trainingId: uuidRule('trainingId')(),
+});
+export const delete_params_employeeFormalWarningSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  formalWarningId: uuidRule('formalWarningId')(),
+});
+export const delete_params_employeeExtraHourSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  extraHourId: uuidRule('extraHourId')(),
+});
+export const delete_params_employeeLateArrivalSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  lateArrivalId: uuidRule('lateArrivalId')(),
+});
+export const delete_params_employeeLicenseSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  licenseId: uuidRule('licenseId')(),
+});
+export const delete_params_employeeVacationSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  vacationId: uuidRule('vacationId')(),
+});
+export const delete_params_employeeFamilyMemberSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  familyMemberId: uuidRule('familyMemberId')(),
+});
+export const delete_params_employeeLifeInsuranceSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  lifeInsuranceId: uuidRule('lifeInsuranceId')(),
+});
+export const delete_params_lifeInsuranceBeneficiarySchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  lifeInsuranceId: uuidRule('lifeInsuranceId')(),
+  beneficiaryId: uuidRule('beneficiaryId')(),
+});
+export const delete_params_licenseTypeSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  licenseTypeId: uuidRule('licenseTypeId')(),
+});
+export const delete_params_trainingTypeSchema = Joi.object({
+  employeeId: uuidRule('employeeId')(),
+  trainingTypeId: uuidRule('trainingTypeId')(),
+});

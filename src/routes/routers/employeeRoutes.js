@@ -14,6 +14,21 @@ import { ENDPOINTS } from '../endpoints.js';
 import { upload } from '../../helpers/multer.js';
 
 import {
+  delete_params_employeeAbsenceSchema,
+  delete_params_employeeDocFolderSchema,
+  delete_params_employeeDocSchema,
+  delete_params_employeeExtraHourSchema,
+  delete_params_employeeFamilyMemberSchema,
+  delete_params_employeeFormalWarningSchema,
+  delete_params_employeeLateArrivalSchema,
+  delete_params_employeeLicenseSchema,
+  delete_params_employeeLifeInsuranceSchema,
+  delete_params_employeeSchema,
+  delete_params_employeeTrainingSchema,
+  delete_params_employeeVacationSchema,
+  delete_params_licenseTypeSchema,
+  delete_params_lifeInsuranceBeneficiarySchema,
+  delete_params_trainingTypeSchema,
   get_params_employeeAbsencesSchema,
   get_params_employeeByIdSchema,
   get_params_employeeDocsSchema,
@@ -55,6 +70,24 @@ import {
   post_params_employeeVacationSchema,
   post_params_lifeInsuranceBeneficiarySchema,
   post_trainingTypeSchema,
+  put_employeeDocFolderSchema,
+  put_employeeDocSchema,
+  put_employeeFamilyMemberSchema,
+  put_employeeImageSchema,
+  put_employeeLifeInsuranceSchema,
+  put_employeeSchema,
+  put_licenseTypeSchema,
+  put_lifeInsuranceBeneficiarySchema,
+  put_params_employeeDocFolderSchema,
+  put_params_employeeDocSchema,
+  put_params_employeeFamilyMemberSchema,
+  put_params_employeeImageSchema,
+  put_params_employeeLifeInsuranceSchema,
+  put_params_employeeSchema,
+  put_params_licenseTypeSchema,
+  put_params_lifeInsuranceBeneficiarySchema,
+  put_params_trainingTypeSchema,
+  put_trainingTypeSchema,
 } from '../../helpers/validationSchemas/employeeSchemas.js';
 
 export const employeeRouter = express.Router();
@@ -368,6 +401,8 @@ employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) => validateParams(req, res, next, put_params_employeeSchema),
+  (req, res, next) => validateBody(req, res, next, put_employeeSchema),
   Employees.PutController.updateEmployee,
 );
 employeeRouter.put(
@@ -375,6 +410,9 @@ employeeRouter.put(
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   upload.single('imgFile'),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_employeeImageSchema),
+  (req, res, next) => validateBody(req, res, next, put_employeeImageSchema),
   (req, res, next) => validateFile(req, res, next),
   Employees.PutController.updateEmployeeImage,
 );
@@ -382,42 +420,66 @@ employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_DOC,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_employeeDocSchema),
+  (req, res, next) => validateBody(req, res, next, put_employeeDocSchema),
   Employees.PutController.updateEmployeeDoc,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FOLDER,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_employeeDocFolderSchema),
+  (req, res, next) => validateBody(req, res, next, put_employeeDocFolderSchema),
   Employees.PutController.updateEmployeeFolder,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_employeeFamilyMemberSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, put_employeeFamilyMemberSchema),
   Employees.PutController.updateEmployeeFamilyMember,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_EMPLOYEE_LIFE_INSURANCE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_employeeLifeInsuranceSchema),
+  (req, res, next) =>
+    validateBody(req, res, next, put_employeeLifeInsuranceSchema),
   Employees.PutController.updateEmployeeLifeInsurance,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_lifeInsuranceBeneficiarySchema),
+  (req, res, next) =>
+    validateBody(req, res, next, put_lifeInsuranceBeneficiarySchema),
   Employees.PutController.updateLifeInsuranceBeneficiary,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_LICENSE_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_licenseTypeSchema),
+  (req, res, next) => validateBody(req, res, next, put_licenseTypeSchema),
   Employees.PutController.updateLicenseType,
 );
 employeeRouter.put(
   ENDPOINTS.EMPLOYEES.PUT_TRAINING_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, put_params_trainingTypeSchema),
+  (req, res, next) => validateBody(req, res, next, put_trainingTypeSchema),
   Employees.PutController.updateTrainingType,
 );
 
@@ -426,89 +488,124 @@ employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeSchema),
   Employees.DeleteController.deleteEmployee,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_DOC,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeDocSchema),
   Employees.DeleteController.deleteEmployeeDoc,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FOLDER,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeDocFolderSchema),
   Employees.DeleteController.deleteEmployeeFolder,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_ABSENCE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeAbsenceSchema),
   Employees.DeleteController.deleteEmployeeAbsence,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_TRAINING,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeTrainingSchema),
   Employees.DeleteController.deleteEmployeeTraining,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FORMAL_WARNING,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeFormalWarningSchema),
   Employees.DeleteController.deleteEmployeeFormalWarning,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_EXTRA_HOUR,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeExtraHourSchema),
   Employees.DeleteController.deleteEmployeeExtraHour,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LATE_ARRIVAL,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeLateArrivalSchema),
   Employees.DeleteController.deleteEmployeeLateArrival,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LICENSE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeLicenseSchema),
   Employees.DeleteController.deleteEmployeeLicense,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_VACATION,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeVacationSchema),
   Employees.DeleteController.deleteEmployeeVacation,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_FAMILY_MEMBER,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeFamilyMemberSchema),
   Employees.DeleteController.deleteEmployeeFamilyMember,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_EMPLOYEE_LIFE_INSURANCE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_employeeLifeInsuranceSchema),
   Employees.DeleteController.deleteEmployeeLifeInsurance,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_LIFE_INSURANCE_BENEFICIARY,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(
+      req,
+      res,
+      next,
+      delete_params_lifeInsuranceBeneficiarySchema,
+    ),
   Employees.DeleteController.deleteEmployeeLifeInsuranceBeneficiary,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_LICENSE_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_licenseTypeSchema),
   Employees.DeleteController.deleteLicenseType,
 );
 employeeRouter.delete(
   ENDPOINTS.EMPLOYEES.DELETE_TRAINING_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_trainingTypeSchema),
   Employees.DeleteController.deleteTrainingType,
 );

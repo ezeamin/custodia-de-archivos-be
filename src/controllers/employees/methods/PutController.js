@@ -342,12 +342,14 @@ export class PutController {
   static async updateEmployeeImage(req, res) {
     const {
       params: { employeeId },
+      file,
+      user: { id: loggedInUser },
     } = req;
 
     let imageUrl = '';
 
     // Check if image was sent
-    if (!req.file) {
+    if (!file) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message: 'No se ha enviado una imagen',
@@ -357,7 +359,7 @@ export class PutController {
 
     // Check image size
     const FIVE_MB = 5000000;
-    if (req.file.size > FIVE_MB) {
+    if (file.size > FIVE_MB) {
       res.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         message:
@@ -368,7 +370,7 @@ export class PutController {
 
     // Upload image to cloudinary
     try {
-      const { url } = await handleUpload(req.file);
+      const { url } = await handleUpload(file);
 
       const splitUrl = url.split('/upload/');
       imageUrl = `${splitUrl[0]}/upload/w_300,h_300,c_fill,g_face/${splitUrl[1]}`;
@@ -422,7 +424,7 @@ export class PutController {
         changedTable: 'employee',
         previousValue: previousImageUrl,
         newValue: imageUrl,
-        modifyingUser: req.user.id,
+        modifyingUser: loggedInUser,
         employeeId,
       });
     } catch (e) {
@@ -439,7 +441,9 @@ export class PutController {
   // @param - docId
   static async updateEmployeeDoc(req, res) {
     const {
-      params: { docId },
+      params: { employeeId, docId },
+      body: { name },
+      user: { id: loggedInUser },
     } = req;
 
     try {
@@ -459,7 +463,7 @@ export class PutController {
       }
 
       const previousNameExtension = doc.employee_doc_name.split('.');
-      const newName = `${req.body.name}.${previousNameExtension.pop()}`;
+      const newName = `${name}.${previousNameExtension.pop()}`;
 
       await prisma.employee_doc.update({
         where: {
@@ -481,8 +485,8 @@ export class PutController {
         changedTable: 'employee_doc',
         previousValue: doc.employee_doc_name,
         newValue: newName,
-        modifyingUser: req.user.id,
-        employeeId: doc.id_employee,
+        modifyingUser: loggedInUser,
+        employeeId,
       });
     } catch (e) {
       console.error('🟥', e);
