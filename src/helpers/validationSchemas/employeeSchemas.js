@@ -61,7 +61,11 @@ export const post_employeeAbsenceSchema = Joi.object({
 });
 
 export const post_employeeLicenseSchema = Joi.object({
-  observations: textRules('reason', 3, 100)(),
+  observations: Joi.string().trim().default('').max(200).messages({
+    'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+    'string.base': 'Las observaciones deben ser de tipo texto',
+    '*': 'Revisa el campo "observations"',
+  }),
   fromDate: Joi.date().required(),
   toDate: Joi.date().required().min(Joi.ref('fromDate')),
   typeId: uuidRule('typeId')(),
@@ -71,7 +75,11 @@ export const post_employeeLicenseSchema = Joi.object({
 });
 
 export const post_employeeVacationSchema = Joi.object({
-  observations: textRules('reason', 3, 100)(),
+  observations: Joi.string().trim().default('').max(200).messages({
+    'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+    'string.base': 'Las observaciones deben ser de tipo texto',
+    '*': 'Revisa el campo "observations"',
+  }),
   fromDate: Joi.date().required(),
   toDate: Joi.date().required().min(Joi.ref('fromDate')),
 }).messages({
@@ -80,7 +88,11 @@ export const post_employeeVacationSchema = Joi.object({
 });
 
 export const post_employeeTrainingSchema = Joi.object({
-  observations: textRules('reason', 3, 100)(),
+  observations: Joi.string().trim().default('').max(200).messages({
+    'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+    'string.base': 'Las observaciones deben ser de tipo texto',
+    '*': 'Revisa el campo "observations"',
+  }),
   typeId: uuidRule('typeId')(),
   reason: textRules('reason', 3, 100)(),
   date: Joi.date().required(),
@@ -111,7 +123,11 @@ export const post_employeeLateArrivalSchema = Joi.object({
 export const post_employeeExtraHourSchema = Joi.object({
   date: Joi.date().required(),
   hours: numberRules('hours', 1, 24)(),
-  observations: textRules('observations', 3, 100)(),
+  observations: Joi.string().trim().default('').max(200).messages({
+    'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+    'string.base': 'Las observaciones deben ser de tipo texto',
+    '*': 'Revisa el campo "observations"',
+  }),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
@@ -195,21 +211,34 @@ export const put_employeeImageSchema = Joi.object({}).messages({
 });
 
 export const put_employeeDocSchema = Joi.object({
-  name: textRules('name', 3, 50),
+  name: textRules('name', 3, 50)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
 });
 
 export const put_employeeDocFolderSchema = Joi.object({
-  name: textRules('name', 3, 50),
-  color: textRules('color', 7, 7),
+  name: textRules('name', 3, 50)(),
+  color: textRules('color', 7, 7)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
 });
 
-export const put_employeeFamilyMemberSchema = Joi.object().messages({
+export const put_employeeFamilyMemberSchema = Joi.object({
+  name: textRules('name', 3, 50)(),
+  lastname: textRules('lastname', 3, 50)(),
+  dni: dniRules('dni')(),
+  birthdate: dateBeforeTodayRules('birthdate')(),
+  relationshipId: uuidRule('relationshipId')(),
+  genderId: uuidRule('genderId')(),
+  street: typeRule('street')(),
+  locality: typeRule('locality')(),
+  state: typeRule('state')(),
+  streetNumber: numberRules('streetNumber', 1, 10000)(),
+  apt: textRules('apt', 1, 10)(),
+  phone: phoneRules('phone')(),
+}).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
 });
@@ -241,16 +270,16 @@ export const put_lifeInsuranceBeneficiarySchema = Joi.object({
 });
 
 export const put_licenseTypeSchema = Joi.object({
-  title: textRules('title', 3, 50),
-  description: textRules('description', 3, 100),
+  title: textRules('title', 3, 50)(),
+  description: textRules('description', 3, 100)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
 });
 
 export const put_trainingTypeSchema = Joi.object({
-  title: textRules('title', 3, 50),
-  description: textRules('description', 3, 100),
+  title: textRules('title', 3, 50)(),
+  description: textRules('description', 3, 100)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
@@ -408,7 +437,7 @@ export const delete_params_trainingTypeSchema = Joi.object({
 
 export const get_query_employeesSchema = Joi.object({
   page: pageRules()(),
-  entries: entriesRules(),
+  entries: entriesRules()(),
   query: queryRules()(),
 }).messages({
   'object.unknown': 'El query "{#key}" no está permitido',
