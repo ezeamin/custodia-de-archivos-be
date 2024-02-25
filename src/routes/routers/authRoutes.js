@@ -3,14 +3,14 @@ import express from 'express';
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { validateBody } from '../../middlewares/validateBody.js';
 
-import { Auth } from '../../controllers/auth/index.js';
-import { ENDPOINTS } from '../endpoints.js';
-
 import {
   post_loginSchema,
   post_recoverPasswordSchema,
   post_resetPasswordSchema,
 } from '../../helpers/validationSchemas/authSchemas.js';
+
+import { Auth } from '../../controllers/auth/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const authRouter = express.Router();
 

@@ -14,7 +14,7 @@ const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 export class PostController {
   static async createNotification(req, res) {
     const {
-      body: { typeId, receivers, message, isResponseBody },
+      body: { typeId, receivers, message, isResponse: isResponseBody },
       user: { id: userId, role: userRole },
       files,
     } = req;
@@ -443,8 +443,6 @@ export class PostController {
     const {
       body: { title, description, startHour, endHour, allowedRoles },
     } = req;
-
-    // TODO: Add check for allowedRoles: minimum of 1 role
 
     try {
       const newNotificationType = await prisma.notification_type.create({

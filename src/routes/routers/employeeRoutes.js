@@ -2,9 +2,10 @@ import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { checkRole } from '../../middlewares/checkRole.js';
-import { validateParams } from '../../middlewares/validateParams.js';
 import { validateBody } from '../../middlewares/validateBody.js';
 import { validateFile } from '../../middlewares/validateFile.js';
+import { validateParams } from '../../middlewares/validateParams.js';
+import { validateQuery } from '../../middlewares/validateQuery.js';
 
 import { roles } from '../../constants/roles.js';
 
@@ -43,6 +44,8 @@ import {
   get_params_licensesTypesByIdSchema,
   get_params_lifeInsuranceBeneficiarySchema,
   get_params_trainingsTypesByIdSchema,
+  get_query_employeeHistorySchema,
+  get_query_employeesSchema,
   post_employeeAbsenceSchema,
   post_employeeDocFolderSchema,
   post_employeeDocSchema,
@@ -98,6 +101,7 @@ employeeRouter.get(
   isAuthenticated,
   (req, res, next) =>
     checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
+  (req, res, next) => validateQuery(req, res, next, get_query_employeesSchema),
   Employees.GetController.employees,
 );
 employeeRouter.get(
@@ -132,7 +136,8 @@ employeeRouter.get(
     checkRole(req, res, next, [roles.ADMIN, roles.THIRD_PARTY, roles.AREA]),
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeHistorySchema),
-
+  (req, res, next) =>
+    validateQuery(req, res, next, get_query_employeeHistorySchema),
   Employees.GetController.employeeHistory,
 );
 employeeRouter.get(

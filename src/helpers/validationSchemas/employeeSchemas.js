@@ -345,7 +345,6 @@ export const put_params_trainingTypeSchema = Joi.object({
 });
 
 // DELETE ---------------------------------------------------
-
 export const delete_params_employeeSchema = get_params_employeeByIdSchema;
 export const delete_params_employeeDocSchema = put_params_employeeDocSchema;
 export const delete_params_employeeDocFolderSchema =
@@ -399,3 +398,18 @@ export const delete_params_trainingTypeSchema = Joi.object({
   employeeId: uuidRule('employeeId')(),
   trainingTypeId: uuidRule('trainingTypeId')(),
 });
+
+// ----------------------------
+// QUERY
+// ----------------------------
+
+export const get_query_employeesSchema = Joi.object({
+  page: numberRules('page', 0, 1000)(),
+  entries: numberRules('entries', 1, 100)(),
+  query: textRules('query', 0, 50)(),
+}).messages({
+  'object.unknown': 'El query "{#key}" no está permitido',
+  '*': 'Formato del query incorrecto',
+});
+
+export const get_query_employeeHistorySchema = get_query_employeesSchema;

@@ -136,3 +136,26 @@ export const phoneRules = (name = 'phone') => {
         '*': `Revisa el campo "${name}"`,
       });
 };
+
+export const queryBooleanRules = (name) => {
+  return () =>
+    Joi.string()
+      .valid('true', 'false')
+      .messages({
+        'string.base': `El query "${name}" debe ser de tipo "string"`,
+        'string.empty': `El query "${name}" no puede estar vacío`,
+        'any.required': `El query "${name}" es requerido`,
+        'any.only': `El query "${name}" debe ser "true" o "false"`,
+      });
+};
+
+export const hourRules = (name) => {
+  return () =>
+    Joi.string()
+      .pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'hour')
+      .messages({
+        'string.pattern.base': `El campo "${name}" debe ser una hora válida`,
+        'any.required': `El campo "${name}" es obligatorio`,
+        '*': `Revisa el campo "${name}"`,
+      });
+};

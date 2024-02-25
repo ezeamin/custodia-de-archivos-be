@@ -2,15 +2,12 @@ import express from 'express';
 
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { checkRole } from '../../middlewares/checkRole.js';
-
-import { roles } from '../../constants/roles.js';
-
-import { Users } from '../../controllers/users/index.js';
-import { ENDPOINTS } from '../endpoints.js';
-
 import { validateBody } from '../../middlewares/validateBody.js';
 import { validateParams } from '../../middlewares/validateParams.js';
 import { validateQuery } from '../../middlewares/validateQuery.js';
+
+import { roles } from '../../constants/roles.js';
+
 import {
   delete_params_deleteAdminSchema,
   delete_params_deleteReadOnlySchema,
@@ -20,6 +17,9 @@ import {
   post_userSchema,
   put_params_createAdminSchema,
 } from '../../helpers/validationSchemas/userSchemas.js';
+
+import { Users } from '../../controllers/users/index.js';
+import { ENDPOINTS } from '../endpoints.js';
 
 export const userRouter = express.Router();
 

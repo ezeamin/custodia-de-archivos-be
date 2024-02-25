@@ -13,7 +13,6 @@ export const post_userSchema = Joi.object({
   '*': 'Revisa los parámetros del cuerpo',
 });
 
-// name, lastname, dni, description, email
 export const post_readOnlyUserSchema = Joi.object({
   name: textRules('name', 3, 50)(),
   lastname: textRules('lastname', 3, 50)(),
@@ -37,17 +36,6 @@ export const put_params_createAdminSchema = Joi.object({
 });
 export const delete_params_deleteAdminSchema = put_params_createAdminSchema;
 export const delete_params_deleteReadOnlySchema = put_params_createAdminSchema;
-
-// export const get_params_userSchema = Joi.object({
-//   id: Joi.string().required().length(24).messages({
-//     'string.empty': 'El parámetro "id" no puede estar vacio',
-//     'string.length': 'El parámetro "id" debe ser un id válido',
-//     'any.required': 'El parámetro "id" es obligatorio',
-//     '*': 'Revisa el parámetro "id"',
-//   }),
-// });
-// export const put_params_userSchema = get_params_userSchema;
-// export const delete_params_userSchema = get_params_userSchema;
 
 // ----------------------------
 // QUERY
