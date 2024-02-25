@@ -1149,7 +1149,7 @@ export class PostController {
       await prisma.life_insurance.create({
         data: {
           life_insurance_name: name,
-          policy_number: policyNumber.toString(),
+          policy_number: policyNumber,
           employee: {
             connect: {
               id_employee: employeeId,

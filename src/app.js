@@ -14,6 +14,7 @@ const whitelist = [
   'http://localhost:3000',
   'http://localhost:5173',
   'https://custodia-archivos.netlify.app',
+  'https://develop--custodia-archivos.netlify.app',
 ];
 const corsOptions = {
   credentials: true,

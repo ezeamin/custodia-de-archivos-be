@@ -884,7 +884,7 @@ export class PutController {
         },
         data: {
           life_insurance_name: name,
-          policy_number: policyNumber.toString(),
+          policy_number: policyNumber,
         },
       });
 

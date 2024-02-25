@@ -46,7 +46,7 @@ export const post_employeeDocSchema = Joi.object({
 
 export const post_employeeDocFolderSchema = Joi.object({
   name: textRules('name', 3, 50)(),
-  color: textRules('color', 6, 6)(),
+  color: textRules('color', 7, 7)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
@@ -203,7 +203,7 @@ export const put_employeeDocSchema = Joi.object({
 
 export const put_employeeDocFolderSchema = Joi.object({
   name: textRules('name', 3, 50),
-  color: textRules('color', 3, 50),
+  color: textRules('color', 7, 7),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
