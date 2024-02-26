@@ -259,6 +259,11 @@ async function insertData() {
         id_notification_type: '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
         id_user_type: '62ffb154-64a6-4b87-9486-3bb7b14a77f3',
       },
+      {
+        id_notification_allowed_role: '018de5cd-b236-71f1-8b9a-3c85ed683cec',
+        id_notification_type: '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
+        id_user_type: '018dd17a-2ec0-7db7-a398-c401a5817b45',
+      },
     ],
   });
 

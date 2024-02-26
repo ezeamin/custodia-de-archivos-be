@@ -315,6 +315,11 @@ export class GetController {
           //   },
           // },
         },
+        orderBy: {
+          person: {
+            surname: 'asc',
+          },
+        },
       });
 
       employees.forEach((employee) => {

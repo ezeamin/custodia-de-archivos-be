@@ -870,7 +870,8 @@ VALUES (
 INSERT INTO public.notification_allowed_role (id_notification_allowed_role,id_notification_type,id_user_type)
 VALUES 
     ('018d61a4-9f1e-7188-8d62-35a1d3399e22','018d6192-a7fd-725a-b5a3-8f667a9a53eb','32deb906-6292-4908-9cfc-02394fd4ab28'),
-    ('018d61a4-9f1e-7188-8d62-35a1d3399e23','018d6192-a7fd-725a-b5a3-8f667a9a53eb','62ffb154-64a6-4b87-9486-3bb7b14a77f3');
+    ('018d61a4-9f1e-7188-8d62-35a1d3399e23','018d6192-a7fd-725a-b5a3-8f667a9a53eb','62ffb154-64a6-4b87-9486-3bb7b14a77f3'),
+    ('018de5cd-b236-71f1-8b9a-3c85ed683cec','018d6192-a7fd-725a-b5a3-8f667a9a53eb','018dd17a-2ec0-7db7-a398-c401a5817b45');
 
 -- Insert example employee
 INSERT INTO public.employee (id_employee,id_person,id_status,id_area,no_file,email,employment_date,position,working_hours,picture_url)

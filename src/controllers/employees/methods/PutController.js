@@ -828,6 +828,34 @@ export class PutController {
         familyMemberPromise,
       ]);
 
+      const familyMemberNewData = await prisma.family_member.findUnique({
+        where: {
+          id_family_member: familyMemberOriginalData.id_family_member,
+        },
+        include: {
+          person: {
+            include: {
+              address: {
+                include: {
+                  street: {
+                    include: {
+                      locality: {
+                        include: {
+                          province: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              gender: true,
+              phone: true,
+            },
+          },
+          family_relationship_type: true,
+        },
+      });
+
       res.json({
         data: null,
         message: 'Familiar actualizado exitosamente',
@@ -838,7 +866,7 @@ export class PutController {
         changedField: 'family_member',
         changedFieldLabel: 'Actualización de Familiar - JSON',
         previousValue: JSON.stringify(familyMemberOriginalData),
-        newValue: JSON.stringify(formattedData),
+        newValue: JSON.stringify(familyMemberNewData),
         modifyingUser: loggedInUser,
         employeeId: familyMemberOriginalData.id_employee,
       });
