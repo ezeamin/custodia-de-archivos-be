@@ -8,7 +8,7 @@ import {
   queryRules,
   textRules,
   uuidRule,
-} from './rules.js';
+} from '../validationRules/rules.js';
 
 // ----------------------------
 // BODY

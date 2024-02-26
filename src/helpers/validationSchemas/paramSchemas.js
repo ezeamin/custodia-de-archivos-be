@@ -1,5 +1,10 @@
 import Joi from 'joi';
-import { emailRules, queryBooleanRules, textRules, uuidRule } from './rules.js';
+import {
+  emailRules,
+  queryBooleanRules,
+  textRules,
+  uuidRule,
+} from '../validationRules/rules.js';
 
 // ----------------------------
 // BODY

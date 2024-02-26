@@ -12,7 +12,7 @@ import {
   textRules,
   typeRule,
   uuidRule,
-} from './rules.js';
+} from '../validationRules/rules.js';
 
 // ----------------------------
 // BODY
@@ -61,7 +61,7 @@ export const post_employeeAbsenceSchema = Joi.object({
 });
 
 export const post_employeeLicenseSchema = Joi.object({
-  observations: Joi.string().trim().default('').max(200).messages({
+  observations: Joi.string().trim().min(0).max(200).default('').messages({
     'string.max': 'Las observaciones no pueden superar los 200 caracteres',
     'string.base': 'Las observaciones deben ser de tipo texto',
     '*': 'Revisa el campo "observations"',
@@ -75,7 +75,7 @@ export const post_employeeLicenseSchema = Joi.object({
 });
 
 export const post_employeeVacationSchema = Joi.object({
-  observations: Joi.string().trim().default('').max(200).messages({
+  observations: Joi.string().trim().min(0).max(200).default('').messages({
     'string.max': 'Las observaciones no pueden superar los 200 caracteres',
     'string.base': 'Las observaciones deben ser de tipo texto',
     '*': 'Revisa el campo "observations"',
@@ -88,7 +88,7 @@ export const post_employeeVacationSchema = Joi.object({
 });
 
 export const post_employeeTrainingSchema = Joi.object({
-  observations: Joi.string().trim().default('').max(200).messages({
+  observations: Joi.string().trim().min(0).max(200).default('').messages({
     'string.max': 'Las observaciones no pueden superar los 200 caracteres',
     'string.base': 'Las observaciones deben ser de tipo texto',
     '*': 'Revisa el campo "observations"',
@@ -114,7 +114,11 @@ export const post_employeeLateArrivalSchema = Joi.object({
   hour: Joi.string()
     .required()
     .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
-  observations: textRules('observations', 3, 100)(),
+  observations: Joi.string().trim().min(0).max(200).default('').messages({
+    'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+    'string.base': 'Las observaciones deben ser de tipo texto',
+    '*': 'Revisa el campo "observations"',
+  }),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
   '*': 'Formato del body incorrecto',
@@ -123,7 +127,7 @@ export const post_employeeLateArrivalSchema = Joi.object({
 export const post_employeeExtraHourSchema = Joi.object({
   date: Joi.date().required(),
   hours: numberRules('hours', 1, 24)(),
-  observations: Joi.string().trim().default('').max(200).messages({
+  observations: Joi.string().trim().min(0).max(200).default('').messages({
     'string.max': 'Las observaciones no pueden superar los 200 caracteres',
     'string.base': 'Las observaciones deben ser de tipo texto',
     '*': 'Revisa el campo "observations"',
@@ -160,7 +164,7 @@ export const post_employeeFamilyMemberSchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: Joi.string().trim().max(10).messages({
+  apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
@@ -191,7 +195,7 @@ export const post_lifeInsuranceBeneficiarySchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: Joi.string().trim().max(10).messages({
+  apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
@@ -244,7 +248,7 @@ export const put_employeeFamilyMemberSchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: Joi.string().trim().max(10).messages({
+  apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
@@ -274,7 +278,7 @@ export const put_lifeInsuranceBeneficiarySchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: Joi.string().trim().max(10).messages({
+  apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
