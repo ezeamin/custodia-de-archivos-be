@@ -1,3 +1,4 @@
+import { getDownloadLink } from '../cloudinary.js';
 import { prisma } from '../prisma.js';
 
 const DEFAULT_IMAGE_URL =
@@ -45,40 +46,55 @@ const formatReceiver = async (receiver) => {
   };
 };
 
-const formatReceivedNotifications = (data, hasBeenRead) => {
-  return data.map((item) => ({
-    id: item.id_notification,
-    message: item.message,
-    issuer: {
-      id: item.user.id_user,
-      firstname: item.user.employee
-        ? item.user.employee.person.name
-        : item.user.area.area,
-      lastname: item.user.employee ? item.user.employee.person.surname : 'Area',
-      email: item.user.employee
-        ? item.user.employee.email
-        : item.user.area.responsible_email,
-      imgSrc: item.user.employee
-        ? item.user.employee.picture_url
-        : DEFAULT_IMAGE_URL,
-    },
-    type: {
-      id: item.notification_type.id_notification_type,
-      title: item.notification_type.title_notification,
-      description: item.notification_type.description_notification,
-    },
-    hasBeenRead,
-    date: item.notification_date,
-    files: item.notification_doc.map((doc) => ({
+const formatReceivedNotifications = async (data, hasBeenRead) => {
+  const formattedData = data.map(async (item) => {
+    const filesPromises = item.notification_doc.map(async (doc) => ({
       id: doc.id_notification_doc,
       name: doc.notification_doc_name,
-      url: doc.notification_doc_url,
-    })),
-  }));
+      url: await getDownloadLink(doc.notification_doc_url),
+    }));
+
+    const files = await Promise.all(filesPromises);
+
+    return {
+      id: item.id_notification,
+      message: item.message,
+      issuer: {
+        id: item.user.id_user,
+        firstname: item.user.employee
+          ? item.user.employee.person.name
+          : item.user.area.area,
+        lastname: item.user.employee
+          ? item.user.employee.person.surname
+          : 'Area',
+        email: item.user.employee
+          ? item.user.employee.email
+          : item.user.area.responsible_email,
+        imgSrc: item.user.employee
+          ? item.user.employee.picture_url
+          : DEFAULT_IMAGE_URL,
+      },
+      type: {
+        id: item.notification_type.id_notification_type,
+        title: item.notification_type.title_notification,
+        description: item.notification_type.description_notification,
+      },
+      hasBeenRead,
+      date: item.notification_date,
+      files,
+    };
+  });
+
+  const result = await Promise.all(formattedData);
+
+  return result;
 };
 
 export const formatNotifications = async ({ data, sent, hasBeenRead }) => {
-  if (!sent) return formatReceivedNotifications(data, hasBeenRead);
+  if (!sent) {
+    const res = await formatReceivedNotifications(data, hasBeenRead);
+    return res;
+  }
 
   // Sent notifications formatting
 
@@ -89,7 +105,14 @@ export const formatNotifications = async ({ data, sent, hasBeenRead }) => {
       receiversPromises.push(formatReceiver(receiver));
     }
 
+    const filesPromises = item.notification_doc.map(async (doc) => ({
+      id: doc.id_notification_doc,
+      name: doc.notification_doc_name,
+      url: await getDownloadLink(doc.notification_doc_url),
+    }));
+
     const receivers = await Promise.all(receiversPromises);
+    const files = await Promise.all(filesPromises);
 
     return {
       id: item.id_notification,
@@ -108,11 +131,7 @@ export const formatNotifications = async ({ data, sent, hasBeenRead }) => {
         description: item.notification_type.description_notification,
       },
       date: item.notification_created_at,
-      files: item.notification_doc.map((doc) => ({
-        id: doc.id_notification_doc,
-        name: doc.notification_doc_name,
-        url: doc.notification_doc_url,
-      })),
+      files,
     };
   });
 

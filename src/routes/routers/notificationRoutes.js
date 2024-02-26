@@ -27,6 +27,7 @@ import {
 import { Notifications } from '../../controllers/notifications/index.js';
 import { ENDPOINTS } from '../endpoints.js';
 import { parseArrayEntry } from '../../middlewares/parseArrayEntry.js';
+import { validateFiles } from '../../middlewares/validateFiles.js';
 
 export const notificationRouter = express.Router();
 
@@ -80,6 +81,7 @@ notificationRouter.post(
   isAuthenticated,
   upload.array('files', 5),
   parseArrayEntry('receivers'),
+  validateFiles,
   (req, res, next) => validateBody(req, res, next, post_notificationSchema),
   Notifications.PostController.createNotification,
 );

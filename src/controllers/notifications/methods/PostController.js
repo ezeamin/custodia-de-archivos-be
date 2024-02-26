@@ -227,15 +227,26 @@ export class PostController {
         // Relate entries to employees docs
 
         const areasIds = [];
+        const userIds = [];
         receivers.forEach((receiver) => {
-          areasIds.push(receiver.id);
+          if (receiver.type === 'user') userIds.push(receiver.id);
+          else areasIds.push(receiver.id);
+        });
+
+        userIds.forEach(async (user) => {
+          await createDocumentEntriesInProfile({
+            docs,
+            userId: user,
+            submittedBy: userId,
+            isAllEmployees: receiverHasAllEmployees,
+          });
         });
 
         areasIds.forEach(async (area) => {
           await createDocumentEntriesInProfile({
             docs,
             areaId: area,
-            userId,
+            submittedBy: userId,
             isAllEmployees: receiverHasAllEmployees,
           });
         });

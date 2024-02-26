@@ -83,32 +83,53 @@ export const createDocumentEntriesInProfile = async ({
   docs,
   areaId,
   userId,
+  submittedBy,
   isAllEmployees = false,
 }) => {
-  let usersInArea = [];
-  usersInArea = await prisma.user.findMany({
-    where: {
-      ...(!isAllEmployees
-        ? {
-            employee: {
-              id_area: areaId,
-            },
-          }
-        : {}),
-      user_isactive: true,
-    },
-    select: {
-      id_user: true,
-      username: true,
-      employee: {
-        include: {
-          document_folder: true,
+  let employees = [];
+  if (areaId) {
+    const usersInArea = await prisma.user.findMany({
+      where: {
+        ...(!isAllEmployees
+          ? {
+              employee: {
+                id_area: areaId,
+              },
+            }
+          : {}),
+        user_isactive: true,
+      },
+      select: {
+        id_user: true,
+        username: true,
+        employee: {
+          include: {
+            document_folder: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  const employees = usersInArea.map((user) => user.employee).filter(Boolean);
+    employees = usersInArea.map((user) => user.employee).filter(Boolean);
+  } else {
+    // employees
+    const employeesData = await prisma.employee.findMany({
+      where: {
+        user: {
+          some: {
+            id_user: userId,
+            user_isactive: true,
+          },
+        },
+      },
+      include: {
+        user: true,
+        document_folder: true,
+      },
+    });
+
+    employees = employeesData.filter(Boolean);
+  }
 
   const todayInArgentina = dayjs().add(3, 'hour').format('DD/MM/YYYY');
 
@@ -119,23 +140,28 @@ export const createDocumentEntriesInProfile = async ({
     )?.id_document_folder;
 
     docs.forEach((doc) => {
+      let { name } = doc;
+      if (name.length > 200) {
+        name = name.slice(0, 200).concat('...');
+      }
+
       const promise = prisma.employee_doc.create({
         data: {
-          employee_doc_name: `${todayInArgentina} - ${doc.name}`,
+          employee_doc_name: `${todayInArgentina} - ${name}`,
           employee_doc_url: doc.url,
           employee: {
             connect: {
               id_employee: employee.id_employee,
             },
           },
-          user: {
-            connect: {
-              id_user: userId,
-            },
-          },
           document_folder: {
             connect: {
               id_document_folder: id_folder,
+            },
+          },
+          user: {
+            connect: {
+              id_user: submittedBy,
             },
           },
         },

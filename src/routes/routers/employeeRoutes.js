@@ -3,7 +3,7 @@ import express from 'express';
 import { isAuthenticated } from '../../middlewares/isAuthenticated.js';
 import { checkRole } from '../../middlewares/checkRole.js';
 import { validateBody } from '../../middlewares/validateBody.js';
-import { validateFile } from '../../middlewares/validateFile.js';
+import { validateFiles } from '../../middlewares/validateFiles.js';
 import { validateParams } from '../../middlewares/validateParams.js';
 import { validateQuery } from '../../middlewares/validateQuery.js';
 
@@ -265,7 +265,7 @@ employeeRouter.post(
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN, roles.AREA]),
   upload.single('imgFile'),
-  (req, res, next) => validateFile(req, res, next),
+  (req, res, next) => validateFiles(req, res, next),
   (req, res, next) => validateBody(req, res, next, post_employeeSchema),
   Employees.PostController.createEmployee,
 );
@@ -276,7 +276,7 @@ employeeRouter.post(
   upload.single('file'),
   (req, res, next) =>
     validateParams(req, res, next, post_params_employeeDocSchema),
-  (req, res, next) => validateFile(req, res, next),
+  (req, res, next) => validateFiles(req, res, next),
   (req, res, next) => validateBody(req, res, next, post_employeeDocSchema),
   Employees.PostController.createEmployeeDoc,
 );
@@ -418,7 +418,7 @@ employeeRouter.put(
   (req, res, next) =>
     validateParams(req, res, next, put_params_employeeImageSchema),
   (req, res, next) => validateBody(req, res, next, put_employeeImageSchema),
-  (req, res, next) => validateFile(req, res, next),
+  (req, res, next) => validateFiles(req, res, next),
   Employees.PutController.updateEmployeeImage,
 );
 employeeRouter.put(
