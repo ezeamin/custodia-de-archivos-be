@@ -53,12 +53,14 @@ export const get_query_userSchema = Joi.object({
   page: pageRules()(),
   entries: entriesRules()(),
   query: queryRules()(),
-  role: Joi.string().valid('ADMIN', 'EMPLOYEE', 'THIRD_PARTY').messages({
-    'string.base': 'El parámetro "role" debe ser un texto',
-    'any.only':
-      'El parámetro "role" debe ser "ADMIN", "EMPLOYEE" o "THIRD_PARTY"',
-    '*': 'Revisa el parámetro "role"',
-  }),
+  role: Joi.string()
+    .pattern(/^(ADMIN|EMPLOYEE|THIRD_PARTY)(,(ADMIN|EMPLOYEE|THIRD_PARTY))*$/)
+    .messages({
+      'string.base': 'El parámetro "role" debe ser un texto',
+      'string.pattern.base':
+        'El parámetro "role" debe ser "ADMIN", "EMPLOYEE" o "THIRD_PARTY"',
+      '*': 'Revisa el parámetro "role"',
+    }),
 }).messages({
   'object.unknown': 'No se permiten parámetros adicionales',
   '*': 'Revisa los parámetros de la consulta',

@@ -13,6 +13,13 @@ export class GetController {
       user: { id: userId },
     } = req;
 
+    let roles = [];
+    if (role.includes(',')) {
+      roles = role.split(',');
+    } else {
+      roles.push(role);
+    }
+
     const searchFilters = {
       user_isactive: true,
       NOT: {
@@ -20,7 +27,7 @@ export class GetController {
       },
       user_type: {
         user_type: {
-          contains: role,
+          in: roles,
           mode: 'insensitive',
         },
       },
