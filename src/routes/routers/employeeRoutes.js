@@ -198,7 +198,7 @@ employeeRouter.get(
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeExtraHoursSchema),
 
-  Employees.GetController.employeeLateArrivals,
+  Employees.GetController.employeeExtraHours,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_LATE_ARRIVALS,
@@ -208,7 +208,7 @@ employeeRouter.get(
   (req, res, next) =>
     validateParams(req, res, next, get_params_employeeLateArrivalsSchema),
 
-  Employees.GetController.employeeExtraHours,
+  Employees.GetController.employeeLateArrivals,
 );
 employeeRouter.get(
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_FAMILY_MEMBER,
