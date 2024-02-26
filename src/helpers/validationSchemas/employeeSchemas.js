@@ -160,7 +160,11 @@ export const post_employeeFamilyMemberSchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: textRules('apt', 1, 10)(),
+  apt: Joi.string().trim().max(10).messages({
+    'string.max': 'El campo "apt" no puede superar los 10 caracteres',
+    'string.base': 'El campo "apt" debe ser de tipo texto',
+    '*': 'Revisa el campo "apt"',
+  }),
   phone: phoneRules('phone')(),
   force: Joi.boolean().default(false),
 }).messages({
@@ -187,7 +191,11 @@ export const post_lifeInsuranceBeneficiarySchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: textRules('apt', 1, 10)(),
+  apt: Joi.string().trim().max(10).messages({
+    'string.max': 'El campo "apt" no puede superar los 10 caracteres',
+    'string.base': 'El campo "apt" debe ser de tipo texto',
+    '*': 'Revisa el campo "apt"',
+  }),
   percentage: numberRules('percentage', 1, 100)(),
   force: Joi.boolean().default(false),
 }).messages({
@@ -236,7 +244,11 @@ export const put_employeeFamilyMemberSchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: textRules('apt', 1, 10)(),
+  apt: Joi.string().trim().max(10).messages({
+    'string.max': 'El campo "apt" no puede superar los 10 caracteres',
+    'string.base': 'El campo "apt" debe ser de tipo texto',
+    '*': 'Revisa el campo "apt"',
+  }),
   phone: phoneRules('phone')(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
@@ -262,7 +274,11 @@ export const put_lifeInsuranceBeneficiarySchema = Joi.object({
   locality: typeRule('locality')(),
   state: typeRule('state')(),
   streetNumber: numberRules('streetNumber', 1, 10000)(),
-  apt: textRules('apt', 1, 10)(),
+  apt: Joi.string().trim().max(10).messages({
+    'string.max': 'El campo "apt" no puede superar los 10 caracteres',
+    'string.base': 'El campo "apt" debe ser de tipo texto',
+    '*': 'Revisa el campo "apt"',
+  }),
   percentage: numberRules('percentage', 1, 100)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
