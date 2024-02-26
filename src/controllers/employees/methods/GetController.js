@@ -1282,7 +1282,7 @@ export class GetController {
           description:
             familyMember.family_relationship_type.family_relationship_type,
         },
-        address: familyMember.address
+        address: familyMember.person.address
           ? {
               street: {
                 id: familyMember.person.address.street.street_api_id,
