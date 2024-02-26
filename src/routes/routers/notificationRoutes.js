@@ -11,6 +11,7 @@ import { validateQuery } from '../../middlewares/validateQuery.js';
 import { roles } from '../../constants/roles.js';
 
 import {
+  delete_params_notificationTypeSchema,
   get_params_notificationAreaReceiversSchema,
   get_params_notificationByIdSchema,
   get_params_notificationTypeByIdSchema,
@@ -106,5 +107,7 @@ notificationRouter.delete(
   ENDPOINTS.NOTIFICATIONS.DELETE_TYPE,
   isAuthenticated,
   (req, res, next) => checkRole(req, res, next, [roles.ADMIN]),
+  (req, res, next) =>
+    validateParams(req, res, next, delete_params_notificationTypeSchema),
   Notifications.DeleteController.deleteNotificationType,
 );

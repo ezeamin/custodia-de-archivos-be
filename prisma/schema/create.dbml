@@ -1,0 +1,664 @@
+Table "area" {
+  "id_area" UUID [not null, default: `uuid_generate_v7()`]
+  "area" varchar(20) [unique, not null]
+  "responsible_email" varchar(75)
+  "is_assignable" boolean [not null, default: true]
+  "area_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_area [pk, name: "pk_area"]
+}
+}
+
+Table "employee_status" {
+  "id_status" UUID [not null, default: `uuid_generate_v7()`]
+  "status" varchar(10) [unique, not null]
+  "status_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_status [pk, name: "pk_employee_status"]
+}
+}
+
+Table "gender" {
+  "id_gender" UUID [not null, default: `uuid_generate_v7()`]
+  "gender" varchar(15) [unique, not null]
+  "gender_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_gender [pk, name: "pk_gender"]
+}
+}
+
+Table "province" {
+  "id_province" UUID [not null, default: `uuid_generate_v7()`]
+  "province_api_id" varchar(20) [unique, not null]
+  "province" varchar(50) [unique, not null]
+
+Indexes {
+  id_province [pk, name: "pk_province"]
+}
+}
+
+Table "locality" {
+  "id_locality" UUID [not null, default: `uuid_generate_v7()`]
+  "id_province" UUID [not null]
+  "locality_api_id" varchar(20) [unique, not null]
+  "locality" varchar(30) [unique, not null]
+
+Indexes {
+  id_locality [pk, name: "pk_localidad"]
+}
+}
+
+Table "street" {
+  "id_street" UUID [not null, default: `uuid_generate_v7()`]
+  "id_locality" UUID [not null]
+  "street_api_id" varchar(20) [unique, not null]
+  "street" varchar(75) [unique, not null]
+
+Indexes {
+  id_street [pk, name: "pk_street"]
+}
+}
+
+Table "address" {
+  "id_address" UUID [not null, default: `uuid_generate_v7()`]
+  "id_street" UUID [not null]
+  "street_number" integer [not null]
+  "door" varchar(4)
+  "address_isactive" boolean [not null, default: true]
+  "address_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "address_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_address [pk, name: "pk_address"]
+}
+}
+
+Table "phone" {
+  "id_phone" UUID [not null, default: `uuid_generate_v7()`]
+  "phone_no" varchar(13) [not null]
+  "phone_isactive" boolean [not null, default: true]
+  "phone_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "phone_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_phone [pk, name: "pk_phone"]
+}
+}
+
+Table "civil_status_type" {
+  "id_civil_status_type" UUID [not null, default: `uuid_generate_v7()`]
+  "civil_status_type" varchar(20) [unique, not null]
+  "civil_status_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_civil_status_type [pk, name: "pk_civil_status_type"]
+}
+}
+
+Table "person" {
+  "id_person" UUID [not null, default: `uuid_generate_v7()`]
+  "id_gender" UUID
+  "id_address" UUID
+  "id_phone" UUID
+  "id_civil_status" UUID
+  "name" varchar(50) [not null]
+  "surname" varchar(50) [not null]
+  "birth_date" timestamp [not null]
+  "identification_number" varchar(8) [unique, not null]
+  "person_isactive" boolean [not null, default: true]
+  "person_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "person_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_person [pk, name: "pk_person"]
+  id_person [unique, name: "unq_id_person"]
+}
+}
+
+Table "user_type" {
+  "id_user_type" UUID [not null, default: `uuid_generate_v7()`]
+  "user_type" varchar(20) [unique, not null]
+  "user_type_label" varchar(30) [not null]
+  "user_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_user_type [pk, name: "pk_user_type"]
+}
+}
+
+Table "third_party" {
+  "id_third_party" UUID [not null, default: `uuid_generate_v7()`]
+  "id_person" UUID [unique, not null]
+  "description" varchar(100)
+  "email" varchar(75) [unique, not null]
+  "third_party_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_third_party [pk, name: "pk"]
+}
+}
+
+Table "preoccupational_checkup" {
+  "id_preoccupational_checkup" UUID [not null, default: `uuid_generate_v7()`]
+  "is_fit" boolean [not null]
+  "observations_preoccupational_checkup" varchar(200)
+  "preoccupational_checkup_isactive" boolean [not null, default: true]
+  "preoccupational_checkup_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "preoccupational_checkup_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_preoccupational_checkup [pk, name: "pk_preoccupational_checkup"]
+}
+}
+
+Table "health_insurance" {
+  "id_health_insurance" UUID [not null, default: `uuid_generate_v7()`]
+  "health_insurance" varchar(50) [not null]
+  "affiliate_number" varchar(20) [not null]
+  "health_insurance_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_health_insurance [pk, name: "pk_health_insurance"]
+}
+}
+
+Table "employee" {
+  "id_employee" UUID [not null, default: `uuid_generate_v7()`]
+  "id_person" UUID [unique, not null]
+  "id_status" UUID [not null]
+  "id_area" UUID [not null]
+  "id_preoccupational_checkup" UUID
+  "id_health_insurance" UUID
+  "no_file" integer [unique, not null]
+  "email" varchar(75) [unique, not null]
+  "employment_date" timestamp [not null]
+  "termination_date" timestamp
+  "position" varchar(100) [not null]
+  "working_hours" integer [default: 0]
+  "picture_url" varchar(300) [not null]
+  "drivers_license_expiration_date" timestamp
+  "employee_isactive" boolean [not null, default: true]
+  "employee_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "employee_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_employee [pk, name: "pk_employee"]
+  id_employee [unique, name: "unq_id_employee"]
+}
+}
+
+Table "family_relationship_type" {
+  "id_family_relationship_type" UUID [not null, default: `uuid_generate_v7()`]
+  "family_relationship_type" varchar(20) [not null]
+  "family_relationship_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_family_relationship_type [pk, name: "pk_family_relationship_type"]
+}
+}
+
+Table "life_insurance" {
+  "id_life_insurance" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "life_insurance_name" varchar(50) [not null]
+  "policy_number" varchar(20) [not null]
+  "life_insurance_isactive" boolean [not null, default: true]
+  "life_insurance_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "life_insurance_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_life_insurance [pk, name: "pk_life_insurance"]
+}
+}
+
+Table "employee_life_insurance_beneficiary" {
+  "id_life_insurance_beneficiary" UUID [not null, default: `uuid_generate_v7()`]
+  "id_life_insurance" UUID [not null]
+  "id_person" UUID [not null]
+  "id_relationship_type" UUID [not null]
+  "beneficiary_percentage" integer [not null, default: 100]
+  "life_insurance_beneficiary_isactive" boolean [not null, default: true]
+  "life_insurance_beneficiary_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "life_insurance_beneficiary_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_life_insurance_beneficiary [pk, name: "pk_life_insurance_beneficiary"]
+}
+}
+
+Table "family_member" {
+  "id_family_member" UUID [not null, default: `uuid_generate_v7()`]
+  "id_person" UUID [not null]
+  "id_employee" UUID [not null]
+  "id_relationship_type" UUID [not null, default: `uuid_generate_v7()`]
+  "family_member_isactive" boolean [not null, default: true]
+  "family_member_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "family_member_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_family_member [pk, name: "pk_family_member"]
+}
+}
+
+Table "user" {
+  "id_user" UUID [not null, default: `uuid_generate_v7()`]
+  "id_user_type" UUID [not null]
+  "id_employee" UUID
+  "id_third_party" UUID
+  "id_area" UUID
+  "username" varchar(8) [unique, not null]
+  "password" varchar(100) [not null]
+  "has_changed_def_pass" boolean [not null, default: false]
+  "user_isactive" boolean [not null, default: true]
+  "user_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "user_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_user [pk, name: "pk_user"]
+  id_user [unique, name: "unq_id_user"]
+}
+}
+
+Table "employee_history" {
+  "id_history" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "modified_table" varchar(100) [not null]
+  "modified_field" varchar(100) [not null]
+  "modified_field_label" varchar(100) [not null]
+  "previous_value" jsonb
+  "current_value" jsonb
+  "modification_date" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_history [pk, name: "pk_employee_history"]
+}
+}
+
+Table "extra_hours" {
+  "id_extra_hours" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "date_extra_hours" date [not null]
+  "qty_extra_hours" integer [not null]
+  "observation_extra_hours" varchar(200)
+  "extra_hours_isactive" boolean [not null, default: true]
+  "extra_hours_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "extra_hours_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_extra_hours [pk, name: "pk_extra_hours"]
+}
+}
+
+Table "formal_warning" {
+  "id_formal_warning" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "reason_formal_warning" varchar(200) [not null]
+  "date_formal_warning" timestamp [not null]
+  "formal_warning_isactive" boolean [not null, default: true]
+  "formal_warning_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "formal_warning_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_formal_warning [pk, name: "pk_formal_warning"]
+}
+}
+
+Table "late_arrival" {
+  "id_late_arrival" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "date_late_arrival" timestamp [not null]
+  "time_late_arrival" "char (5)" [not null]
+  "observation_late_arrival" varchar(200)
+  "late_arrival_isactive" boolean [not null, default: true]
+  "late_arrival_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "late_arrival_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_late_arrival [pk, name: "pk_late_arrival"]
+}
+}
+
+Table "license_type" {
+  "id_license_type" UUID [not null, default: `uuid_generate_v7()`]
+  "title_license" varchar(30) [unique, not null]
+  "description_license" varchar(100) [not null]
+  "license_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_license_type [pk, name: "pk_license_type"]
+}
+}
+
+Table "training_type" {
+  "id_training_type" UUID [not null, default: `uuid_generate_v7()`]
+  "title_training_type" varchar(30) [unique, not null]
+  "description_training_type" varchar(100) [not null]
+  "training_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_training_type [pk, name: "pk_id_training_type"]
+}
+}
+
+Table "vacation" {
+  "id_vacation" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "start_date_vacation" timestamp [not null]
+  "end_date_vacation" timestamp [not null]
+  "observation_vacation" varchar(200)
+  "vacation_isactive" boolean [not null, default: true]
+  "vacation_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "vacation_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_vacation [pk, name: "pk_vacation"]
+}
+}
+
+Table "absence" {
+  "id_absence" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "date_absence" timestamp [not null]
+  "reason_absence" varchar(50) [not null]
+  "absence_isactive" boolean [not null, default: true]
+  "absence_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "absence_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_absence [pk, name: "pk_absence"]
+}
+}
+
+Table "license" {
+  "id_license" UUID [not null, default: `uuid_generate_v7()`]
+  "id_license_type" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "id_employee" UUID [not null]
+  "start_date_license" timestamp [not null]
+  "end_date_license" timestamp [not null]
+  "observation_license" varchar(200)
+  "license_isactive" boolean [not null, default: true]
+  "license_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "license_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_license [pk, name: "pk_license"]
+  id_license [unique, name: "unq_id_license"]
+}
+}
+
+Table "training" {
+  "id_training" UUID [not null, default: `uuid_generate_v7()`]
+  "id_training_type" UUID [not null]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "date_training" timestamp [not null]
+  "reason_training" varchar(200)
+  "observation_training" varchar(200)
+  "training_isactive" boolean [not null, default: true]
+  "training_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "training_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_training [pk, name: "pk_training"]
+  id_training [unique, name: "unq_id_training"]
+}
+}
+
+Table "login" {
+  "id_log" UUID [not null, default: `uuid_generate_v7()`]
+  "id_user" UUID [not null]
+  "ip_address" varchar(15) [not null]
+  "user_agent" varchar(150) [not null]
+  "log_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_log [pk, name: "pk_login"]
+}
+}
+
+Table "notification_type" {
+  "id_notification_type" UUID [not null, default: `uuid_generate_v7()`]
+  "title_notification" varchar(100) [not null]
+  "start_hour" "char (5)" [not null]
+  "end_hour" "char (5)" [not null]
+  "description_notification" varchar(200) [not null]
+  "can_modify" boolean [not null, default: true]
+  "notification_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_notification_type [pk, name: "pk_notification_type"]
+}
+}
+
+Table "notification_allowed_role" {
+  "id_notification_allowed_role" UUID [not null, default: `uuid_generate_v7()`]
+  "id_notification_type" UUID [not null]
+  "id_user_type" UUID [not null]
+  "notification_allowed_role_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_notification_allowed_role [pk, name: "pk_notification_allowed_role"]
+}
+}
+
+Table "receiver_type" {
+  "id_receiver_type" UUID [not null, default: `uuid_generate_v7()`]
+  "receiver_type" varchar(20) [unique, not null]
+  "receiver_type_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_receiver_type [pk, name: "pk_receiver_type"]
+}
+}
+
+Table "notification" {
+  "id_notification" UUID [not null, default: `uuid_generate_v7()`]
+  "id_notification_type" UUID [not null]
+  "id_notification_response" UUID
+  "id_sender" UUID [not null]
+  "message" varchar(500) [not null]
+  "notification_isactive" boolean [not null, default: true]
+  "notification_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "notification_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_notification [pk, name: "pk_notification"]
+}
+}
+
+Table "notification_receiver" {
+  "id_notification_receiver" UUID [not null, default: `uuid_generate_v7()`]
+  "id_notification" UUID [not null]
+  "id_receiver_type" UUID [not null]
+  "id_receiver" UUID [not null]
+  "has_read_notification" boolean [not null, default: false]
+  "time_read_notification" timestamp
+  "notification_receiver_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_notification_receiver [pk, name: "pk_notification_receiver"]
+}
+}
+
+Table "notification_area_receiver" {
+  "id_notification_area_receiver" UUID [not null, default: `uuid_generate_v7()`]
+  "id_notification" UUID [not null]
+  "id_area" UUID [not null]
+  "id_user" UUID [not null]
+  "has_read_notification" boolean [not null, default: false]
+  "time_read_notification" timestamp
+  "notification_area_receiver_isactive" boolean [not null, default: true]
+
+Indexes {
+  id_notification_area_receiver [pk, name: "pk_notification_area_receiver"]
+}
+}
+
+Table "document_folder" {
+  "id_document_folder" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "folder_name" varchar(50) [not null]
+  "folder_color" varchar(7) [not null]
+  "folder_isactive" boolean [not null, default: true]
+  "folder_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "folder_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_document_folder [pk, name: "pk_document_folder"]
+}
+}
+
+Table "employee_doc" {
+  "id_employee_doc" UUID [not null, default: `uuid_generate_v7()`]
+  "id_employee" UUID [not null]
+  "id_submitted_by" UUID [not null]
+  "id_document_folder" UUID [not null]
+  "employee_doc_url" varchar(250) [not null]
+  "employee_doc_name" varchar(50) [not null]
+  "employee_doc_isactive" boolean [not null, default: true]
+  "employee_doc_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "employee_doc_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_employee_doc [pk, name: "pk_employee_doc"]
+}
+}
+
+Table "notification_doc" {
+  "id_notification_doc" UUID [not null, default: `uuid_generate_v7()`]
+  "id_notification" UUID [not null]
+  "notification_doc_url" varchar(250) [not null]
+  "notification_doc_name" varchar(250) [not null]
+  "notification_doc_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  "notification_doc_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_notification_doc [pk, name: "pk_notification_doc"]
+}
+}
+
+Ref "fk_locality_province":"province"."id_province" < "locality"."id_province"
+
+Ref "fk_street_locality":"locality"."id_locality" < "street"."id_locality"
+
+Ref "fk_address_street":"street"."id_street" < "address"."id_street"
+
+Ref "fk_person_gender":"gender"."id_gender" < "person"."id_gender"
+
+Ref "fk_person_address":"address"."id_address" < "person"."id_address"
+
+Ref "fk_person_phone":"phone"."id_phone" < "person"."id_phone"
+
+Ref "fk_person_civil_status":"civil_status_type"."id_civil_status_type" < "person"."id_civil_status"
+
+Ref "fk_third_party_person":"person"."id_person" < "third_party"."id_person"
+
+Ref "fk_employee_status":"employee_status"."id_status" < "employee"."id_status"
+
+Ref "fk_employee_area":"area"."id_area" < "employee"."id_area"
+
+Ref "fk_employee_person":"person"."id_person" < "employee"."id_person"
+
+Ref "fk_employee_preoccupational_checkup":"preoccupational_checkup"."id_preoccupational_checkup" < "employee"."id_preoccupational_checkup"
+
+Ref "fk_employee_health_insurance":"health_insurance"."id_health_insurance" < "employee"."id_health_insurance"
+
+Ref "fk_life_insurance_employee":"employee"."id_employee" < "life_insurance"."id_employee"
+
+Ref "fk_life_insurance_beneficiary_life_insurance":"life_insurance"."id_life_insurance" < "employee_life_insurance_beneficiary"."id_life_insurance"
+
+Ref "fk_life_insurance_beneficiary_person":"person"."id_person" < "employee_life_insurance_beneficiary"."id_person"
+
+Ref "fk_life_insurance_beneficiary_relationship_type":"family_relationship_type"."id_family_relationship_type" < "employee_life_insurance_beneficiary"."id_relationship_type"
+
+Ref "fk_family_member_relationship_type":"family_relationship_type"."id_family_relationship_type" < "family_member"."id_relationship_type"
+
+Ref "fk_family_member_employee":"employee"."id_employee" < "family_member"."id_employee"
+
+Ref "fk_family_member_person":"person"."id_person" < "family_member"."id_person"
+
+Ref "fk_user_type":"user_type"."id_user_type" < "user"."id_user_type"
+
+Ref "fk_user_employee":"employee"."id_employee" < "user"."id_employee"
+
+Ref "fk_user_third_party":"third_party"."id_third_party" < "user"."id_third_party"
+
+Ref "fk_user_area":"area"."id_area" < "user"."id_area"
+
+Ref "fk_employee_history_employee":"employee"."id_employee" < "employee_history"."id_employee"
+
+Ref "fk_employee_history_user":"user"."id_user" < "employee_history"."id_submitted_by"
+
+Ref "fk_extra_hours_employee":"employee"."id_employee" < "extra_hours"."id_employee"
+
+Ref "fk_extra_hours_submitted_by":"user"."id_user" < "extra_hours"."id_submitted_by"
+
+Ref "fk_formal_warning_employee":"employee"."id_employee" < "formal_warning"."id_employee"
+
+Ref "fk_formal_warning_submitted_by":"user"."id_user" < "formal_warning"."id_submitted_by"
+
+Ref "fk_late_arrival_employee":"employee"."id_employee" < "late_arrival"."id_employee"
+
+Ref "fk_late_arrival_submitted_by":"user"."id_user" < "late_arrival"."id_submitted_by"
+
+Ref "fk_vacations_employee":"employee"."id_employee" < "vacation"."id_employee"
+
+Ref "fk_vacations_submitted_by":"user"."id_user" < "vacation"."id_submitted_by"
+
+Ref "fk_absence_employee":"employee"."id_employee" < "absence"."id_employee"
+
+Ref "fk_absence_submitted_by":"user"."id_user" < "absence"."id_submitted_by"
+
+Ref "fk_license_type":"license_type"."id_license_type" < "license"."id_license_type"
+
+Ref "fk_license_employee":"employee"."id_employee" < "license"."id_employee"
+
+Ref "fk_license_submitted_by":"user"."id_user" < "license"."id_submitted_by"
+
+Ref "fk_training_type":"training_type"."id_training_type" < "training"."id_training_type"
+
+Ref "fk_training_employee":"employee"."id_employee" < "training"."id_employee"
+
+Ref "fk_training_submitted_by":"user"."id_user" < "training"."id_submitted_by"
+
+Ref "fk_login_user":"user"."id_user" < "login"."id_user"
+
+Ref "fk_notification_type":"notification_type"."id_notification_type" < "notification_allowed_role"."id_notification_type"
+
+Ref "fk_user_type":"user_type"."id_user_type" < "notification_allowed_role"."id_user_type"
+
+Ref "fk_notification_type":"notification_type"."id_notification_type" < "notification"."id_notification_type"
+
+Ref "fk_sender":"user"."id_user" < "notification"."id_sender"
+
+Ref "fk_notification_response":"notification"."id_notification" < "notification"."id_notification_response"
+
+Ref "fk_notification_receiver_notification":"notification"."id_notification" < "notification_receiver"."id_notification"
+
+Ref "fk_notification_receiver_receiver_type":"receiver_type"."id_receiver_type" < "notification_receiver"."id_receiver_type"
+
+Ref "fk_notification_area_receiver_notification":"notification"."id_notification" < "notification_area_receiver"."id_notification"
+
+Ref "fk_notification_area_receiver_user":"user"."id_user" < "notification_area_receiver"."id_user"
+
+Ref "fk_notification_area_receiver_area":"area"."id_area" < "notification_area_receiver"."id_area"
+
+Ref "fk_document_folder_employee":"employee"."id_employee" < "document_folder"."id_employee"
+
+Ref "fk_employee_doc_employee":"employee"."id_employee" < "employee_doc"."id_employee"
+
+Ref "fk_user_submitted_by":"user"."id_user" < "employee_doc"."id_submitted_by"
+
+Ref "fk_employee_doc_document_folder":"document_folder"."id_document_folder" < "employee_doc"."id_document_folder"
+
+Ref "fk_notification_doc_notification":"notification"."id_notification" < "notification_doc"."id_notification"

@@ -1,0 +1,534 @@
+components:
+  schemas:
+    Receiver:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        imgSrc:
+          type: string
+        email:
+          type: string
+        hasReadNotification:
+          type: boolean
+        timeReadNotification:
+          type: string
+    NotificationType:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        startHour:
+          type: string
+        endHour:
+          type: string
+        canModify:
+          type: boolean
+        allowedRoles:
+          $ref: '#/components/schemas/BasicList'
+/api/v1/notifications:
+  get:
+    tags:
+      - Notifications
+    summary: Get list of notifications
+    description: Get list of notifications
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number
+      - in: query
+        name: entries
+        schema:
+          type: integer
+        description: Number of entries per page
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search query
+      - in: query
+        name: hasBeenRead
+        schema:
+          type: boolean
+        description: Filter by read status
+      - in: query
+        name: sent
+        schema:
+          type: boolean
+        description: Filter only sent notifications
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      message:
+                        type: string
+                      issuer:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          firstname:
+                            type: string
+                          lastname:
+                            type: string
+                          email:
+                            type: string
+                          imgSrc:
+                            type: string
+                      receivers:
+                        type: array
+                        nullable: true
+                        items:
+                          $ref: '#/components/schemas/Receiver'
+                      type:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      date:
+                        type: string
+                      files:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            url:
+                              type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  post:
+    tags:
+      - Notifications
+    summary: Create a new notification
+    description: Create a new notification
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              receivers:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+              typeId:
+                type: string
+                format: uuid
+              isResponse:
+                type: boolean
+                default: false
+              files:
+                type: array
+                items:
+                  type: string
+                  format: binary
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/notifications/{notificationId}:
+  get:
+    tags:
+      - Notifications
+    summary: Get a specific notification
+    description: Get a specific notification
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: notificationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: query
+        name: sent
+        schema:
+          type: boolean
+        description: Who's requesting this notification, issuer (sent) or receiver
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    message:
+                      type: string
+                    issuer:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        firstname:
+                          type: string
+                        lastname:
+                          type: string
+                        email:
+                          type: string
+                        imgSrc:
+                          type: string
+                    receivers:
+                      type: array
+                      nullable: true
+                      items:
+                        $ref: '#/components/schemas/Receiver'
+                    type:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        description:
+                          type: string
+                    date:
+                      type: string
+                    files:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          url:
+                            type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/notifications/receivers:
+  get:
+    tags:
+      - Notifications
+    summary: Get list of possible receivers
+    description: Get list of possible receivers
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      description:
+                        type: string
+                      type:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/notifications/{notificationId}/receivers/{areaId}:
+  get:
+    tags:
+      - Notifications
+    summary: Get list of receivers from a notification, for a specific area
+    description: Get list of receivers from a notification, for a specific area
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: notificationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: areaId
+        schema:
+          type: string
+          format: uuid
+        required: true
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Receiver'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/notifications/types:
+  get:
+    tags:
+      - Notifications
+    summary: Get list of types of notifications
+    description: Get list of types of notifications
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: all
+        schema:
+          type: boolean
+        description: Get all types of notifications or allowed ones (excludes "response" type)
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/NotificationType'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  post:
+    tags:
+      - Notifications
+    summary: Create a new type of notification
+    description: Create a new type of notification
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              startHour:
+                type: string
+              endHour:
+                type: string
+              canModify:
+                type: boolean
+              allowedRoles:
+                $ref: '#/components/schemas/BasicList'
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/notifications/types/{typeId}:
+  get:
+    tags:
+      - Notifications
+    summary: Get a specific type of notification
+    description: Get a specific type of notification
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: typeId
+        schema:
+          type: string
+          format: uuid
+        required: true
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/NotificationType'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Notifications
+    summary: Update a type of notification
+    description: Update a type of notification
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: typeId
+        schema:
+          type: string
+          format: uuid
+        required: true
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              startHour:
+                type: string
+              endHour:
+                type: string
+              canModify:
+                type: boolean
+              allowedRoles:
+                $ref: '#/components/schemas/BasicList'
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Notifications
+    summary: Delete a type of notification
+    description: Delete a type of notification
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: typeId
+        schema:
+          type: string
+          format: uuid
+        required: true
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'

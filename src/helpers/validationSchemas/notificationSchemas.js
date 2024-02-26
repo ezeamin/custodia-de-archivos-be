@@ -79,6 +79,9 @@ export const put_params_notificationTypeSchema = Joi.object({
   typeId: uuidRule('typeId')(),
 });
 
+export const delete_params_notificationTypeSchema =
+  put_params_notificationTypeSchema;
+
 // ----------------------------
 // QUERY
 // ----------------------------

@@ -1,0 +1,281 @@
+/api/v1/users:
+  get:
+    tags:
+      - Users
+    summary: Get list of users
+    description: Get list of users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number
+      - in: query
+        name: entries
+        schema:
+          type: integer
+        description: Number of entries per page
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search query
+      - in: query
+        name: role
+        schema:
+          type: string
+          pattern: '^(ADMIN|EMPLOYEE|THIRD_PARTY|AREA)$'
+        description: User role (ADMIN, EMPLOYEE, THIRD_PARTY, AREA)
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    username:
+                      type: string
+                    imgSrc:
+                      type: string
+                    firstname:
+                      type: string
+                    lastname:
+                      type: string
+                    role:
+                      $ref: '#/components/schemas/BasicItem'
+                    description:
+                      type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  post:
+    tags:
+      - Users
+    summary: Create user given the employeeId
+    description: Create user given the employeeId
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              employeeId:
+                type: string
+                format: uuid
+            required:
+              - employeeId
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/login-logs:
+  get:
+    tags:
+      - Users
+    summary: Get login logs
+    description: Get login logs
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number
+      - in: query
+        name: entries
+        schema:
+          type: integer
+        description: Number of entries per page
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search query
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    username:
+                      type: string
+                    date:
+                      type: string
+                    ipAddress:
+                      type: string
+                    userAgent:
+                      type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/create-read-only:
+  post:
+    tags:
+      - Users
+    summary: Create read only user
+    description: Create read only user
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              name:
+                type: string
+              lastname:
+                type: string
+              dni:
+                type: string
+              description:
+                type: string
+              email:
+                type: string
+                format: email
+            required:
+              - name
+              - lastname
+              - dni
+              - description
+              - email
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/create-admin/{userId}:
+  put:
+    tags:
+      - Users
+    summary: Update employee role to be "admin"
+    description: Update employee role to be "admin"
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/delete-admin/{userId}:
+  delete:
+    tags:
+      - Users
+    summary: Set admin role to be "employee"
+    description: Set admin role to be "employee"
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/delete-read-only/{userId}:
+  delete:
+    tags:
+      - Users
+    summary: Delete read only user
+    description: Delete read only user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'

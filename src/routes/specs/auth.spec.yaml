@@ -34,27 +34,62 @@
                 message:
                   type: string
       '400':
-        description: Bad request
-        content:
-          application/json:
-            schema:
-              properties:
-                data:
-                  type: 'null'
-                message:
-                  type: string
+        '400':
+        $ref: '#/components/responses/BadRequest'
       '401':
-        description: Unauthorized
-        content:
-          application/json:
-            schema:
-              properties:
-                data:
-                  type: 'null'
-                message:
-                  type: string
+        $ref: '#/components/responses/Unauthorized'
       '500':
-        description: Internal Server Error
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/auth/refresh-token:
+  post:
+    tags:
+      - Auth
+    summary: Refresh access token and refresh token
+    description: Refresh access token and refresh token
+    parameters:
+      - in: cookie
+        name: refresh_token
+        schema:
+          type: string
+          default: ''
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                    shouldChangePass:
+                      type: boolean
+                message:
+                  type: string
+      '400':
+        '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/auth/logout:
+  post:
+    tags:
+      - Auth
+    summary: Delete refresh_token from cookies
+    description: Delete refresh_token from cookies
+    parameters:
+      - in: cookie
+        name: refresh_token
+        schema:
+          type: string
+          default: ''
+    responses:
+      '200':
+        description: Success
         content:
           application/json:
             schema:
@@ -63,3 +98,81 @@
                   type: 'null'
                 message:
                   type: string
+      '400':
+        '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/auth/recover-password:
+  post:
+    tags:
+      - Auth
+    summary: Recover password
+    description: Recover password
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              username:
+                type: string
+            required:
+              - username
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                message:
+                  type: string
+      '400':
+        '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/auth/reset-password:
+  put:
+    tags:
+      - Auth
+    summary: Reset forgotten password
+    description: Reset forgotten password
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              password:
+                type: string
+            required:
+              - password
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: 'null'
+                message:
+                  type: string
+      '400':
+        '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'

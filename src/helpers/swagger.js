@@ -10,7 +10,7 @@ const options = {
       description: 'REST API for Custodia de Archivos',
     },
     components: {
-      securitySchemas: {
+      securitySchemes: {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',

@@ -1,0 +1,86 @@
+components:
+  schemas:
+    BasicList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BasicItem'
+    BasicItem:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+    Error:
+      type: object
+      properties:
+        data:
+          type: 'null'
+        message:
+          type: string
+      required:
+        - data
+        - message
+    Success:
+      type: object
+      properties:
+        data:
+          type: 'null'
+        message:
+          type: string
+      required:
+        - data
+        - message
+  parameters:
+    PaginationPage:
+      name: page
+      schema:
+        type: integer
+      description: Page number
+    PaginationEntries:
+      name: entries
+      schema:
+        type: integer
+      description: Number of entries per page
+    Filter:
+      name: query
+      schema:
+        type: string
+      description: Search query
+  responses:
+    EmptySuccess:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Success'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: Internal Server Error (unknown cause)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

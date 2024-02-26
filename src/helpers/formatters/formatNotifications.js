@@ -41,7 +41,7 @@ const formatReceiver = async (receiver) => {
         ? receiverData.employee.email
         : '',
     hasReadNotification: receiver.has_read_notification,
-    timeRead: receiver.time_read_notification,
+    timeReadNotification: receiver.time_read_notification,
   };
 };
 

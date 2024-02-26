@@ -1,0 +1,302 @@
+/api/v1/params/relationships:
+  get:
+    tags:
+      - Params
+    summary: Get family relationship types
+    description: Get family relationship types
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/BasicList'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/params/status:
+  get:
+    tags:
+      - Params
+    summary: Get employee status types
+    description: Get employee status types
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/BasicList'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/params/roles:
+  get:
+    tags:
+      - Params
+    summary: Get user role types
+    description: Get user role types
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: notifications
+        schema:
+          type: boolean
+        description: Optional query parameter to filter out "third_party" role when set to true
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/BasicList'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/params/gender:
+  get:
+    tags:
+      - Params
+    summary: Get gender types
+    description: Get gender types
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/BasicList'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/params/areas:
+  get:
+    tags:
+      - Params
+    summary: Get employee area types
+    description: Get employee area types
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: filterAssignable
+        schema:
+          type: boolean
+          default: false
+        description: Optional query parameter to filter out assignable areas (for eg. "all_employees" cannot be assigned to user)
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/BasicList'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  post:
+    tags:
+      - Params
+    summary: Create a new area
+    description: Create a new area
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              title:
+                type: string
+              responsibleEmail:
+                type: string
+            required:
+              - title
+              - responsibleEmail
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/params/areas/{areaId}:
+  get:
+    tags:
+      - Params
+    summary: Get employee area
+    description: Get employee area
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: areaId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    description:
+                      type: string
+                    responsibleEmail:
+                      type: string
+                    username:
+                      oneOf:
+                        - string
+                        - 'null'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Params
+    summary: Edit an existing area
+    description: Edit an existing area
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              title:
+                type: string
+              responsibleEmail:
+                type: string
+            required:
+              - title
+              - responsibleEmail
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Params
+    summary: Delete an existing area
+    description: Delete an existing area
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/params/civil-status:
+  get:
+    tags:
+      - Params
+    summary: Get civil status types
+    description: Get civil status types
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  $ref: '#/components/schemas/BasicList'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
