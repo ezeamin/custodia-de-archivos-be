@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 import {
-  dniRules,
+  cuilRules,
   emailRules,
   entriesRules,
   pageRules,
@@ -24,7 +24,7 @@ export const post_userSchema = Joi.object({
 export const post_readOnlyUserSchema = Joi.object({
   name: textRules('name', 3, 50)(),
   lastname: textRules('lastname', 3, 50)(),
-  dni: dniRules('dni')(),
+  cuil: cuilRules('cuil')(),
   description: textRules('description', 3, 100)(),
   email: emailRules('email')(),
 }).messages({

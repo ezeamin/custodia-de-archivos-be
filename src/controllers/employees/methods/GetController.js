@@ -10,7 +10,7 @@ import { formatEmployeeResponseData } from '../../../helpers/formatters/formatEm
 import { formatEmployeesData } from '../../../helpers/formatters/formatEmployeesData.js';
 import { formatBeneficiaryData } from '../../../helpers/formatters/formatBeneficiaryData.js';
 import { formatAddressAsString } from '../../../helpers/formatters/formatAddress.js';
-import { formatDni } from '../../../helpers/formatters/formatDni.js';
+import { formatCuil } from '../../../helpers/formatters/formatCuil.js';
 import { mapStatus } from '../../../helpers/formatters/mapStatus.js';
 
 export class GetController {
@@ -102,7 +102,7 @@ export class GetController {
         width: 25,
       },
       {
-        header: 'DNI',
+        header: 'CUIL',
         key: 'identification_number',
         width: 20,
       },
@@ -332,7 +332,7 @@ export class GetController {
         worksheet.addRow({
           surname: employee.person.surname,
           name: employee.person.name,
-          identification_number: formatDni(
+          identification_number: formatCuil(
             employee.person.identification_number,
           ),
           birth_date: dayjs(employee.person.birth_date).format('DD/MM/YYYY'),
@@ -1274,7 +1274,7 @@ export class GetController {
         id: familyMember.id_family_member,
         name: familyMember.person.name,
         lastname: familyMember.person.surname,
-        dni: familyMember.person.identification_number,
+        cuil: familyMember.person.identification_number,
         gender: familyMember.person.gender
           ? {
               id: familyMember.person.gender.id_gender,

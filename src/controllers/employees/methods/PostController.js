@@ -13,7 +13,7 @@ export class PostController {
       body: {
         name,
         lastname,
-        dni,
+        cuil,
         birthdate,
         genderId,
         email,
@@ -70,7 +70,7 @@ export class PostController {
       // Check for existing (inactive) person
       const existingPerson = await prisma.person.findUnique({
         where: {
-          identification_number: dni,
+          identification_number: cuil,
         },
         include: {
           phone: true,
@@ -103,7 +103,7 @@ export class PostController {
         res.status(HttpStatus.BAD_REQUEST).json({
           data: null,
           message:
-            'Esta persona ya está registrada como empleado activo bajo el mismo DNI.',
+            'Esta persona ya está registrada como empleado activo bajo el mismo CUIL.',
         });
         return;
       }
@@ -123,7 +123,7 @@ export class PostController {
             body: req.body,
             name: uppercaseName(existingPerson.name),
             lastname: uppercaseName(existingPerson.surname),
-            dni: existingPerson.identification_number,
+            cuil: existingPerson.identification_number,
             phone: existingPerson?.phone?.phone_no || null,
             address: existingPerson.address
               ? formatAddressAsString(existingPerson.address)
@@ -184,7 +184,7 @@ export class PostController {
           data: {
             name,
             surname: lastname,
-            identification_number: dni,
+            identification_number: cuil,
             birth_date: birthdate,
             id_gender: genderId,
           },
@@ -261,7 +261,7 @@ export class PostController {
         if (e.meta.target.includes('identification_number')) {
           res.status(HttpStatus.BAD_REQUEST).json({
             data: null,
-            message: 'El DNI ingresado ya existe',
+            message: 'El CUIL ingresado ya existe',
           });
           return;
         }
@@ -876,7 +876,7 @@ export class PostController {
       body: {
         name,
         lastname,
-        dni,
+        cuil,
         birthdate,
         relationshipId,
         genderId,
@@ -897,7 +897,7 @@ export class PostController {
     try {
       person = await prisma.person.findUnique({
         where: {
-          identification_number: dni,
+          identification_number: cuil,
         },
         include: {
           phone: true,
@@ -924,7 +924,7 @@ export class PostController {
             data: {
               name: person.name,
               lastname: person.surname,
-              dni: person.identification_number,
+              cuil: person.identification_number,
               phone: person?.phone?.phone_no || null,
               address: person.address
                 ? formatAddressAsString(person.address)
@@ -1055,7 +1055,7 @@ export class PostController {
           data: {
             name,
             surname: lastname,
-            identification_number: dni,
+            identification_number: cuil,
             birth_date: birthdate,
             gender: {
               connect: {
@@ -1190,7 +1190,7 @@ export class PostController {
       body: {
         name,
         lastname,
-        dni,
+        cuil,
         birthdate,
         genderId,
         relationshipId,
@@ -1210,7 +1210,7 @@ export class PostController {
     try {
       person = await prisma.person.findUnique({
         where: {
-          identification_number: dni,
+          identification_number: cuil,
         },
         include: {
           address: {
@@ -1236,7 +1236,7 @@ export class PostController {
             data: {
               name: person.name,
               lastname: person.surname,
-              dni: person.identification_number,
+              cuil: person.identification_number,
               address: person.address
                 ? formatAddressAsString(person.address)
                 : null,
@@ -1359,7 +1359,7 @@ export class PostController {
           data: {
             name,
             surname: lastname,
-            identification_number: dni,
+            identification_number: cuil,
             birth_date: birthdate,
             gender: {
               connect: {

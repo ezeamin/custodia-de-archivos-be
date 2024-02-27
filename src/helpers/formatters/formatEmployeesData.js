@@ -3,7 +3,7 @@ import { calculateDateDiffInAges } from '../helpers.js';
 export const formatEmployeesData = (employees) =>
   employees.map((employee) => ({
     id: employee.id_employee,
-    dni: employee.person.identification_number,
+    cuil: employee.person.identification_number,
     imgSrc: employee.picture_url,
     lastname: employee.person.surname,
     firstname: employee.person.name,

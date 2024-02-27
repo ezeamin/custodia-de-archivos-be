@@ -169,7 +169,7 @@
                 type: string
               lastname:
                 type: string
-              dni:
+              cuil:
                 type: string
               description:
                 type: string
@@ -179,7 +179,7 @@
             required:
               - name
               - lastname
-              - dni
+              - cuil
               - description
               - email
     responses:

@@ -89,10 +89,10 @@ export class PostController {
 
   static async createReadOnlyUser(req, res) {
     const {
-      body: { name, lastname, dni, description, email },
+      body: { name, lastname, cuil, description, email },
     } = req;
 
-    const username = dni;
+    const username = cuil;
     const password = generateFirstPassword();
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -109,7 +109,7 @@ export class PostController {
                 create: {
                   name,
                   surname: lastname,
-                  identification_number: dni,
+                  identification_number: cuil,
                   birth_date: new Date(),
                   id_gender: genders[0]?.id_gender || null,
                 },

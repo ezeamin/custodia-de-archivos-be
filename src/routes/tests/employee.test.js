@@ -16,7 +16,7 @@ const {
 } = envs;
 const EMPLOYEE_ID = '018d3b85-ad41-7cca-94c9-0cf50325d9a4';
 const FAMILY_MEMBER_ID = '018d5a99-9686-7b77-b151-eb3cfaefd72c';
-const FAMILY_MEMBER_DNI = '20000000';
+const FAMILY_MEMBER_CUIL = '20000000';
 
 const getEndpoints = [
   ENDPOINTS.EMPLOYEES.GET_EMPLOYEE_DOCS,
@@ -154,7 +154,7 @@ describe('2. EMPLOYEE Testing', () => {
 
         expect(response.body.data).toBeDefined();
         expect(response.body.data).toEqual(expect.any(Object));
-        expect(response.body.data.dni).toEqual(FAMILY_MEMBER_DNI);
+        expect(response.body.data.cuil).toEqual(FAMILY_MEMBER_CUIL);
       });
 
       it('No token - 401', async () => {
@@ -270,7 +270,7 @@ describe('2. EMPLOYEE Testing', () => {
           .field('lastname', 'Doe')
           .field('birthdate', '1980-01-01T00:00:00.000Z')
           .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
-          .field('dni', '12345678')
+          .field('cuil', '12345678')
           .field('email', 'johndoe123@mail.com')
           .field('startDate', '1990-01-01T00:00:00.000Z')
           .field('position', 'Prueba')
@@ -310,7 +310,7 @@ describe('2. EMPLOYEE Testing', () => {
           .field('lastname', 'Doe')
           .field('birthdate', '1980-01-01T00:00:00.000Z')
           .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
-          .field('dni', '12345678')
+          .field('cuil', '12345678')
           .field('email', 'johndoe@mail.com')
           .field('startDate', '1990-01-01T00:00:00.000Z')
           .field('position', 'Prueba')
@@ -327,7 +327,7 @@ describe('2. EMPLOYEE Testing', () => {
           .field('lastname', 'Doe')
           .field('birthdate', '1980-01-01T00:00:00.000Z')
           .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
-          .field('dni', '12345678')
+          .field('cuil', '12345678')
           .field('email', 'johndoe@mail.com')
           .field('startDate', '1990-01-01T00:00:00.000Z')
           .field('position', 'Prueba')
@@ -346,7 +346,7 @@ describe('2. EMPLOYEE Testing', () => {
           .field('lastname', 'Doe')
           .field('birthdate', 'hola') // incorrect data
           .field('genderId', '018d3b85-ad41-71c2-a317-95f3fa1a632d')
-          .field('dni', '12345678')
+          .field('cuil', '12345678')
           .field('email', 'johndoe@mail.com')
           .field('startDate', '1990-01-01T00:00:00.000Z')
           .field('position', 'Prueba')

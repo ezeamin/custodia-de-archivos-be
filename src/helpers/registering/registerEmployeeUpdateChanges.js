@@ -413,7 +413,7 @@ export const registerEmployeeUpdateChanges = async (
       employeeId: previousData.id_employee,
       changedTable: 'person',
       changedField: 'identification_number',
-      changedFieldLabel: 'DNI',
+      changedFieldLabel: 'CUIL',
       previousValue: personPreviousData.identification_number,
       newValue: personNewData.identification_number,
     });

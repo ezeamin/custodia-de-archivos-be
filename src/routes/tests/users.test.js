@@ -12,7 +12,7 @@ const {
 } = envs;
 const TEST_NEW_USER_EMPLOYEE_ID = '018d5f7e-0a00-7913-87ef-c43edb396158';
 const TEST_NEW_USER_PERSON_ID = '018d5f79-eb05-7563-b721-497393e1ee8a';
-const TEST_NEW_USER_DNI = '30000000';
+const TEST_NEW_USER_CUIL = '30000000';
 
 describe('5. USERS Testing', () => {
   describe('-- GET ENDPOINTS -- ', () => {
@@ -39,7 +39,7 @@ describe('5. USERS Testing', () => {
         expect(response.body.data).toHaveLength(0);
       });
 
-      it('Get filtered data (DNI - 1 result) - 200', async () => {
+      it('Get filtered data (CUIL - 1 result) - 200', async () => {
         const response = await request(app)
           .get(
             `${getEndpoint('USERS', ENDPOINTS.USERS.GET_USERS)}?query=40000000`,
@@ -206,7 +206,7 @@ describe('5. USERS Testing', () => {
           .send({
             name: 'Test',
             lastname: 'Test',
-            dni: '60000000',
+            cuil: '60000000',
             email: 'test@test.com',
             description: 'Test',
           })
@@ -234,21 +234,21 @@ describe('5. USERS Testing', () => {
           .send({
             name: 'Test',
             lastname: 'Test',
-            dni: '60000000',
+            cuil: '60000000',
             email: 'testtest.com', // Incorrect email
             description: 'Test',
           })
           .expect(HttpStatus.BAD_REQUEST);
       });
 
-      it('Create read-only user (Incorrect dni) - 400', async () => {
+      it('Create read-only user (Incorrect cuil) - 400', async () => {
         await request(app)
           .post(getEndpoint('USERS', ENDPOINTS.USERS.POST_READ_ONLY_USER))
           .set('Authorization', `Bearer ${ACCESS_TOKEN_ADMIN}`)
           .send({
             name: 'Test',
             lastname: 'Test',
-            dni: '600a0000',
+            cuil: '600a0000',
             email: 'test@test.com', // Incorrect email
             description: 'Test',
           })
@@ -262,7 +262,7 @@ describe('5. USERS Testing', () => {
           .send({
             name: 'Test',
             lastname: 'Test',
-            dni: '60000000',
+            cuil: '60000000',
             description: 'Test',
           })
           .expect(HttpStatus.BAD_REQUEST);
@@ -275,7 +275,7 @@ describe('5. USERS Testing', () => {
           .send({
             name: 'Test',
             lastname: 'Test',
-            dni: '60000000',
+            cuil: '60000000',
             email: 'test@test.com',
             description: 'Test',
             extra: 'Extra',
@@ -305,7 +305,7 @@ describe('5. USERS Testing', () => {
       beforeAll(async () => {
         const data = await prisma.user.create({
           data: {
-            username: TEST_NEW_USER_DNI,
+            username: TEST_NEW_USER_CUIL,
             password: '123456789',
             user_type: {
               connect: {
@@ -409,7 +409,7 @@ describe('5. USERS Testing', () => {
       beforeAll(async () => {
         const data = await prisma.user.create({
           data: {
-            username: TEST_NEW_USER_DNI,
+            username: TEST_NEW_USER_CUIL,
             password: '123456789',
             user_type: {
               connect: {
@@ -521,7 +521,7 @@ describe('5. USERS Testing', () => {
       beforeAll(async () => {
         const data = await prisma.user.create({
           data: {
-            username: TEST_NEW_USER_DNI,
+            username: TEST_NEW_USER_CUIL,
             password: '123456789',
             user_type: {
               connect: {

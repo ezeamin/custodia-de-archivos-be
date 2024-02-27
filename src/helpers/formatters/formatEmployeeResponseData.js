@@ -2,7 +2,7 @@ import { calculateDateDiffInAges } from '../helpers.js';
 
 export const formatEmployeeResponseData = ({ employee, family, user }) => ({
   id: employee.id_employee,
-  dni: employee.person.identification_number,
+  cuil: employee.person.identification_number,
   imgSrc: employee.picture_url,
   lastname: employee.person.surname,
   firstname: employee.person.name,
@@ -30,7 +30,7 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
         id: beneficiary.id_life_insurance_beneficiary,
         name: beneficiary.person.name,
         lastname: beneficiary.person.surname,
-        dni: beneficiary.person.identification_number,
+        cuil: beneficiary.person.identification_number,
         address: beneficiary.person.address
           ? {
               street: {

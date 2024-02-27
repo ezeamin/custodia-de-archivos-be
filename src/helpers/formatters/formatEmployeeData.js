@@ -21,7 +21,7 @@ export const formatEmployeeData = (originalData) => {
         ? uppercaseName(originalData.lastname)
         : undefined,
       birth_date: originalData.birthdate,
-      identification_number: originalData.dni,
+      identification_number: originalData.cuil,
     },
     address: {
       street_number: originalData.streetNumber,

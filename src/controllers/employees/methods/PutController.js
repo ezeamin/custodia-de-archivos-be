@@ -949,7 +949,7 @@ export class PutController {
       body: {
         name,
         lastname,
-        dni,
+        cuil,
         relationshipId,
         genderId,
         percentage,
@@ -1112,7 +1112,7 @@ export class PutController {
         data: {
           name,
           surname: lastname,
-          identification_number: dni,
+          identification_number: cuil,
           id_gender: genderId,
         },
       });

@@ -4,7 +4,7 @@ export const formatBeneficiaryData = (beneficiaryData) => ({
   id: beneficiaryData.id_life_insurance_beneficiary,
   name: beneficiaryData.person.name,
   lastname: beneficiaryData.person.surname,
-  dni: beneficiaryData.person.identification_number,
+  cuil: beneficiaryData.person.identification_number,
   gender: {
     id: beneficiaryData.person.gender.id_gender,
     description: beneficiaryData.person.gender.gender,

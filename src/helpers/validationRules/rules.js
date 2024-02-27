@@ -15,7 +15,7 @@ export const usernameRules = () =>
       'string.max':
         'El campo "nombre de usuario" debe tener maximo 8 caracteres',
       'string.pattern.base':
-        'El campo "nombre de usuario" debe ser un DNI válido. No puede empezar por 0',
+        'El campo "nombre de usuario" debe ser un CUIL válido. No puede empezar por 0',
       'any.required': 'El campo "nombre de usuario" es obligatorio',
       '*': 'Revisa el campo "nombre de usuario"',
     });
@@ -95,17 +95,17 @@ export const emailRules = (name = 'email') => {
       });
 };
 
-export const dniRules = (name = 'dni') => {
+export const cuilRules = (name = 'cuil') => {
   return () =>
     Joi.string()
       .trim()
       .required()
-      .length(8)
+      .length(11)
       .regex(/^[0-9]+$/)
       .messages({
         'string.empty': `El campo "${name}" no puede estar vacio`,
-        'string.length': `El campo "${name}" debe tener 8 caracteres`,
-        'string.pattern.base': `El campo "${name}" debe ser un dni válido`,
+        'string.length': `El campo "${name}" debe tener 11 caracteres`,
+        'string.pattern.base': `El campo "${name}" debe ser un cuil válido`,
         'any.required': `El campo "${name}" es obligatorio`,
         '*': `Revisa el campo "${name}"`,
       });

@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 import {
   dateBeforeTodayRules,
-  dniRules,
+  cuilRules,
   emailRules,
   entriesRules,
   numberRules,
@@ -25,7 +25,7 @@ export const post_employeeSchema = Joi.object({
   birthdate: dateBeforeTodayRules('birthdate')(),
   startDate: dateBeforeTodayRules('startDate')(),
   email: emailRules('email')(),
-  dni: dniRules('dni')(),
+  cuil: cuilRules('cuil')(),
   genderId: uuidRule('genderId')(),
   areaId: uuidRule('areaId')(),
   position: textRules('position', 3, 100)(),
@@ -156,7 +156,7 @@ export const post_trainingTypeSchema = Joi.object({
 export const post_employeeFamilyMemberSchema = Joi.object({
   name: textRules('name', 3, 50)(),
   lastname: textRules('lastname', 3, 50)(),
-  dni: dniRules('dni')(),
+  cuil: cuilRules('cuil')(),
   birthdate: dateBeforeTodayRules('birthdate')(),
   relationshipId: uuidRule('relationshipId')(),
   genderId: uuidRule('genderId')(),
@@ -187,7 +187,7 @@ export const post_employeeLifeInsuranceSchema = Joi.object({
 export const post_lifeInsuranceBeneficiarySchema = Joi.object({
   name: textRules('name', 3, 50)(),
   lastname: textRules('lastname', 3, 50)(),
-  dni: dniRules('dni')(),
+  cuil: cuilRules('cuil')(),
   birthdate: dateBeforeTodayRules('birthdate')(),
   relationshipId: uuidRule('relationshipId')(),
   genderId: uuidRule('genderId')(),
@@ -240,7 +240,7 @@ export const put_employeeDocFolderSchema = Joi.object({
 export const put_employeeFamilyMemberSchema = Joi.object({
   name: textRules('name', 3, 50)(),
   lastname: textRules('lastname', 3, 50)(),
-  dni: dniRules('dni')(),
+  cuil: cuilRules('cuil')(),
   birthdate: dateBeforeTodayRules('birthdate')(),
   relationshipId: uuidRule('relationshipId')(),
   genderId: uuidRule('genderId')(),
@@ -270,7 +270,7 @@ export const put_employeeLifeInsuranceSchema = Joi.object({
 export const put_lifeInsuranceBeneficiarySchema = Joi.object({
   name: textRules('name', 3, 50)(),
   lastname: textRules('lastname', 3, 50)(),
-  dni: dniRules('dni')(),
+  cuil: cuilRules('cuil')(),
   birthdate: dateBeforeTodayRules('birthdate')(),
   relationshipId: uuidRule('relationshipId')(),
   genderId: uuidRule('genderId')(),
