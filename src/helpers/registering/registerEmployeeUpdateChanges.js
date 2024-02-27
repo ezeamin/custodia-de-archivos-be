@@ -350,6 +350,25 @@ export const registerEmployeeUpdateChanges = async (
     });
   }
 
+  if (
+    addressNewData &&
+    addressNewData.observations &&
+    (!addressPreviousData ||
+      addressPreviousData.observations !== addressNewData.observations)
+  ) {
+    registerChange({
+      modifyingUser: userId,
+      employeeId: previousData.id_employee,
+      changedTable: 'address',
+      changedField: 'observations',
+      changedFieldLabel: 'Observaciones de la dirección',
+      previousValue: addressPreviousData
+        ? addressPreviousData.observations
+        : null,
+      newValue: addressNewData.observations,
+    });
+  }
+
   // --------------------------------------------------------
   // D - Person
   // --------------------------------------------------------

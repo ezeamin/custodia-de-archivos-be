@@ -14,6 +14,7 @@ export const formatFamilyMemberData = (familyMemberData) => ({
   address: {
     street_number: familyMemberData.streetNumber,
     door: familyMemberData.apt,
+    observations: familyMemberData.addressObservations,
   },
   street: {
     street_api_id: familyMemberData.street.id,

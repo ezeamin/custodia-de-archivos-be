@@ -57,6 +57,7 @@ CREATE TABLE public."address" (
     id_street               UUID NOT NULL,
     street_number           integer NOT NULL,
     door                    varchar(4),
+    observations            varchar(200),
     address_isactive        boolean DEFAULT true NOT NULL,
     address_created_at      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     address_updated_at      timestamp DEFAULT CURRENT_TIMESTAMP,

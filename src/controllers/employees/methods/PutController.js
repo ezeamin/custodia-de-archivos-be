@@ -956,6 +956,7 @@ export class PutController {
         street,
         streetNumber,
         apt,
+        addressObservations,
         locality,
         state,
       },
@@ -1077,6 +1078,7 @@ export class PutController {
             id_street: streetId,
             street_number: streetNumber,
             door: apt,
+            observations: addressObservations,
           },
         });
 
@@ -1097,6 +1099,7 @@ export class PutController {
             id_street: streetId,
             street_number: streetNumber,
             door: apt,
+            observations: addressObservations,
           },
         });
       }

@@ -169,6 +169,16 @@ export const post_employeeFamilyMemberSchema = Joi.object({
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
   }),
+  addressObservations: Joi.string()
+    .trim()
+    .min(0)
+    .max(200)
+    .default('')
+    .messages({
+      'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+      'string.base': 'Las observaciones deben ser de tipo texto',
+      '*': 'Revisa el campo "addressObservations"',
+    }),
   phone: phoneRules('phone')(),
   force: Joi.boolean().default(false),
 }).messages({
@@ -200,6 +210,16 @@ export const post_lifeInsuranceBeneficiarySchema = Joi.object({
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
   }),
+  addressObservations: Joi.string()
+    .trim()
+    .min(0)
+    .max(200)
+    .default('')
+    .messages({
+      'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+      'string.base': 'Las observaciones deben ser de tipo texto',
+      '*': 'Revisa el campo "addressObservations"',
+    }),
   percentage: numberRules('percentage', 1, 100)(),
   force: Joi.boolean().default(false),
 }).messages({
@@ -253,6 +273,16 @@ export const put_employeeFamilyMemberSchema = Joi.object({
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
   }),
+  addressObservations: Joi.string()
+    .trim()
+    .min(0)
+    .max(200)
+    .default('')
+    .messages({
+      'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+      'string.base': 'Las observaciones deben ser de tipo texto',
+      '*': 'Revisa el campo "addressObservations"',
+    }),
   phone: phoneRules('phone')(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
@@ -283,6 +313,16 @@ export const put_lifeInsuranceBeneficiarySchema = Joi.object({
     'string.base': 'El campo "apt" debe ser de tipo texto',
     '*': 'Revisa el campo "apt"',
   }),
+  addressObservations: Joi.string()
+    .trim()
+    .min(0)
+    .max(200)
+    .default('')
+    .messages({
+      'string.max': 'Las observaciones no pueden superar los 200 caracteres',
+      'string.base': 'Las observaciones deben ser de tipo texto',
+      '*': 'Revisa el campo "addressObservations"',
+    }),
   percentage: numberRules('percentage', 1, 100)(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',

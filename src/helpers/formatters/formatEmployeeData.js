@@ -24,6 +24,7 @@ export const formatEmployeeData = (originalData) => {
       identification_number: originalData.cuil,
     },
     address: {
+      observations: originalData.addressObservations,
       street_number: originalData.streetNumber,
       door: originalData.apt,
     },
