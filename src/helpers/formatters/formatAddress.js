@@ -1,5 +1,5 @@
 export const formatAddressAsString = (address) => {
-  return `${address.street.street} ${address.street_number}${address.door ? ` - ${address.door}` : ''}, ${address.street.locality.locality}, ${address.street.locality.province.province} ${address.observations ? `(${address.observations})` : ''}`;
+  return `${address.street.street} ${address.street_number || ''}${address.door ? ` - ${address.door}` : ''}, ${address.street.locality.locality}, ${address.street.locality.province.province} ${address.observations ? `(${address.observations})` : ''}`;
 };
 
 export const formatAddress = (address) => ({

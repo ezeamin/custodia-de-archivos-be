@@ -163,7 +163,7 @@ export const post_employeeFamilyMemberSchema = Joi.object({
   street: typeRule('street')(),
   locality: typeRule('locality')(),
   state: typeRule('state')(),
-  streetNumber: numberRules('streetNumber', 1, 10000)(),
+  streetNumber: numberRules('streetNumber', 0, 10000)(),
   apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
@@ -204,7 +204,7 @@ export const post_lifeInsuranceBeneficiarySchema = Joi.object({
   street: typeRule('street')(),
   locality: typeRule('locality')(),
   state: typeRule('state')(),
-  streetNumber: numberRules('streetNumber', 1, 10000)(),
+  streetNumber: numberRules('streetNumber', 0, 10000)(),
   apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
@@ -267,7 +267,7 @@ export const put_employeeFamilyMemberSchema = Joi.object({
   street: typeRule('street')(),
   locality: typeRule('locality')(),
   state: typeRule('state')(),
-  streetNumber: numberRules('streetNumber', 1, 10000)(),
+  streetNumber: numberRules('streetNumber', 0, 10000)(),
   apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',
@@ -307,7 +307,7 @@ export const put_lifeInsuranceBeneficiarySchema = Joi.object({
   street: typeRule('street')(),
   locality: typeRule('locality')(),
   state: typeRule('state')(),
-  streetNumber: numberRules('streetNumber', 1, 10000)(),
+  streetNumber: numberRules('streetNumber', 0, 10000)(),
   apt: Joi.string().trim().min(0).max(10).messages({
     'string.max': 'El campo "apt" no puede superar los 10 caracteres',
     'string.base': 'El campo "apt" debe ser de tipo texto',

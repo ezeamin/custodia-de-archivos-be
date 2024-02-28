@@ -25,7 +25,7 @@ export const formatEmployeeData = (originalData) => {
     },
     address: {
       observations: originalData.addressObservations,
-      street_number: originalData.streetNumber,
+      street_number: originalData.streetNumber || 0,
       door: originalData.apt,
     },
     phone: {

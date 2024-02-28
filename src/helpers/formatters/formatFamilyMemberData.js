@@ -12,7 +12,7 @@ export const formatFamilyMemberData = (familyMemberData) => ({
     phone_no: formatPhone(familyMemberData.phone),
   },
   address: {
-    street_number: familyMemberData.streetNumber,
+    street_number: familyMemberData.streetNumber || 0,
     door: familyMemberData.apt,
     observations: familyMemberData.addressObservations,
   },

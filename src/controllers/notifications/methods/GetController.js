@@ -241,6 +241,7 @@ export class GetController {
         }
 
         const totalNotifications = [...userNotifications, ...areaNotifications];
+        const totalElements = totalNotifications.length;
 
         // Limit response to page and entries quantity
 
@@ -262,6 +263,7 @@ export class GetController {
 
         res.json({
           data: formattedData,
+          totalElements,
           message: 'Notificaciones obtenidas exitosamente',
         });
       }

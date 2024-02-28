@@ -954,7 +954,7 @@ export class PutController {
         genderId,
         percentage,
         street,
-        streetNumber,
+        streetNumber = 0,
         apt,
         addressObservations,
         locality,

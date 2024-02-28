@@ -29,6 +29,7 @@ model address {
   address_isactive   Boolean   @default(true)
   address_created_at DateTime  @default(now()) @db.Timestamp(6)
   address_updated_at DateTime? @default(now()) @db.Timestamp(6)
+  observations       String?   @db.VarChar(200)
   street             street    @relation(fields: [id_street], references: [id_street], onDelete: NoAction, onUpdate: NoAction, map: "fk_address_street")
   person             person[]
 }
@@ -108,9 +109,9 @@ model employee_history {
   id_history           String   @id(map: "pk_employee_history") @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   id_employee          String   @db.Uuid
   id_submitted_by      String   @db.Uuid
-  modified_table       String   @db.VarChar(50)
-  modified_field       String   @db.VarChar(30)
-  modified_field_label String   @db.VarChar(50)
+  modified_table       String   @db.VarChar(100)
+  modified_field       String   @db.VarChar(100)
+  modified_field_label String   @db.VarChar(100)
   previous_value       Json?
   current_value        Json?
   modification_date    DateTime @default(now()) @db.Timestamp(6)
@@ -297,7 +298,7 @@ model person {
   name                                String                                @db.VarChar(50)
   surname                             String                                @db.VarChar(50)
   birth_date                          DateTime                              @db.Timestamp(6)
-  identification_number               String                                @unique @db.VarChar(8)
+  identification_number               String                                @unique @db.VarChar(11)
   person_isactive                     Boolean                               @default(true)
   person_created_at                   DateTime                              @default(now()) @db.Timestamp(6)
   person_updated_at                   DateTime?                             @default(now()) @db.Timestamp(6)
@@ -383,7 +384,7 @@ model user {
   id_employee                String?                      @db.Uuid
   id_third_party             String?                      @db.Uuid
   id_area                    String?                      @db.Uuid
-  username                   String                       @unique @db.VarChar(8)
+  username                   String                       @unique @db.VarChar(11)
   password                   String                       @db.VarChar(100)
   has_changed_def_pass       Boolean                      @default(false)
   user_isactive              Boolean                      @default(true)
