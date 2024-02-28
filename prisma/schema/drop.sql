@@ -1,4 +1,5 @@
 -- Drop tables
+DROP TABLE IF EXISTS public.error_logs; CASCADE;
 DROP TABLE IF EXISTS public.employee_doc CASCADE;
 DROP TABLE IF EXISTS public.document_folder CASCADE;
 DROP TABLE IF EXISTS public.login CASCADE;

@@ -2,11 +2,13 @@ import HttpStatus from 'http-status-codes';
 import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
+
 import {
   generateFirstPassword,
   generateRandomUsername,
 } from '../../../helpers/helpers.js';
 import { sendNewUserMail } from '../../../helpers/mailing/newUserMail.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class PostController {
   static async createArea(req, res) {
@@ -15,45 +17,46 @@ export class PostController {
     } = req;
 
     try {
-      const emailInUseAreaPromise = prisma.area.findFirst({
-        where: {
-          responsible_email: responsibleEmail,
-          area_isactive: true,
-          is_assignable: true,
-        },
-      });
+      // ! Temporary disable checking mail in use
+      // const emailInUseAreaPromise = prisma.area.findFirst({
+      //   where: {
+      //     responsible_email: responsibleEmail,
+      //     area_isactive: true,
+      //     is_assignable: true,
+      //   },
+      // });
 
-      const emailInUseEmployeePromise = prisma.employee.findFirst({
-        where: {
-          email: responsibleEmail,
-          employee_isactive: true,
-        },
-      });
+      // const emailInUseEmployeePromise = prisma.employee.findFirst({
+      //   where: {
+      //     email: responsibleEmail,
+      //     employee_isactive: true,
+      //   },
+      // });
 
-      const emailInUseThirdPartyPromise = prisma.third_party.findFirst({
-        where: {
-          email: responsibleEmail,
-          third_party_isactive: true,
-        },
-      });
+      // const emailInUseThirdPartyPromise = prisma.third_party.findFirst({
+      //   where: {
+      //     email: responsibleEmail,
+      //     third_party_isactive: true,
+      //   },
+      // });
 
-      const [emailInUseArea, emailInUseEmployee, emailInUseThirdParty] =
-        await Promise.all([
-          emailInUseAreaPromise,
-          emailInUseEmployeePromise,
-          emailInUseThirdPartyPromise,
-        ]);
+      // const [emailInUseArea, emailInUseEmployee, emailInUseThirdParty] =
+      //   await Promise.all([
+      //     emailInUseAreaPromise,
+      //     emailInUseEmployeePromise,
+      //     emailInUseThirdPartyPromise,
+      //   ]);
 
-      const emailInUse =
-        emailInUseArea || emailInUseEmployee || emailInUseThirdParty;
+      // const emailInUse =
+      //   emailInUseArea || emailInUseEmployee || emailInUseThirdParty;
 
-      if (emailInUse) {
-        res.status(HttpStatus.CONFLICT).json({
-          data: null,
-          message: 'El correo ya está en uso',
-        });
-        return;
-      }
+      // if (emailInUse) {
+      //   res.status(HttpStatus.CONFLICT).json({
+      //     data: null,
+      //     message: 'El correo ya está en uso',
+      //   });
+      //   return;
+      // }
 
       const existingArea = await prisma.area.findFirst({
         where: {
@@ -131,7 +134,7 @@ export class PostController {
         password,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error creando el área',

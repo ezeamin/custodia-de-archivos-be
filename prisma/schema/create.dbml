@@ -1,6 +1,16 @@
+Table "error_logs" {
+  "id_error_log" UUID [not null, default: `uuid_generate_v7()`]
+  "error_message" varchar(1000) [not null]
+  "error_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+Indexes {
+  id_error_log [pk, name: "pk_error_logs"]
+}
+}
+
 Table "area" {
   "id_area" UUID [not null, default: `uuid_generate_v7()`]
-  "area" varchar(20) [unique, not null]
+  "area" varchar(75) [unique, not null]
   "responsible_email" varchar(75)
   "is_assignable" boolean [not null, default: true]
   "area_isactive" boolean [not null, default: true]
@@ -67,6 +77,7 @@ Table "address" {
   "id_street" UUID [not null]
   "street_number" integer [not null]
   "door" varchar(4)
+  "observations" varchar(200)
   "address_isactive" boolean [not null, default: true]
   "address_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
   "address_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
@@ -107,7 +118,7 @@ Table "person" {
   "name" varchar(50) [not null]
   "surname" varchar(50) [not null]
   "birth_date" timestamp [not null]
-  "identification_number" varchar(8) [unique, not null]
+  "identification_number" varchar(11) [unique, not null]
   "person_isactive" boolean [not null, default: true]
   "person_created_at" timestamp [not null, default: `CURRENT_TIMESTAMP`]
   "person_updated_at" timestamp [default: `CURRENT_TIMESTAMP`]

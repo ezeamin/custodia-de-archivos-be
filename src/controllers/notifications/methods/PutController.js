@@ -2,6 +2,8 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 
+import { registerError } from '../../../helpers/registering/registerError.js';
+
 export class PutController {
   // @param - typeId
   static async updateNotificationType(req, res) {
@@ -118,7 +120,7 @@ export class PutController {
         message: 'Tipo de notificación actualizado exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al actualizar el tipo de notificación',

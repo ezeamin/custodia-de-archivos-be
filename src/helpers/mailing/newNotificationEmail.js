@@ -1,4 +1,5 @@
 import { envs } from '../envs.js';
+import { registerError } from '../registering/registerError.js';
 import { transporter } from './transport.js';
 
 const frontendUrl = envs.CLIENT_URL;
@@ -47,6 +48,6 @@ export const sendNewNotificationMail = async ({
       );
     });
   } catch (err) {
-    console.error('🟥', err);
+    registerError(err);
   }
 };

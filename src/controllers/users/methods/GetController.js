@@ -3,6 +3,8 @@ import UAParser from 'ua-parser-js';
 
 import { prisma } from '../../../helpers/prisma.js';
 
+import { registerError } from '../../../helpers/registering/registerError.js';
+
 const DEFAULT_IMAGE_URL =
   'https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg';
 
@@ -145,7 +147,7 @@ export class GetController {
         message: 'Usuarios obtenidos exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener los usuarios',
@@ -207,7 +209,7 @@ export class GetController {
         message: 'Logs de inicio de sesión obtenidos exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener los logs de inicio de sesión',

@@ -1,8 +1,10 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
+
 import { formatNotifications } from '../../../helpers/formatters/formatNotifications.js';
 import { roles } from '../../../constants/roles.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 
@@ -268,7 +270,7 @@ export class GetController {
         });
       }
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener las notificaciones',
@@ -451,7 +453,7 @@ export class GetController {
         message: 'Notificación obtenida exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener la notificación',
@@ -511,7 +513,7 @@ export class GetController {
         message: 'Receptores obtenidos exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener los receptores de la notificación',
@@ -633,7 +635,7 @@ export class GetController {
         message: 'Receptores de notificación obtenidos exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener los receptores de la notificación',
@@ -713,7 +715,7 @@ export class GetController {
         message: 'Tipos de notificación obtenidos exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener los tipos de notificación',
@@ -767,7 +769,7 @@ export class GetController {
         message: 'Tipo de notificación obtenido exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al obtener el tipo de notificación',

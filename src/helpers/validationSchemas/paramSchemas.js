@@ -12,7 +12,7 @@ import {
 
 // POST -----------------------------
 export const post_areaSchema = Joi.object({
-  title: textRules('title', 3, 50)(),
+  title: textRules('title', 3, 75)(),
   responsibleEmail: emailRules('responsibleEmail')(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',
@@ -21,7 +21,7 @@ export const post_areaSchema = Joi.object({
 
 // PUT -----------------------------
 export const put_areaSchema = Joi.object({
-  title: textRules('title', 3, 50)(),
+  title: textRules('title', 3, 75)(),
   responsibleEmail: emailRules('responsibleEmail')(),
 }).messages({
   'object.unknown': 'El campo "{#key}" no está permitido',

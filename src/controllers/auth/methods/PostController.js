@@ -8,6 +8,7 @@ import { prisma } from '../../../helpers/prisma.js';
 import { sendNewUserMail } from '../../../helpers/mailing/recoverMail.js';
 import { registerLogin } from '../../../helpers/registering/registerLogin.js';
 import { generateToken } from '../../../helpers/token.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 const { JWT_SECRET_KEY } = envs;
 
@@ -80,7 +81,7 @@ export class PostController {
 
       registerLogin(req, userInDB.id_user);
     } catch (err) {
-      console.error('🟥', err);
+      registerError(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al iniciar sesión`,
@@ -147,7 +148,7 @@ export class PostController {
         message: 'Refresh token exitoso',
       });
     } catch (err) {
-      console.error('🟥', err);
+      registerError(err);
       // delete refreshToken cookie
       res.clearCookie('refresh_token', {
         httpOnly: true,
@@ -241,7 +242,7 @@ export class PostController {
         res,
       });
     } catch (err) {
-      console.error('🟥', err);
+      registerError(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al intentar recuperar la contraseña`,
@@ -270,7 +271,7 @@ export class PostController {
         message: 'Logout exitoso',
       });
     } catch (err) {
-      console.error('🟥', err);
+      registerError(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al cerrar sesión. Intente refrescar la pantalla`,

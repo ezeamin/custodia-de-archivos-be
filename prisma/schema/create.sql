@@ -3,9 +3,16 @@ CREATE SCHEMA IF NOT EXISTS public;
 -- Enable UUID extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS "pg_uuidv7";
 
+CREATE TABLE public.error_logs (
+    id_error_log        UUID DEFAULT uuid_generate_v7() NOT NULL,
+    error_message       varchar(1000) NOT NULL,
+    error_created_at    timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT pk_error_logs PRIMARY KEY (id_error_log)
+);
+
 CREATE TABLE public.area (
     id_area             UUID DEFAULT uuid_generate_v7() NOT NULL,
-    area                varchar(20) NOT NULL UNIQUE,
+    area                varchar(75) NOT NULL UNIQUE,
     responsible_email   varchar(75),
     is_assignable       boolean DEFAULT true NOT NULL,
     area_isactive       boolean DEFAULT true NOT NULL,

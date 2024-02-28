@@ -1,5 +1,7 @@
 import { prisma } from '../prisma.js';
 
+import { registerError } from './registerError.js';
+
 export const registerChange = async ({
   changedField,
   changedFieldLabel,
@@ -22,6 +24,6 @@ export const registerChange = async ({
       },
     });
   } catch (e) {
-    console.error('🟥', e);
+    registerError(e);
   }
 };

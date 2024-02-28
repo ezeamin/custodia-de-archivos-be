@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class PutController {
   static async resetPassword(req, res) {
@@ -67,7 +68,7 @@ export class PutController {
         });
       }
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al actualizar la contraseña`,

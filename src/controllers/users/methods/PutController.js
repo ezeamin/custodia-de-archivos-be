@@ -1,7 +1,9 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
+
 import { registerChange } from '../../../helpers/registering/registerChange.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class PutController {
   // @param userId
@@ -60,7 +62,7 @@ export class PutController {
         previousValue: user.id_user_type,
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al actualizar el usuario`,

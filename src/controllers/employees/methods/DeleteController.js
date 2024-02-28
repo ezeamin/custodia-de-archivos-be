@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 
 import { prisma } from '../../../helpers/prisma.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class DeleteController {
   // @param - employeeId
@@ -57,7 +58,7 @@ export class DeleteController {
         employeeId: doc.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -141,7 +142,7 @@ export class DeleteController {
         });
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -201,7 +202,7 @@ export class DeleteController {
         employeeId: license.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -258,7 +259,7 @@ export class DeleteController {
         employeeId: vacation.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -316,7 +317,7 @@ export class DeleteController {
         employeeId: absence.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -374,7 +375,7 @@ export class DeleteController {
         employeeId: training.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -432,7 +433,7 @@ export class DeleteController {
         employeeId: formalWarning.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -490,7 +491,7 @@ export class DeleteController {
         employeeId: extraHour.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -548,7 +549,7 @@ export class DeleteController {
         employeeId: lateArrival.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -595,7 +596,7 @@ export class DeleteController {
         message: 'Tipo de licencia eliminada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -641,7 +642,7 @@ export class DeleteController {
         message: 'Tipo de capacitación eliminada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -729,7 +730,7 @@ export class DeleteController {
         employeeId: familyMember.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -787,7 +788,7 @@ export class DeleteController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -851,7 +852,7 @@ export class DeleteController {
         employeeId: beneficiary.life_insurance.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:

@@ -1,6 +1,7 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
+
 import { handleUpload } from '../../../helpers/cloudinary.js';
 import { sendNewNotificationMail } from '../../../helpers/mailing/newNotificationEmail.js';
 import {
@@ -8,6 +9,7 @@ import {
   createIndividualNotificationReceiverData,
 } from '../../../helpers/notificationReceivers.js';
 import { roles } from '../../../constants/roles.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 const ALL_EMPLOYEES_ID = '018d3b85-ad41-789e-b615-cd610c5c12ef';
 
@@ -81,7 +83,7 @@ export class PostController {
         return;
       }
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al crear la notificacion',
@@ -123,7 +125,7 @@ export class PostController {
         return;
       }
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al crear la notificacion',
@@ -161,8 +163,8 @@ export class PostController {
           const file = files[i];
           const uploadPromise = handleUpload(file, true);
           uploadPromises.push(uploadPromise);
-        } catch (e) {
-          console.error('🟥', e);
+        } catch (error) {
+          registerError(error);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             data: null,
             message:
@@ -253,7 +255,7 @@ export class PostController {
 
         await Promise.all(notificationDocsPromises);
       } catch (error) {
-        console.error('🟥', error);
+        registerError(error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           data: null,
           message: 'Error al crear la notificación',
@@ -362,7 +364,7 @@ export class PostController {
         message: 'Notificación creada exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al crear la notificación',
@@ -448,7 +450,7 @@ export class PostController {
         }
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
     }
   }
 

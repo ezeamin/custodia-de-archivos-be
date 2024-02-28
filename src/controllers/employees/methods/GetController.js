@@ -12,6 +12,7 @@ import { formatBeneficiaryData } from '../../../helpers/formatters/formatBenefic
 import { formatAddressAsString } from '../../../helpers/formatters/formatAddress.js';
 import { formatCuil } from '../../../helpers/formatters/formatCuil.js';
 import { mapStatus } from '../../../helpers/formatters/mapStatus.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class GetController {
   static async employees(req, res) {
@@ -79,7 +80,7 @@ export class GetController {
         message: 'Empleados recuperados exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -469,7 +470,7 @@ export class GetController {
 
       res.end();
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -586,7 +587,7 @@ export class GetController {
         message: 'Employee retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -658,7 +659,7 @@ export class GetController {
         message: 'Employee documents retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -726,7 +727,7 @@ export class GetController {
         message: 'Employee history retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -774,7 +775,7 @@ export class GetController {
         message: 'Employee absences retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -830,7 +831,7 @@ export class GetController {
         message: 'Employee licenses retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -879,7 +880,7 @@ export class GetController {
         message: 'Employee vacations retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener las vacaciones del empleado',
@@ -934,7 +935,7 @@ export class GetController {
         message: 'Employee trainings retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener los entrenamientos del empleado',
@@ -981,7 +982,7 @@ export class GetController {
         message: 'Employee formal warnings retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1030,7 +1031,7 @@ export class GetController {
         message: 'Employee late arrivals retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1079,7 +1080,7 @@ export class GetController {
         message: 'Employee extra hours retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1107,7 +1108,7 @@ export class GetController {
         message: 'License types retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener los tipos de licencia',
@@ -1148,7 +1149,7 @@ export class GetController {
         message: 'License type retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener el tipo de licencia',
@@ -1175,7 +1176,7 @@ export class GetController {
         message: 'Training types retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener los tipos de entrenamiento',
@@ -1216,7 +1217,7 @@ export class GetController {
         message: 'Training type retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al intentar obtener el tipo de capacitación',
@@ -1316,7 +1317,7 @@ export class GetController {
         message: 'Employee family member retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Error al intentar obtener el familiar del empleado',
       });
@@ -1376,7 +1377,7 @@ export class GetController {
         message: 'Beneficiario recuperado exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Error al intentar obtener el beneficiario del seguro de vida',
       });

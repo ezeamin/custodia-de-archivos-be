@@ -1,3 +1,4 @@
+TRUNCATE TABLE public.error_logs;
 TRUNCATE TABLE public.employee_doc;
 TRUNCATE TABLE public.document_folder;
 TRUNCATE TABLE public.login;

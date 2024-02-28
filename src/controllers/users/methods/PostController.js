@@ -2,8 +2,10 @@ import HttpStatus from 'http-status-codes';
 import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../../helpers/prisma.js';
+
 import { generateFirstPassword } from '../../../helpers/helpers.js';
 import { sendNewUserMail } from '../../../helpers/mailing/newUserMail.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class PostController {
   static async createUser(req, res) {
@@ -131,7 +133,7 @@ export class PostController {
         message: 'Usuario creado exitosamente',
       });
     } catch (error) {
-      console.log('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al crear el usuario',

@@ -2,6 +2,8 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 
+import { registerError } from '../../../helpers/registering/registerError.js';
+
 export class GetController {
   static async relationships(_, res) {
     try {
@@ -21,7 +23,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error trayendo la información de los parentescos',
@@ -47,7 +49,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -83,7 +85,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error trayendo la información de los roles de los usuarios',
@@ -109,7 +111,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error trayendo la información de los géneros',
@@ -148,7 +150,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error trayendo la información de las áreas',
@@ -191,7 +193,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error trayendo la información del área',
@@ -217,7 +219,7 @@ export class GetController {
         message: 'Data retrieved successfully',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error trayendo la información de los estados civiles',

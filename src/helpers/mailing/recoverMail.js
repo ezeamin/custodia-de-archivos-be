@@ -2,6 +2,7 @@ import HttpStatus from 'http-status-codes';
 
 import { envs } from '../envs.js';
 import { transporter } from './transport.js';
+import { registerError } from '../registering/registerError.js';
 
 const recoverMailOptions = ({ user, token }) => {
   const isEmployee = !!user.id_employee;
@@ -66,7 +67,7 @@ export const sendNewUserMail = async ({
       console.log(`🟩 RECOVER MAIL SENT TO ${email} - ${user.username}`);
     });
   } catch (err) {
-    console.error('🟥', err);
+    registerError(err);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       errors: {
         data: null,

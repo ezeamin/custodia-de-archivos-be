@@ -2,6 +2,7 @@ import { prisma } from '../helpers/prisma.js';
 
 async function truncateTables() {
   await prisma.employee_doc.deleteMany();
+  await prisma.error_logs.deleteMany();
   await prisma.document_folder.deleteMany();
   await prisma.login.deleteMany();
   await prisma.training.deleteMany();

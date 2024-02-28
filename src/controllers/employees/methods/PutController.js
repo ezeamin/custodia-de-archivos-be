@@ -6,6 +6,7 @@ import { handleUpload } from '../../../helpers/cloudinary.js';
 import { formatEmployeeData } from '../../../helpers/formatters/formatEmployeeData.js';
 import { registerEmployeeUpdateChanges } from '../../../helpers/registering/registerEmployeeUpdateChanges.js';
 import { formatFamilyMemberData } from '../../../helpers/formatters/formatFamilyMemberData.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class PutController {
   // @param - employeeId
@@ -329,7 +330,7 @@ export class PutController {
         req.user.id,
       );
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -375,7 +376,7 @@ export class PutController {
       const splitUrl = url.split('/upload/');
       imageUrl = `${splitUrl[0]}/upload/w_300,h_300,c_fill,g_face/${splitUrl[1]}`;
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -428,7 +429,7 @@ export class PutController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -489,7 +490,7 @@ export class PutController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -551,7 +552,7 @@ export class PutController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -598,7 +599,7 @@ export class PutController {
         message: 'Tipo de licencia actualizado exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -645,7 +646,7 @@ export class PutController {
         message: 'Tipo de capacitación actualizado exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -871,7 +872,7 @@ export class PutController {
         employeeId: familyMemberOriginalData.id_employee,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -931,7 +932,7 @@ export class PutController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1139,7 +1140,7 @@ export class PutController {
         message: 'Beneficiario actualizado exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:

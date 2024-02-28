@@ -2,6 +2,8 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 
+import { registerError } from '../../../helpers/registering/registerError.js';
+
 export class DeleteController {
   // @param - areaId
   static async deleteArea(req, res) {
@@ -55,7 +57,7 @@ export class DeleteController {
         message: 'Área eliminada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error eliminando el área',

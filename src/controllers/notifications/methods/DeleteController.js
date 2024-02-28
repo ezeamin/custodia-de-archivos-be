@@ -2,6 +2,8 @@ import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
 
+import { registerError } from '../../../helpers/registering/registerError.js';
+
 export class DeleteController {
   // @param - typeId
   static async deleteNotificationType(req, res) {
@@ -63,7 +65,7 @@ export class DeleteController {
         message: 'Tipo de notificación eliminado exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: 'Error al eliminar el tipo de notificación',

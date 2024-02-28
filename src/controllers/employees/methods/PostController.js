@@ -6,6 +6,7 @@ import { handleUpload } from '../../../helpers/cloudinary.js';
 import { registerChange } from '../../../helpers/registering/registerChange.js';
 import { formatAddressAsString } from '../../../helpers/formatters/formatAddress.js';
 import { formatPhone, uppercaseName } from '../../../helpers/helpers.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class PostController {
   static async createEmployee(req, res) {
@@ -56,7 +57,7 @@ export class PostController {
       const splitUrl = url.split('/upload/');
       imageUrl = `${splitUrl[0]}/upload/w_300,h_300,c_fill,g_face/${splitUrl[1]}`;
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -293,7 +294,7 @@ export class PostController {
         }
       }
 
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -338,7 +339,7 @@ export class PostController {
       const { url } = await handleUpload(file, true);
       docUrl = url;
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -403,7 +404,7 @@ export class PostController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -475,7 +476,7 @@ export class PostController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -515,7 +516,7 @@ export class PostController {
         message: 'Ausencia creada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -561,7 +562,7 @@ export class PostController {
         message: 'Licencia creada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -602,7 +603,7 @@ export class PostController {
         message: 'Vacaciones creadas exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -658,7 +659,7 @@ export class PostController {
         }
       }
 
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -708,7 +709,7 @@ export class PostController {
         }
       }
 
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -749,7 +750,7 @@ export class PostController {
         message: 'Llegada tarde creada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -790,7 +791,7 @@ export class PostController {
         message: 'Hora extra creada exitosamente',
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -825,7 +826,7 @@ export class PostController {
         }
       }
 
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -860,7 +861,7 @@ export class PostController {
         }
       }
 
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -937,7 +938,7 @@ export class PostController {
         }
       }
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1131,7 +1132,7 @@ export class PostController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1176,7 +1177,7 @@ export class PostController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1251,7 +1252,7 @@ export class PostController {
         }
       }
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:
@@ -1426,7 +1427,7 @@ export class PostController {
         employeeId,
       });
     } catch (e) {
-      console.error('🟥', e);
+      registerError(e);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message:

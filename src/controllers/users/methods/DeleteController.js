@@ -1,7 +1,9 @@
 import HttpStatus from 'http-status-codes';
 
 import { prisma } from '../../../helpers/prisma.js';
+
 import { registerChange } from '../../../helpers/registering/registerChange.js';
+import { registerError } from '../../../helpers/registering/registerError.js';
 
 export class DeleteController {
   // @param userId
@@ -58,7 +60,7 @@ export class DeleteController {
         previousValue: user.id_user_type,
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al eliminar el rol del usuario`,
@@ -113,7 +115,7 @@ export class DeleteController {
         message: 'Usuario eliminado exitosamente',
       });
     } catch (error) {
-      console.error('🟥', error);
+      registerError(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         data: null,
         message: `Ocurrió un error al eliminar el usuario`,

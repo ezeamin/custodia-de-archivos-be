@@ -1,4 +1,5 @@
 import { prisma } from '../prisma.js';
+import { registerError } from './registerError.js';
 
 export const registerLogin = async (req, id_user) => {
   const {
@@ -15,6 +16,6 @@ export const registerLogin = async (req, id_user) => {
       },
     });
   } catch (e) {
-    console.error('🟥', e);
+    registerError(e);
   }
 };
