@@ -1306,6 +1306,7 @@ export class GetController {
                 description:
                   familyMember.person.address.street.locality.province.province,
               },
+              observations: familyMember.person.address.observations,
             }
           : null,
       };

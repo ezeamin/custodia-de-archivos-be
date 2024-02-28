@@ -50,6 +50,7 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
                 description:
                   beneficiary.person.address.street.locality.locality,
               },
+              observations: beneficiary.person.address.observations,
             }
           : null,
         relationship: {
@@ -84,6 +85,7 @@ export const formatEmployeeResponseData = ({ employee, family, user }) => ({
         },
         streetNumber: employee.person.address.street_number,
         apt: employee.person.address.door,
+        observations: employee.person.address.observations,
       }
     : null,
   phone: employee.person.phone ? employee.person.phone.phone_no : null,

@@ -1,0 +1,985 @@
+components:
+  schemas:
+    BasicEmployee:
+      type: object
+      properties:
+        id:
+          type: string
+        cuil:
+          type: string
+        imgSrc:
+          type: string
+        lastname:
+          type: string
+        firstname:
+          type: string
+        age:
+          type: integer
+        antiquity:
+          type: integer
+        position:
+          type: string
+        area:
+          $ref: '#/components/schemas/BasicItem'
+        fileNumber:
+          type: integer
+        driversLicenseDate:
+          oneOf:
+            - string
+            - null
+        status:
+          $ref: '#/components/schemas/BasicItem'
+    HealthInsurance:
+      type: object
+      properties:
+        name:
+          type: string
+        affiliateNumber:
+          type: string
+    PreoccupationalCheckup:
+      type: object
+      properties:
+        fit:
+          type: boolean
+        observations:
+          type: string
+    Address:
+      type: object
+      properties:
+        street:
+          $ref: '#/components/schemas/BasicItem'
+        streetNumber:
+          type: string
+        location:
+          $ref: '#/components/schemas/BasicItem'
+        state:
+          $ref: '#/components/schemas/BasicItem'
+        apt:
+          type: string
+        observations:
+          type: string
+    LifeInsurance:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        policyNumber:
+          type: string
+        beneficiaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/LifeInsuranceBeneficiary'
+    LifeInsuranceBeneficiary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        lastname:
+          type: string
+        cuil:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        relationship:
+          $ref: '#/components/schemas/BasicItem'
+        percentage:
+          type: integer
+    BasicFamilyMember:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        relationship:
+          $ref: '#/components/schemas/BasicItem'
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+    DocumentFolder:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+/api/v1/employees:
+  get:
+    tags:
+      - Employees
+    summary: Get simplified list of employees
+    description: Get simplified list of employees
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number
+      - in: query
+        name: entries
+        schema:
+          type: integer
+        description: Number of entries per page
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search query
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/BasicEmployee'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/report:
+  get:
+    tags:
+      - Employees
+    summary: Get simplified list of employees
+    description: Get simplified list of employees
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Success
+        content:
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+/api/v1/employees/{employeeId}:
+  get:
+    tags:
+      - Employees
+    summary: Get employee by id
+    description: Get employee by id
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  allOf:
+                    - $ref: '#/components/schemas/BasicEmployee'
+                    - type: object
+                      properties:
+                        birthdate:
+                          type: string
+                          format: date
+                        workingHours:
+                          type: integer
+                        healthInsurance:
+                          $ref: '#/components/schemas/HealthInsurance'
+                        preoccupationalCheckup:
+                          $ref: '#/components/schemas/PreoccupationalCheckup'
+                        lifeInsurances:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LifeInsurance'
+                        civilStatus:
+                          $ref: '#/components/schemas/BasicItem'
+                        address:
+                          $ref: '#/components/schemas/Address'
+                        phone:
+                          type: string
+                        email:
+                          type: string
+                        gender:
+                          $ref: '#/components/schemas/BasicItem'
+                        startDate:
+                          type: string
+                          format: date
+                        endDate:
+                          type: string
+                          format: date
+                        user:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                        familyMembers:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/BasicFamilyMember'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/docs:
+  get:
+    tags:
+      - Employees
+    summary: Get employee documents
+    description: Get employee documents
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DocumentFolder'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/history:
+  get:
+    tags:
+      - Employees
+    summary: Get employee changes history
+    description: Get employee changes history
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      date:
+                        type: string
+                        format: date-time
+                      field:
+                        type: string
+                      previousValue:
+                        type: string
+                      newValue:
+                        type: string
+                      user:
+                        $ref: '#/components/schemas/BasicItem'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/absences:
+  get:
+    tags:
+      - Employees
+    summary: Get employee absences
+    description: Get employee absences
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      date:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/licenses:
+  get:
+    tags:
+      - Employees
+    summary: Get employee licenses
+    description: Get employee licenses
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      startDate:
+                        type: string
+                        format: date-time
+                      endDate:
+                        type: string
+                        format: date-time
+                      type:
+                        $ref: '#/components/schemas/BasicItem'
+                      observations:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/vacations:
+  get:
+    tags:
+      - Employees
+    summary: Get employee vacations
+    description: Get employee vacations
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      startDate:
+                        type: string
+                        format: date-time
+                      endDate:
+                        type: string
+                        format: date-time
+                      observations:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/trainings:
+  get:
+    tags:
+      - Employees
+    summary: Get employee trainings
+    description: Get employee trainings
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      date:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      type:
+                        $ref: '#/components/schemas/BasicItem'
+                      observations:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/formal-warnings:
+  get:
+    tags:
+      - Employees
+    summary: Get employee formal warnings
+    description: Get employee formal warnings
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      date:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/extra-hours:
+  get:
+    tags:
+      - Employees
+    summary: Get employee extra hours
+    description: Get employee extra hours
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      date:
+                        type: string
+                        format: date-time
+                      hours:
+                        type: integer
+                      observations:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/late-arrivals:
+  get:
+    tags:
+      - Employees
+    summary: Get employee late arrivals
+    description: Get employee late arrivals
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      date:
+                        type: string
+                        format: date
+                      time:
+                        type: string
+                        format: time
+                      observations:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/family/{familyMemberId}:
+  get:
+    tags:
+      - Employees
+    summary: Get employee family member
+    description: Get employee family member
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: familyMemberId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      lastname:
+                        type: string
+                      cuil:
+                        type: string
+                      gender:
+                        $ref: '#/components/schemas/BasicItem'
+                      phone:
+                        type: string
+                      relationship:
+                        $ref: '#/components/schemas/BasicItem'
+                      address:
+                        $ref: '#/components/schemas/Address'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/life-insurances/{lifeInsuranceId}/beneficiaries/{beneficiaryId}:
+  get:
+    tags:
+      - Employees
+    summary: Get employee life insurance beneficiaries
+    description: Get employee life insurance beneficiaries
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: lifeInsuranceId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: beneficiaryId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      lastname:
+                        type: string
+                      cuil:
+                        type: string
+                      gender:
+                        $ref: '#/components/schemas/BasicItem'
+                      percentage:
+                        type: integer
+                      relationship:
+                        $ref: '#/components/schemas/BasicItem'
+                      address:
+                        $ref: '#/components/schemas/Address'
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/licenses/types:
+  get:
+    tags:
+      - Employees
+    summary: Get employee licenses types
+    description: Get employee licenses types
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      title:
+                        type: string
+                      description:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/licenses/types/{licenseTypeId}:
+  get:
+    tags:
+      - Employees
+    summary: Get employee licenses types
+    description: Get employee licenses types
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: licenseTypeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/trainings/types:
+  get:
+    tags:
+      - Employees
+    summary: Get employee trainings types
+    description: Get employee trainings types
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      title:
+                        type: string
+                      description:
+                        type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/trainings/types/{trainingTypeId}:
+  get:
+    tags:
+      - Employees
+    summary: Get employee trainings types
+    description: Get employee trainings types
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: trainingTypeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                message:
+                  type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
