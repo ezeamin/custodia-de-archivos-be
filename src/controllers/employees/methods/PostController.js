@@ -389,7 +389,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Documento creado exitosamente',
       });
@@ -461,7 +461,7 @@ export class PostController {
         });
       }
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Carpeta creada exitosamente',
       });
@@ -511,7 +511,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Ausencia creada exitosamente',
       });
@@ -557,7 +557,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Licencia creada exitosamente',
       });
@@ -598,7 +598,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Vacaciones creadas exitosamente',
       });
@@ -644,7 +644,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Capacitación creada exitosamente',
       });
@@ -694,7 +694,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Amonestación formal creada exitosamente',
       });
@@ -745,7 +745,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Llegada tarde creada exitosamente',
       });
@@ -786,7 +786,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Hora extra creada exitosamente',
       });
@@ -811,7 +811,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Tipo de licencia creado exitosamente',
       });
@@ -846,7 +846,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Tipo de capacitación creado exitosamente',
       });
@@ -1117,7 +1117,7 @@ export class PostController {
         relationshipPromise,
       ]);
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Familiar creado exitosamente',
       });
@@ -1162,7 +1162,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Seguro de vida creado exitosamente',
       });
@@ -1412,7 +1412,7 @@ export class PostController {
         },
       });
 
-      res.json({
+      res.status(HttpStatus.CREATED).json({
         data: null,
         message: 'Beneficiario creado exitosamente',
       });

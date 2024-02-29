@@ -166,6 +166,48 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+  post:
+    tags:
+      - Employees
+    summary: Create employee
+    description: Create employee
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              lastname:
+                type: string
+              birthdate:
+                type: string
+                format: date
+              startDate:
+                type: string
+                format: date
+              email:
+                type: string
+                format: email
+              cuil:
+                type: string
+              genderId:
+                type: string
+                format: guid
+              areaId:
+                type: string
+                format: guid
+              position:
+                type: string
+              fileNumber:
+                type: integer
+              imgFile:
+                type: string
+                format: binary
 /api/v1/employees/report:
   get:
     tags:
@@ -285,6 +327,85 @@ components:
                     $ref: '#/components/schemas/DocumentFolder'
                 message:
                   type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  post:
+    tags:
+      - Employees
+    summary: Create employee document
+    description: Create employee document
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              folderId:
+                type: string
+                format: guid
+              name:
+                type: string
+              file:
+                type: string
+                format: binary
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/docs/folders:
+  post:
+    tags:
+      - Employees
+    summary: Create employee document
+    description: Create employee document
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              color:
+                type: string
+    responses:
+      '201':
+        $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
       '401':
