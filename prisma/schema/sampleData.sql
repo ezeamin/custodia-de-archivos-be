@@ -1,36 +1,6 @@
-TRUNCATE TABLE public.error_logs;
-TRUNCATE TABLE public.employee_doc;
-TRUNCATE TABLE public.document_folder;
-TRUNCATE TABLE public.login;
-TRUNCATE TABLE public.training;
-TRUNCATE TABLE public.license;
-TRUNCATE TABLE public.absence;
-TRUNCATE TABLE public.vacation;
-TRUNCATE TABLE public.training_type;
-TRUNCATE TABLE public.license_type;
-TRUNCATE TABLE public.late_arrival;
-TRUNCATE TABLE public.formal_warning;
-TRUNCATE TABLE public.extra_hours;
-TRUNCATE TABLE public.employee_history;
-TRUNCATE TABLE public."user";
-TRUNCATE TABLE public.employee;
-TRUNCATE TABLE public.third_party;
-TRUNCATE TABLE public.user_type;
-TRUNCATE TABLE public.person;
-TRUNCATE TABLE public.street;
-TRUNCATE TABLE public.address;
-TRUNCATE TABLE public.province;
-TRUNCATE TABLE public.phone;
-TRUNCATE TABLE public.locality;
-TRUNCATE TABLE public.gender;
-TRUNCATE TABLE public.family;
-TRUNCATE TABLE public.family_relationship_type;
-TRUNCATE TABLE public.area;
-TRUNCATE TABLE public.notification_receiver;
-TRUNCATE TABLE public.notification_doc;
-TRUNCATE TABLE public.notification;
-TRUNCATE TABLE public.notification_type;
-TRUNCATE TABLE public.receiver_type;
+---------------------------------------------------------------
+-- INSERT DEFAULT VALUES
+---------------------------------------------------------------
 
 INSERT INTO public.gender (id_gender,gender)
 VALUES
@@ -58,10 +28,11 @@ INSERT INTO public.employee_status (id_status, "status") VALUES
   ('018d3b85-ad41-705d-b6ac-eff17a2cbb63','inactive'),
   ('018d3b85-ad41-74b8-9bd4-9f7b27b02176','deleted');
 
-INSERT INTO public.user_type (id_user_type, user_type) VALUES
-  ('32deb906-6292-4908-9cfc-02394fd4ab28','admin'),
-  ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee'),
-  ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party');
+INSERT INTO public.user_type (id_user_type, user_type, user_type_label) VALUES
+  ('32deb906-6292-4908-9cfc-02394fd4ab28','admin', 'Administrador'),
+  ('62ffb154-64a6-4b87-9486-3bb7b14a77f3','employee', 'Empleado'),
+  ('5fc9c68b-34f3-45aa-ba54-9305515b8bcb','third_party', 'Solo Lectura'),
+  ('018dd17a-2ec0-7db7-a398-c401a5817b45','area', 'Area');
 
 INSERT INTO public.family_relationship_type (id_family_relationship_type, family_relationship_type) VALUES
   ('018d4131-99a7-7301-95f5-f1851f99af92','Padre'),
@@ -107,6 +78,22 @@ VALUES (
     '17860733'
 );
 
+INSERT INTO public.notification_type (id_notification_type,title_notification,start_hour,end_hour,description_notification,can_modify)
+VALUES (
+    '018d6192-a7fd-725a-b5a3-8f667a9a53eb',
+    'Respuesta',
+    '00:00',
+    '23:59',
+    'Tipo de notificación que permite responder a otra notificación enviada. Utilizarlo solo como respuesta, y no al crear una notificación desde cero.',
+    FALSE
+);
+
+INSERT INTO public.notification_allowed_role (id_notification_allowed_role,id_notification_type,id_user_type)
+VALUES 
+    ('018d61a4-9f1e-7188-8d62-35a1d3399e22','018d6192-a7fd-725a-b5a3-8f667a9a53eb','32deb906-6292-4908-9cfc-02394fd4ab28'),
+    ('018d61a4-9f1e-7188-8d62-35a1d3399e23','018d6192-a7fd-725a-b5a3-8f667a9a53eb','62ffb154-64a6-4b87-9486-3bb7b14a77f3'),
+    ('018de5cd-b236-71f1-8b9a-3c85ed683cec','018d6192-a7fd-725a-b5a3-8f667a9a53eb','018dd17a-2ec0-7db7-a398-c401a5817b45');
+
 -- Insert example employee
 INSERT INTO public.employee (id_employee,id_person,id_status,id_area,no_file,email,employment_date,position,working_hours,picture_url)
 VALUES (
@@ -120,6 +107,14 @@ VALUES (
     'Programador',
     8,
     'https://res.cloudinary.com/dr5ac8e1c/raw/upload/w_300,h_300,c_fill,g_face/v1706054063/img_2267-2.jpg'
+);
+
+INSERT INTO public.family_member (id_family_member, id_person, id_employee, id_relationship_type)
+VALUES (
+    '018d644d-08e5-746c-81fb-8d317e387126',
+    '018d3b85-ad41-7129-b181-0f1fc7c71234',
+    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
+    '018d4131-99a7-7301-95f5-f1851f99af92'
 );
 
 -- Insert default admin user
@@ -141,12 +136,4 @@ VALUES (
     'Creación de Empleado',
     NULL,
     to_jsonb(now())
-);
-
-INSERT INTO public.family_member (id_family_member,id_person,id_employee,id_relationship_type)
-VALUES (
-    '018d5a99-9686-7b77-b151-eb3cfaefd72c',
-    '018d3b85-ad41-7129-b181-0f1fc7c71234',
-    '018d3b85-ad41-7cca-94c9-0cf50325d9a4',
-    '018d4131-99a7-7301-95f5-f1851f99af92'
 );

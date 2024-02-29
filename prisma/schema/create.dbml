@@ -260,7 +260,7 @@ Table "user" {
   "id_employee" UUID
   "id_third_party" UUID
   "id_area" UUID
-  "username" varchar(8) [unique, not null]
+  "username" varchar(11) [unique, not null]
   "password" varchar(100) [not null]
   "has_changed_def_pass" boolean [not null, default: false]
   "user_isactive" boolean [not null, default: true]
