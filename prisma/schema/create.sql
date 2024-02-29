@@ -228,7 +228,7 @@ CREATE TABLE public."user" (
     id_employee          UUID ,
     id_third_party       UUID ,
     id_area              UUID ,
-    username             varchar(8) NOT NULL UNIQUE,
+    username             varchar(11) NOT NULL UNIQUE,
     "password"           varchar(100) NOT NULL,
     has_changed_def_pass boolean DEFAULT false NOT NULL,
     user_isactive        boolean DEFAULT true NOT NULL,
