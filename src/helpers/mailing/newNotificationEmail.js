@@ -40,6 +40,7 @@ export const sendNewNotificationMail = async ({
           `🟥 NOTIFICATION MAIL FAILED FOR ${email} - ${username} - Not. ${notificationId}:`,
           err,
         );
+        registerError(err);
         return;
       }
 

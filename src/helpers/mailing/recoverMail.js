@@ -51,11 +51,10 @@ export const sendNewUserMail = async ({
           err,
         );
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          errors: {
-            data: null,
-            message: `Error generando mail`,
-          },
+          data: null,
+          message: `Error generando mail`,
         });
+        registerError(err);
         return;
       }
 

@@ -3,9 +3,10 @@ import { registerError } from '../registering/registerError.js';
 import { transporter } from './transport.js';
 
 const frontendUrl = envs.CLIENT_URL;
+const user = envs.MAIL.USER;
 
 const newUserMail = ({ name, email, username, password }) => ({
-  from: envs.MAIL.USER,
+  from: user,
   to: email,
   subject: 'Creación de usuario - Custodia de Archivos',
   html: `
@@ -40,6 +41,7 @@ export const sendNewUserMail = async ({ name, email, username, password }) => {
           `🟥 USER CREATION MAIL FAILED FOR ${email} - ${username}:`,
           err,
         );
+        registerError(err);
         return;
       }
 
