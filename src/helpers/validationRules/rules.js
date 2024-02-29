@@ -6,14 +6,14 @@ export const usernameRules = () =>
     .required()
     .trim()
     .min(7)
-    .max(8)
-    .regex(/^[1-9]\d{6,7}$/)
+    .max(11)
+    .regex(/^[1-9]\d{7,11}$/)
     .messages({
       'string.empty': 'El campo "nombre de usuario" no puede estar vacio',
       'string.min':
         'El campo "nombre de usuario" debe tener al menos 7 caracteres',
       'string.max':
-        'El campo "nombre de usuario" debe tener maximo 8 caracteres',
+        'El campo "nombre de usuario" debe tener máximo 11 caracteres',
       'string.pattern.base':
         'El campo "nombre de usuario" debe ser un CUIL válido. No puede empezar por 0',
       'any.required': 'El campo "nombre de usuario" es obligatorio',
