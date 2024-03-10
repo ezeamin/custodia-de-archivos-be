@@ -1103,49 +1103,49 @@ components:
       content:
         application/json:
           schema:
-              type: object
-              properties:
-                  name:
+            type: object
+            properties:
+              name:
+                type: string
+              lastname:
+                type: string
+              cuil:
+                type: string
+              birthdate:
+                type: string
+                format: date
+              relationshipId:
+                type: string
+                format: guid
+              genderId:
+                type: string
+                format: guid
+              phone:
+                type: string
+              force:
+                type: boolean
+              street:
+                type: string
+              streetNumber:
+                type: string
+              locality:
+                type: object
+                properties:
+                  id:
                     type: string
-                  lastname:
+                  description:
                     type: string
-                  cuil:
+              state:
+                type: object
+                properties:
+                  id:
                     type: string
-                  birthdate:
+                  description:
                     type: string
-                    format: date
-                  relationshipId:
-                    type: string
-                    format: guid
-                  genderId:
-                    type: string
-                    format: guid
-                  phone:
-                    type: string
-                  force:
-                    type: boolean
-                  street:
-                    type: string
-                  streetNumber:
-                    type: string
-                  locality:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      description:
-                        type: string
-                  state:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      description:
-                        type: string
-                  apt:
-                    type: string
-                  addressObservations:
-                    type: string
+              apt:
+                type: string
+              addressObservations:
+                type: string
     responses:
       '201':
         $ref: '#/components/responses/EmptySuccess'
