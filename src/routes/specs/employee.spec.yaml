@@ -300,6 +300,70 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Employees
+    summary: Update employee
+    description: Update employee
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            # Pending to define
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/image:
+  put:
+    tags:
+      - Employees
+    summary: Update employee image
+    description: Update employee image
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              imgFile:
+                type: string
+                format: binary
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/docs:
   get:
     tags:
@@ -378,6 +442,78 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/docs/{docId}:
+  put:
+    tags:
+      - Employees
+    summary: Update employee document name
+    description: Update employee document name
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee document
+    description: Delete employee document
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: docId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/docs/folders:
   post:
     tags:
@@ -405,6 +541,80 @@ components:
                 type: string
     responses:
       '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/docs/folders/{folderId}:
+  put:
+    tags:
+      - Employees
+    summary: Update employee document folder
+    description: Update employee document folder
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              color:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee document folder
+    description: Delete employee document folder
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: folderId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
         $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
@@ -550,6 +760,38 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/absences/{absenceId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee absence
+    description: Delete employee absence
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: absenceId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/licenses:
   get:
     tags:
@@ -644,6 +886,38 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/licenses/{licenseId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee license
+    description: Delete employee license
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: licenseId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/vacations:
   get:
     tags:
@@ -722,6 +996,38 @@ components:
                 type: string
     responses:
       '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/vacations/{vacationId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee vacation
+    description: Delete employee vacation
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: vacationId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
         $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
@@ -825,6 +1131,38 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/trainings/{trainingId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee training
+    description: Delete employee training
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: trainingId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/formal-warnings:
   get:
     tags:
@@ -897,6 +1235,38 @@ components:
                 type: string
     responses:
       '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/formal-warnings/{formalWarningId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee formal warning
+    description: Delete employee formal warning
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: formalWarningId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
         $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
@@ -995,6 +1365,38 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/extra-hours/{extraHoursId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee extra hours
+    description: Delete employee extra hours
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: extraHoursId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/late-arrivals:
   get:
     tags:
@@ -1073,6 +1475,38 @@ components:
                 type: string
     responses:
       '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/late-arrivals/{lateArrivalId}:
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee late arrival
+    description: Delete employee late arrival
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: lateArrivalId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
         $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
@@ -1218,6 +1652,116 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Employees
+    summary: Update employee family member
+    description: Update employee family member
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: familyMemberId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              lastname:
+                type: string
+              cuil:
+                type: string
+              birthdate:
+                type: string
+                format: date
+              relationshipId:
+                type: string
+                format: guid
+              genderId:
+                type: string
+                format: guid
+              phone:
+                type: string
+              # force: - SHOULD BE SENT, same as POST
+              #   type: boolean
+              street:
+                type: string
+              streetNumber:
+                type: string
+              locality:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  description:
+                    type: string
+              state:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  description:
+                    type: string
+              apt:
+                type: string
+              addressObservations:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee family member
+    description: Delete employee family member
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: familyMemberId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/{employeeId}/life-insurances:
   post:
     tags:
@@ -1245,6 +1789,80 @@ components:
                 type: string
     responses:
       '201':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+/api/v1/employees/{employeeId}/life-insurances/{lifeInsuranceId}:
+  put:
+    tags:
+      - Employees
+    summary: Update employee life insurance
+    description: Update employee life insurance
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: lifeInsuranceId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              policyNumber:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee life insurance
+    description: Delete employee life insurance
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: lifeInsuranceId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
         $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
@@ -1397,6 +2015,126 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Employees
+    summary: Update employee life insurance beneficiary
+    description: Update employee life insurance beneficiary
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: lifeInsuranceId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: beneficiaryId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              lastname:
+                type: string
+              cuil:
+                type: string
+              birthdate:
+                type: string
+                format: date
+              relationshipId:
+                type: string
+                format: guid
+              genderId:
+                type: string
+                format: guid
+              street:
+                type: string
+              streetNumber:
+                type: string
+              locality:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  description:
+                    type: string
+              state:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  description:
+                    type: string
+              apt:
+                type: string
+              addressObservations:
+                type: string
+              percentage:
+                type: integer
+              # force: - SHOULD BE SENT, same as POST
+              #   type: boolean
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee life insurance beneficiary
+    description: Delete employee life insurance beneficiary
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: lifeInsuranceId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: beneficiaryId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/licenses/types:
   get:
     tags:
@@ -1525,6 +2263,79 @@ components:
         $ref: '#/components/responses/NotFound'
       '500':
         $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Employees
+    summary: Update employee license type
+    description: Update employee license type
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: licenseTypeId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee license type
+    description: Delete employee license type
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: licenseTypeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
 /api/v1/employees/trainings/types:
   get:
     tags:
@@ -1643,6 +2454,79 @@ components:
                       type: string
                 message:
                   type: string
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  put:
+    tags:
+      - Employees
+    summary: Update employee training type
+    description: Update employee training type
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: trainingTypeId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
+      '400':
+        $ref: '#/components/responses/BadRequest'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalServerError'
+  delete:
+    tags:
+      - Employees
+    summary: Delete employee training type
+    description: Delete employee training type
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: trainingTypeId
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/EmptySuccess'
       '400':
         $ref: '#/components/responses/BadRequest'
       '401':
