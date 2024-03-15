@@ -18,7 +18,7 @@ export const generateFirstPassword = () => {
 export const generateRandomUsername = () => {
   // 11 digits long - only numbers
   const username = Math.floor(10000000000 + Math.random() * 90000000000);
-  return username.toString();
+  return username.toString().padStart(11, '0');
 };
 
 export const uppercaseName = (name) => {

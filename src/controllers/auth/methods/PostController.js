@@ -44,7 +44,7 @@ export class PostController {
       // b. incorrect password (we compare them using bcrypt)
       if (
         !userInDB ||
-        !bcrypt.compareSync(password, userInDB.password.trim())
+        !bcrypt.compareSync(password.trim(), userInDB.password.trim())
       ) {
         res.status(HttpStatus.UNAUTHORIZED).json({
           data: null,
